@@ -1,0 +1,170 @@
+body {
+    background: slategrey;
+}
+
+hr {
+    border-top: 2px solid black;
+}
+
+#hooks {
+    margin-top: 10px;
+}
+
+.page-label {
+    margin-top: 5px;
+}
+
+.page-data {
+    margin-left: 15px;
+}
+
+#save,
+#file-list {
+    margin-top: 10px;
+}
+
+#pd-header {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 110%;
+}
+
+.header-size {
+    margin: 10px 20px 0 0;
+}
+
+.page-label {
+    text-align: right;
+}
+
+.btn-rb-add {
+    margin: 10px;
+}
+
+.load-btn-row {
+    margin-top: 10px;
+    background: black;
+    color: white;
+    border: red 1px solid;
+}
+
+.paragraph-text-area {
+    margin-top: 20px;
+}
+
+#msg {
+    margin-top: 10px;
+    color: white;
+    font-size: 130%;
+    font-weight: bold;
+}
+
+.btn-row {
+    margin-top: 10px;
+}
+
+.export-page-btn {
+    margin-top: 30px;
+}
+
+.right-justify {
+    text-align: right;
+}
+
+.button {
+    border-radius: 15%;
+    border: white 1px solid;
+}
+
+#json-output,
+#page-output {
+    background: silver;
+}
+
+.header {
+    background: silver;
+    text-align: center;
+    border: black 2px solid;
+    padding: 10px 0 10px 0;
+    font-size: 150%;
+    font-weight: bolder;
+}
+
+.page-details {
+    margin: 20px;
+    border: black 2px solid;
+    font-weight: bold;
+    padding-bottom: 20px;
+}
+
+#fields {
+    margin: 20px;
+    border: black 2px solid;
+    font-weight: bold;
+    border-radius: 1%;
+}
+
+.field,
+.show-line {
+    padding: 10px 1px 10px 20px;
+    background: lightgrey;
+    border: 2px solid black;
+    font-size: 90%;
+    border-radius: 5%;
+}
+
+.field-type {
+    padding-top: 6px;
+    border: 2px red solid;
+    background: black;
+    color: white;
+    text-align: center;
+    font-size: 90%;
+}
+
+#top-parts {
+    margin-top: 12px;
+    padding: 2px;
+    background: white;
+    border: red 2px solid;
+    font-size: 80%;
+    ;
+}
+
+.fa {
+    margin: 5px 15px 0 0;
+    background: black;
+    color: white;
+    padding: 5px;
+    font-size: 20px
+}
+
+.radio-button-group,
+.bullets-bullet {
+    border: 1px black solid;
+    margin-bottom: 2px;
+}
+
+.inline {
+    font-size: 130%;
+    border: black 1px solid;
+    margin: 10px;
+}
+
+.delete-btn {
+    margin-right: 20px;
+}
+
+.btn-hide:after {
+    content: "Hide";
+}
+
+.btn-hide.collapsed:after {
+    content: "Show";
+}
+
+#export {
+    margin: 15px;
+    font-weight: bolder;
+    font-size: 100%;
+}
