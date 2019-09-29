@@ -1,11 +1,11 @@
 'use strict'
 
-const buildInputRow = (label, name, button, btnID, size = 80) => {
+const buildInputRow = (label, name, button, btnID, size = 60) => {
     let row = `<div class="row" id="${name}"><div class="col-md-2 right-justify">`;
     row += label + `</div><div class="col"><input type="text" id="${name}-value" `;
     if (button) {
         row += `size="${size}"></div>
-              <div class="col-md-1">
+              <div class="col-md-2">
                 <button class="button btn-primary btn-sm btn-block" id="${btnID}">
                   ${button}
                 </button>
@@ -37,7 +37,7 @@ const buildTopOfField = (prefix, fieldType, type) => {
     top += `</div>`
     top += `<div class="col-md-1">Header:</div>`
     top += `<div class="col" id="${prefix}-text-form-header">`
-    top += `<input type="text" id="${prefix}-text-header-value" size="80" />`
+    top += `<input type="text" id="${prefix}-text-header-value" size="60" />`
     top += `</div>`
     top += `</div>` // end of row
 
@@ -46,9 +46,9 @@ const buildTopOfField = (prefix, fieldType, type) => {
     top += `</div>`
     top += `<div class="col-md-1">Hint:</div>`
     top += `<div class="col" id="${prefix}-text-form-hint">`
-    top += `<input type="text" id="${prefix}-text-hint-value" size="80" />`
+    top += `<input type="text" id="${prefix}-text-hint-value" size="60" />`
     top += `</div>`
-    top += `<div class="col-md-1">`
+    top += `<div class="col-md2">`
     top += `<button class="${BTN} delete-btn" id="${prefix}-delete-btn">Delete</button>`
     top += `</div>`
     top += `<div class="col-md-1"></div>`
