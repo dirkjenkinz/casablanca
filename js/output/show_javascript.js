@@ -7,7 +7,8 @@ const showJavaScript = (casa) => {
     $(".page-neutral").show();
     $("#page-output").remove();
     let javaScript = buildJavaScript(casa)
-    $(".page-build").append(`<textarea id="page-output" cols="140" rows="30">${javaScript}</textarea>`);
+    $(".page-build").append(`<textarea id="page-output" cols="100" rows="30">${javaScript}</textarea>`);
+    window.scrollTo(0, 0); 
 }
 
 const buildJavaScript = (casa) => {

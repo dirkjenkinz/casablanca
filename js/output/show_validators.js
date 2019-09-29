@@ -7,7 +7,8 @@ const showValidators = (casa) => {
   $(".page-neutral").show();
   $("#page-output").remove();
   let validators = buildValidators(casa)
-  $(".page-build").append(`<textarea id="page-output" cols="140" rows="30">${validators}</textarea>`);
+  $(".page-build").append(`<textarea id="page-output" cols="100" rows="30">${validators}</textarea>`);
+  window.scrollTo(0, 0); 
 }
 
 const buildValidators = (casa) => {

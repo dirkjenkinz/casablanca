@@ -7,7 +7,8 @@ const showJSON = (casa) => {
   $('.page-neutral').show();
   $('#json-output').remove();
   let json = buildJSON(casa);
-  $('.json-build').append(`<textarea id="json-output" cols="140" rows="30">${json}</textarea>`);
+  $('.json-build').append(`<textarea id="json-output" cols="100" rows="30">${json}</textarea>`);
+  window.scrollTo(0, 0); 
 }
 
 const buildJSON = (casa) => {

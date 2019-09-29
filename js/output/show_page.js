@@ -7,7 +7,8 @@ const showPage = (casa, topPart) => {
   $(".page-neutral").show();
   $("#page-output").remove();
   let page = buildPage(casa, topPart);
-  $(".page-build").append(`<textarea id="page-output" cols="140" rows="30">${page}</textarea>`);
+  $(".page-build").append(`<textarea id="page-output" cols="100" rows="30">${page}</textarea>`);
+  window.scrollTo(0, 0); 
 }
 
 const buildPage = (casa) => {
