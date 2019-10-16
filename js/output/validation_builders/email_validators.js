@@ -1,19 +1,19 @@
 'use strict'
 
-const email_validators = (pageName, data) => {
-    let messages = `
-    ${data}: sf([
+const email_validators = (pageName, tag) => {
+    let validators = `
+    ${tag}: sf([
     r.required.bind({
       errorMsg: {
-        'inline': '${pageName}:${data}.validation.inline',
-        'summary': '${pageName}:${data}.validation.summary'
+        'inline': '${pageName}:${tag}.validation.inline',
+        'summary': '${pageName}:${tag}.validation.summary'
       }
     }),
     r.inArray.bind({
       source: ['Yes', 'No'],
       errorMsg: {
-        'inline': '${pageName}:${data}.inArray.inline',
-        'summary': '${pageName}:${data}.inArray.summary'
+        'inline': '${pageName}:${tag}.inArray.inline',
+        'summary': '${pageName}:${tag}.inArray.summary'
       }
     })
   ]),
@@ -30,8 +30,8 @@ const email_validators = (pageName, data) => {
         summary: '${pageName}:emailDetails.emailAddress.validation.notifyEmailValidation.summary'
       }
     })
-  ], (formData) => {
-    return formData.${data} === 'Yes';
+  ], (formtag) => {
+    return formtag.${tag} === 'Yes';
   }),
   confirmEmailAddress: sf([
     emailValidator.bind({
@@ -40,7 +40,11 @@ const email_validators = (pageName, data) => {
         summary: '${pageName}:emailDetails.confirmEmailAddress.validation.match.summary'
       }
     })
-  })
-};`
-    return messages;
+  ], (formtag) => {
+    return formtag.emailConfirmationWanted === 'Yes';
+  }),`
+
+    return validators;
 }
+
+module.exports = email_validators;

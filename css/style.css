@@ -3,15 +3,45 @@ body {
 }
 
 hr {
-    border-top: 2px solid black;
+    border-top: 4px double black;
+}
+
+.btn-select {
+    border: 2px white double;
 }
 
 #hooks {
     margin-top: 10px;
 }
 
+.element-tag {
+    color: white;
+    margin: 5px 0 5px 30px;
+    ;
+}
+
+.arrow {
+    margin-top: 4px;
+}
+
+.selected,
+.selected:hover {
+    color: black;
+    background: red;
+}
+
+.btn-dark {
+    margin-left: 16px;
+}
+
 .page-label {
     margin-top: 5px;
+}
+
+.element-row {
+    margin-bottom: 10px;
+    background: black;
+    padding: 0 10px 0 5px;
 }
 
 .page-data {
@@ -41,11 +71,15 @@ hr {
     margin: 10px;
 }
 
+.del-file-btn {
+    background: red;
+}
+
 .load-btn-row {
     margin-top: 10px;
     background: black;
     color: white;
-    border: red 1px solid;
+    border: red 2px double;
 }
 
 .paragraph-text-area {
@@ -59,10 +93,6 @@ hr {
     font-weight: bold;
 }
 
-.btn-row {
-    margin-top: 10px;
-}
-
 .export-page-btn {
     margin-top: 30px;
 }
@@ -72,8 +102,8 @@ hr {
 }
 
 .button {
-    border-radius: 15%;
-    border: white 1px solid;
+    border-radius: 3%;
+    border: white 2px double;
 }
 
 #json-output,
@@ -84,51 +114,78 @@ hr {
 .header {
     background: silver;
     text-align: center;
-    border: black 2px solid;
+    border: black 2px double;
     padding: 10px 0 10px 0;
     font-size: 150%;
     font-weight: bolder;
 }
 
 .page-details {
-    margin: 20px;
-    border: black 2px solid;
+    margin: 20px 0 0 10px;
+    border: white 4px double;
     font-weight: bold;
     padding-bottom: 20px;
+    border-radius: 3%;
 }
 
-#fields {
-    margin: 20px;
-    border: black 2px solid;
+#top-tab-content {
+    margin: 20px 0 0 0;
+    background: black;
+    color: white;
+    border: white 4px double;
+    font-size: 80%;
+    border-radius: 3%;
+    padding: 10px 20px 10px 30px;
+}
+
+#page-tab-content {
+    background: black;
+    color: white;
+    margin: 20px 0 0 0;
+    border: black 4px double;
     font-weight: bold;
-    border-radius: 1%;
+    border-radius: 3%;
+    padding-left: 30px;
+}
+
+#fields-tab-content,
+#fields {
+    background: silver;
+    margin: 20px 0 0 0;
+    border: black 4px double;
+    font-weight: bold;
+    border-radius: 3%;
+}
+
+#summary {
+    margin-top: 20px;
+    padding: 0 15px 0 10px;
+    border: black 4px double;
+    font-weight: bold;
+    border-radius: 3%;
+    background: silver;
 }
 
 .field,
 .show-line {
     padding: 10px 1px 10px 20px;
     background: lightgrey;
-    border: 2px solid black;
+    border: 4px double black;
     font-size: 90%;
-    border-radius: 5%;
+    border-radius: 3%;
+}
+
+.field-button {
+    font-size: 80%;
+    margin-bottom: 8px;
 }
 
 .field-type {
     padding-top: 6px;
-    border: 2px red solid;
+    border: 4px red double;
     background: black;
     color: white;
     text-align: center;
-    font-size: 90%;
-}
-
-#top-parts {
-    margin-top: 12px;
-    padding: 2px;
-    background: white;
-    border: red 2px solid;
-    font-size: 80%;
-    ;
 }
 
 .fa {
@@ -140,19 +197,26 @@ hr {
 }
 
 .radio-button-group,
+.checkbox-array-group,
 .bullets-bullet {
-    border: 1px black solid;
+    border: 2px black double;
     margin-bottom: 2px;
+}
+
+.btn-value {
+    margin-top: 8px;
 }
 
 .inline {
     font-size: 130%;
-    border: black 1px solid;
+    border: black 2px double;
     margin: 10px;
 }
 
 .delete-btn {
-    margin-right: 20px;
+    border: black 4px double;
+    padding-left: 5px;
+    font-size: 80%;
 }
 
 .btn-hide:after {
@@ -167,4 +231,52 @@ hr {
     margin: 15px;
     font-weight: bolder;
     font-size: 100%;
+}
+
+.tab {
+    overflow: hidden;
+    border: 4px solid black;
+    background-color: red;
+}
+
+.tab button {
+    background-color: grey;
+    float: left;
+    border: 1px solid black;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    border-radius: 10%;
+}
+
+.tab button:hover {
+    background-color: lightblue;
+}
+
+
+/* Create an active/current tablink class */
+
+.tab button.active {
+    background-color: #ccc;
+}
+
+
+/* Style the tab content */
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
+}
+
+.replace-row {
+    text-align: left;
+    border: black 1px solid;
+    margin: 0 20px 0 20px;
+}
+
+.rep-btn-add {
+  margin: 10px 0 0 0; 
 }

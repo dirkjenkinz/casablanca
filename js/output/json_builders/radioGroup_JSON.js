@@ -1,48 +1,50 @@
 'use strict'
 
-const radioGroup_JSON = (f) => {
+const radioGroup_JSON = (field) => {
+  let tag = field.tag;
+  let answers = buildAnswers(field.buttons);
+  let validation = buildValidation(field.header);
+  let header = field.header;
+  let hint = field["text-hint"];
 
-    let question = f["text-form-data"];
-    let answers = buildAnswers(f.buttons);
-    let validation = buildValidation(f["text-header"]);
-    let header = f["text-header"];
-    let hint = f["text-hint"];
+  let json = `"${tag}": {\n`;
+  json += `"header": "${header}",\n`;
 
-    let messages = `  "${question}": {
-        "header": "${header}",
-        "hint": "${hint}",
-        "answers": {
-            ${answers}},
-        "validation": {
-            ${validation}
-        }
-    },`
-    return messages;
+  if (hint !== "") {
+    json += `"hint": "${hint}",\n`;
+  };
+
+  json += `"answers": {\n`;
+  json += `${answers}},\n`;
+  json += `"validation": {\n`;
+  json += `${validation}\n`;
+  json += `}\n`
+  json += `},\n`
+  return json;
 }
 
-	
 const buildAnswers = buttons => {
   let answers = "";
-    for (let i = 0; i < buttons.length; i = i + 2) {
-        if (i === buttons.length - 2){
-          answers += `"${buttons[i + 1]}":"${buttons[i]}"\n`
-        } else {
-          answers += `"${buttons[i + 1]}":"${buttons[i]}",\n`
-        }
+  for (let i = 0; i < buttons.length; i++) {
+    if (i === buttons.length - 1) {
+      answers += `"${buttons[i][1]}":"${buttons[i][0]}"\n`;
+    } else {
+      answers += `"${buttons[i][1]}":"${buttons[i][0]}",\n`;
     }
-
-    return answers;
+  }
+  return answers;
 }
 
 const buildValidation = header => {
-    let validation = ` "mandatory": {
-                "inline": "You must complete this section",
-                "summary": "${header} - You must complete this section"
-              },
-                "inArray": {
-                "inline": "Invalid value",
-            "summary": "${header} - Invalid value"
-            }`
-
-    return validation;
+  let validation = `"mandatory": {\n`;
+  validation += `"inline": "You must complete this section",\n`
+  validation += `"summary": "${header} - You must complete this section"\n`;
+  validation += `},\n`;
+  validation += `"inArray": {\n`;
+  validation += `"inline": "Invalid value",\n`;
+  validation += `"summary": "${header} - Invalid value"\n`;
+  validation += `}`;
+  return validation;
 }
+
+module.exports = radioGroup_JSON;

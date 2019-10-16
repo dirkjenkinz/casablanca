@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="./css/style.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+    <script src="http://cdn.jsdelivr.net/g/filesaver.js"></script>
 </head>
 
 <body>
@@ -17,7 +19,7 @@
             <div class="page-neutral col-md-3">
                 <div class="row">
                     <div class=col>
-                        <br /><br />
+                        <br><br>
                         <button class="button btn-sm btn-danger btn-block field-button" id="return-to-build">Return to
               Build</button>
                     </div>
@@ -29,9 +31,6 @@
                 <div id="file-display"></div>
                 <div id="main-display">
                     <div class="row">
-                        <div class="col" id="pd-header">
-                            Page Details
-                        </div>
                         <div class=col>
                             <button class="button btn-sm btn-danger field-button btn-block" id="save">Save</button>
                         </div>
@@ -41,87 +40,167 @@
                     </div>
                     <!--end of row -->
                     <hr />
-                    <div class="page-data">
+                    <!-- Tab links -->
+                    <div class="tab">
+                        <button class="tablinks" id="defaultOpen" onclick="selectTab(event, 'page-tab-content')">Page</button>
+                        <button class="tablinks" onclick="selectTab(event, 'fields-tab-content')">Fields<br></button>
+                        <button class="tablinks" onclick="selectTab(event, 'top-tab-content')">Top</button>
+                        <button class="tablinks" onclick="selectTab(event, 'help-tab-content')">Help</button>
+                    </div>
+
+                    <!-- Tab content -->
+                    <div id="top-tab-content" class="tabcontent page-data">
+                        <div class="row" id="top-parts">
+                        </div>
+                    </div>
+
+                    <!-- Tab content -->
+                    <div id="help-tab-content" class="tabcontent">
+                        Coming soon...
+                        <img src="images/casablanca.jpeg" alt="casablanca" width="320px" />
+                    </div>
+
+                    <!-- Tab content -->
+                    <div id="page-tab-content" class="tabcontent page-data">
                         <div class="row page-label">Folder</div>
                         <div class="row"><input type="text" id="folder" size="30"></div>
                         <div class="row page-label">Page Name</div>
                         <div class="row"><input type="text" id="page-name" size="30"></div>
                         <div class="row page-label">Page Header</div>
                         <div class="row"><input type="text" id="page-header" size="30"></div>
+
+                        <div class="row" id="hooks">
+                            <div class="col">
+                                <input type="checkbox" id="prevalidate">&nbsp;Prevalidate</input>
+                            </div>
+                            <div class="col">
+                                <input type="checkbox" id="postvalidate">&nbsp;Postvalidate</input>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="row" id="hooks">
-                        <div class="col">
-                            <input type="checkbox" id="prevalidate">&nbsp;Prevalidate</input>
-                        </div>
-                        <div class="col">
-                            <input type="checkbox" id="postvalidate">&nbsp;Postvalidate</input>
-                        </div>
-                    </div>
-                    <!-- end of row -->
+                    <!-- Tab content -->
+                    <div id="fields-tab-content" class="tabcontent">
 
-                    <hr>
-                    <div class="row btn-row">
-                        <div class="col">
-                            <button class="button btn-sm btn-primary btn-block field-button" id="fragment">Code Fragment</button>
+                        <div class="row btn-row">
+                            <div class="col">
+                                <button class="button btn-sm btn-danger btn-block field-button" id="if">If</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-danger btn-block field-button" id="else">Else</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-danger btn-block field-button" id="elseif">Else If</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-danger btn-block field-button" id="endif">End If</button>
+                            </div>
                         </div>
-                        <div class="col">
-                            <button class="button btn-sm btn-primary btn-block field-button" id="phone">Phone Number</button>
-                        </div>
-                    </div>
-                    <!-- end of btn-row -->
-                    <div class="row btn-row">
-                        <div class="col">
-                            <button class="button btn-sm btn-primary btn-block field-button" id="date">Date</button>
-                        </div>
-                        <div class="col">
-                            <button class="button btn-sm btn-primary btn-block field-button" id="email">Email Address</button>
-                        </div>
-                    </div>
-                    <!-- end of btn-row-->
-                    <div class="row btn-row">
-                        <div class="col">
-                            <button class="button btn-sm btn-primary btn-block field-button" id="address">Address</button>
-                        </div>
-                        <div class="col">
-                            <button class="button btn-sm btn-primary btn-block field-button" id="name">Name</button>
-                        </div>
-                    </div>
-                    <!-- end of btn-row -->
-                    <div class="row btn-row">
-                        <div class="col">
-                            <button class="button btn-sm btn-primary btn-block field-button" id="nino">NINO</button>
-                        </div>
-                        <div class="col">
-                            <button class="button btn-sm btn-primary btn-block field-button" id="radio_group">Radio Group</button>
-                        </div>
-                    </div>
-                    <!-- end of btn-row -->
-                    <div class="row btn-row">
-                        <div class=" col">
-                            <button class="button btn-sm btn-primary btn-block field-button" id="paragraph">Paragraph</button>
-                        </div>
-                        <div class="col">
-                            <button class="button btn-sm btn-primary btn-block field-button" id="header">Header</button>
-                        </div>
-                    </div>
-                    <!-- end of button row-->
 
-                    <div id="top-parts"></div>
+                        <div class="row btn-row">
+                            <div class="col">
+                                <button class="button btn-sm btn-secondary btn-block field-button" id="begin-hidden">Begin Hidden
+                  Field</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-secondary btn-block field-button" id="end-hidden">End Hidden
+                  Field</button>
+                            </div>
+                        </div>
+
+
+                        <div class="row btn-row">
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="address">Address</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="checkbox-array">Check
+                  Boxes</button>
+                            </div>
+                        </div>
+
+                        <div class="row btn-row">
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="fragment">Code Fragment</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="date">Date</button>
+                            </div>
+                        </div>
+
+                        <div class="row btn-row">
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="email">Email</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="errorSummary">Error
+                  Summary</button>
+                            </div>
+                        </div>
+
+
+                        <div class="row btn-row">
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="header">Header</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="name">Name</button>
+                            </div>
+                        </div>
+
+                        <div class="row btn-row">
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="nino">NINO</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="paragraph">Paragraph</button>
+                            </div>
+                        </div>
+                        <!-- end of btn-row -->
+
+                        <div class="row btn-row">
+                            <div class=" col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="phone">Phone</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="radio-group">Radio Group</button>
+                            </div>
+                        </div>
+
+                        <div class="row btn-row">
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="textInput">Text Input</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-primary btn-block field-button" id="top-part">Top Part</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col">Output dividers:</div>
+                    </div>
                     <div class="row">
                         <div class="col">
-                            <br />
-                            <button class="button btn-sm btn-danger btn-block field-button" id="show-page">Show Page</button>
-                            <br />
-                            <button class="button btn-sm btn-danger btn-block field-button" id="show-validators">Show
-              Validators</button>
+                            <input type="checkbox" id="divide-page">&nbsp;Page</input>
                         </div>
                         <div class="col">
-                            <br />
-                            <button class="button btn-sm btn-danger btn-block field-button" id="show-json">Show JSON</button>
-                            <br />
-                            <button class="button btn-sm btn-danger btn-block field-button" id="show-javascript">Show
-              JavaScript</button>
+                            <input type="checkbox" id="divide-JSON">&nbsp;JSON</input>
+                        </div>
+                        <div class="col">
+                            <input type="checkbox" id="divide-validators">&nbsp;Validators</input>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col">
+                            <button class="button btn-sm btn-danger btn-block field-button" id="show-page">Page</button>
+                            <button class="button btn-sm btn-danger btn-block field-button" id="show-validators">Validators</button>
+                        </div>
+                        <div class="col">
+                            <button class="button btn-sm btn-danger btn-block field-button" id="show-json">JSON</button>
+                            <button class="button btn-sm btn-danger btn-block field-button" id="show-javascript">JavaScript</button>
                         </div>
                     </div>
                     <!-- end of row-->
@@ -129,21 +208,30 @@
                     <div class="row">
                         <button class="button btn-sm btn-danger btn-block field-button" id="export">EXPORT</button>
                     </div>
-
                     <div class="row">
-                        <div class="col">
-                            <button class="button btn-sm btn-dark btn-block field-button" id="show-all">Show All</button>
-                        </div>
-                        <div class="col">
-                            <button class="button btn-sm btn-dark btn-block field-button" id="hide-all">Hide All</button>
+                        <div class="col" id="folder-and-page">
+                            Entity:
                         </div>
                     </div>
                 </div>
                 <!-- end of main display -->
             </div>
+            <div class="col-md-2" id="summary">
+                <br>
+                <div id="elements"></div>
+            </div>
 
             <div class="col" id="fields">
-                <div class="field-build"></div>
+                <div class="row">
+                    <div class="col-md-1"></div>
+                    <div class="col">
+                        <button class="button btn-sm btn-dark btn-block field-button" id="show-all">Show All</button>
+                    </div>
+                    <div class="col-md-1"></div>
+                </div>
+                <br>
+                <div class="field-build">
+                </div>
                 <div class="page-build"></div>
                 <div class="json-build"></div>
                 <div class="validators-build"></div>
@@ -154,63 +242,27 @@
     </div>
     <!--end of container-->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="./bundle.js"></script>
+    <script>
+        const selectTab = (evt, cityName) => {
+            var i, tabcontent, tablinks;
 
-    <script src="js/output/json_builders/paragraph_JSON.js"></script>
-    <script src="js/output/json_builders/fragment_JSON.js"></script>
-    <script src="js/output/json_builders/header_JSON.js"></script>
-    <script src="js/output/json_builders/radioGroup_JSON.js"></script>
-    <script src="js/output/json_builders/address_JSON.js"></script>
-    <script src="js/output/json_builders/phone_JSON.js"></script>
-    <script src="js/output/json_builders/name_JSON.js"></script>
-    <script src="js/output/json_builders/nino_JSON.js"></script>
-    <script src="js/output/json_builders/date_JSON.js"></script>
-    <script src="js/output/json_builders/email_JSON.js"></script>
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
 
-    <script src="js/output/page_builders/paragraph_page.js"></script>
-    <script src="js/output/page_builders/header_page.js"></script>
-    <script src="js/output/page_builders/fragment_page.js"></script>
-    <script src="js/output/page_builders/address_page.js"></script>
-    <script src="js/output/page_builders/phone_page.js"></script>
-    <script src="js/output/page_builders/nino_page.js"></script>
-    <script src="js/output/page_builders/name_page.js"></script>
-    <script src="js/output/page_builders/date_page.js"></script>
-    <script src="js/output/page_builders/email_page.js"></script>
-    <script src="js/output/page_builders/radio_group_page.js"></script>
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
 
-    <script src="js/fields/paragraph.js"></script>
-    <script src="js/fields/header.js"></script>
-    <script src="js/fields/fragment.js"></script>
-    <script src="js/fields/partials.js"></script>
-    <script src="js/fields/phone_number.js"></script>
-    <script src="js/fields/date.js"></script>
-    <script src="js/fields/email.js"></script>
-    <script src="js/fields/nino.js"></script>
-    <script src="js/fields/name.js"></script>
-    <script src="js/fields/radio_group.js"></script>
-    <script src="js/fields/address.js"></script>
+            document.getElementById(cityName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
 
-    <script src="js/output/validation_builders/address_validators.js"></script>
-    <script src="js/output/validation_builders/email_validators.js"></script>
-    <script src="js/output/validation_builders/name_validators.js"></script>
-    <script src="js/output/validation_builders/date_validators.js"></script>
-    <script src="js/output/validation_builders/nino_validators.js"></script>
-    <script src="js/output/validation_builders/phone_validators.js"></script>
-    <script src="js/output/validation_builders/radioGroup_validators.js"></script>
-
-    <script src="js/output/build_data.js"></script>
-    <script src="js/output/show_page.js"></script>
-    <script src="js/output/show_JSON.js"></script>
-    <script src="js/output/show_javascript.js"></script>
-    <script src="js/output/show_validators.js"></script>
-
-    <script src="js/input_output/export.js"></script>
-    <script src="js/input_output/file_handler.js"></script>
-    <script src="js/input_output/populate.js"></script>
-
-    <script src="js/app.js"></script>
+        document.getElementById("defaultOpen").click();
+    </script>
 </body>
 
 </html>

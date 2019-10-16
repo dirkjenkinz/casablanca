@@ -1,8 +1,10 @@
 'use strict'
 
-const name_JSON = data => {
-    let messages = `
-    "${data}Title": {
+const name_JSON = field => {
+  let tag = field.tag;
+  console.log(tag)
+    let json = `
+    "${tag}.Title": {
         "label": "Title",
         "validation": {
             "mandatoryInline": "You must complete this section",
@@ -15,7 +17,7 @@ const name_JSON = data => {
             }
         }
     },
-    "${data}FirstName": {
+    "${tag}.FirstName": {
         "label": "First name",
         "validation": {
             "mandatoryInline": "You must complete this section",
@@ -32,7 +34,7 @@ const name_JSON = data => {
             }
         }
     },
-    "${data}MiddleName": {
+    "${tag}.MiddleName": {
         "label": "Middle name(s)",
         "validation": {
             "invalidCharsInline": "Enter details again without using {middleNameInvalidChars}",
@@ -47,7 +49,7 @@ const name_JSON = data => {
             }
         }
     },
-    "${data}LastName": {
+    "${tag}.LastName": {
         "label": "Last name",
         "validation": {
             "mandatoryInline": "You must complete this section",
@@ -63,6 +65,8 @@ const name_JSON = data => {
                 "summary": "Last name - Too many characters entered"
             }
         }
-    }`
-    return messages;
+    },`
+    return json;
 }
+
+module.exports = name_JSON;

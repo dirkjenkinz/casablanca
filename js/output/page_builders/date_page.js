@@ -1,23 +1,25 @@
 'use strict'
 
+const { buildOptions } = require("./page_utilities");
+
 const buildDateObject = (pageName, field) => {
-    let data = field["text-form-data"];
-    let hint = field["text-hint"];
+    let tag = field.tag;
+    let options = buildOptions(pageName, tag, field)
 
     let dateObject = `{{ form.dateObject(\n`;
-    dateObject += 'formData.${data},\n';
-    dateObject += `"${data}",\n`;
-    dateObject += ` t("$${pageName}:${data}.label"),\n`;
 
-    if (hint != ""){
-      dateObject += `options = {\n`;
-      dateObject += `hint: t("$${pageName}:${data}.hint")"\n`
-      dateObject += `},\n`;
-    }
-        
-    dateObject += `errors=formErrors)\n`;
-    dateObject += `}}\n\n`
+    dateObject += `formData.${tag},\n`;
+    dateObject += `"${tag}",\n`;
+    dateObject += `t("${pageName}:${tag}.label"),\n`;
+    dateObject += options;
+    dateObject += `errors=formErrors,\n`
+    dateObject += `validationVariables = validationVariables\n`
+    dateObject += `)\n`
+    dateObject += `}},\n\n`
 
     return dateObject;
-
 }
+
+
+
+module.exports = buildDateObject;

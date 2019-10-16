@@ -1,40 +1,38 @@
-'use strict'
+"use strict"
+
+const { getCode } = require("../codes");
+const { addElement, showSelectedElement } = require("./elements.js");
+const BTN = "button btn-primary btn-sm btn-block";
 
 const buildFragment = () => {
-    let fragment_fieldID = codes[0];
-    codes.shift();
-    let prefix = `${fragment_fieldID}-fragment`;
-    let fragment = buildTop(prefix, 'Code Fragment', 'fragment')
+    let fieldID = getCode();
+    let prefix = `${fieldID}-fragment`;
+    let fragment = buildTop(prefix)
     fragment += `</div></div></div>`
     $(`.field-build`).append(fragment);
-    $(`#${prefix}-show`).hide();
+    $(`#elements`).append(addElement("Code", prefix));
+    showSelectedElement();
     return fragment;
 }
 
-
-const buildTop = (prefix, fieldType, type) => {
-    let top = `<div id="${prefix}" class="field ${type}">`;
+const buildTop = (prefix) => {
+    let top = `<div id="${prefix}" class="field fragment">`;
     top += `<div class="row">`
-    top += `<div class="col-md-2 field-type" data-toggle="collapse" data-target="#${prefix}-details">${fieldType}</div>`
+    top += `<div class="col-md-2 field-type">Code Fragment</div>`
     top += `<div class="col"></div>`
-    top += `<div class="col-md-1 arrows">`
-    top += `<i class="fa fa-arrow-up" id="${prefix}-up"></i>&nbsp`
-    top += `<i class="fa fa-arrow-down" id="${prefix}-down"></i>`
-    top += `</div>`
+    top += `<div class="col-md-1"></div>`
+    top += `<div class="col-md-1"></div>`
     top += `<div class="col-md-1"></div>`
     top += `</div>` // end of row
-
-    top += `<div id="${prefix}-details" class="collapse show">`
+    top += `<br/><div id="${prefix}-details">`
     top += `<div class="row">`
-    top += `<div class="col-md-2"></div>`
-    top += `<div class="col">`
-    top += `<textarea id="${prefix}-textarea" cols="80" rows="10"  class="frag-text"></textarea>`
-    top += `</div>`
-    top += `<div class="col-md-1">`
-    top += `<br/><br/>`
-    top += `<button class="${BTN} delete-btn" id="${prefix}-delete-btn">Delete</button>`
-    top += `</div>`
     top += `<div class="col-md-1"></div>`
-    top += `</div>` // end of row
+    top += `<div class="col">`
+    top += `<textarea class="form-control rounded-0" id="${prefix}-textarea" rows="16"></textarea>`
+    top += `</div>`
+    top += `<div class="col-md-2"></div>`
+    top += `</div><br>` // end of row
     return top;
 }
+
+module.exports = buildFragment;

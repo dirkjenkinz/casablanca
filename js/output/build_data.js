@@ -1,6 +1,6 @@
 "use strict"
 
-const buildData = () => {
+const buildtag = () => {
     let casa = buildCasaObject();
     return casa;
 }
@@ -21,29 +21,67 @@ const buildCasaObject = () => {
         let id = (nodes[i].id);
         let _class = ($(`#${id}`).attr("class"));
         if (_class.includes("field")) {
-            let field = {}
+            let field = {};
             field["field-name"] = id.substring(3);
+            field.replacements = [];
+            let reps = [];
             let inputs = $(`#${id}`).find("input");
+
             for (let i = 0; i < inputs.length; i++) {
                 id = inputs[i].id;
-                if (id.includes("text-form-data")) {
-                    field["text-form-data"] = $(`#${id}`).val();
-                } else if (id.includes("text-header")) {
-                    field["text-header"] = $(`#${id}`).val();
-                } else if (id.includes("text-hint")) {
+                if (id.includes("tag-value")) {
+                    field.tag = $(`#${id}`).val();
+                } else if (id.includes("header-value")) {
+                    field.header = $(`#${id}`).val();
+                } else if (id.includes("text-hint-value")) {
                     field["text-hint"] = $(`#${id}`).val();
+                } else if (id.includes("target-value")) {
+                    field.target = $(`#${id}`).val();
+                } else if (id.includes("blanked-by-value")) {
+                    field["blanked-by"] = $(`#${id}`).val();
+                } else if (id.includes(`textInput-length-value`)) {
+                    field['text-length'] = $(`#${id}`).val();
+                } else if (id.includes("-left-")) {
+                    let left = $(`#${id}`).val();
+                    id = id.replace(`-left-`, `-right-`);
+                    let right = $(`#${id}`).val();
+                    let name = id.replace(`right`, `field`);
+                    let fieldName = $(`input[name=${name}]:checked`).val();
+                    if (fieldName) {
+                        reps.push([fieldName, left, right]);
+                    }
                 } else {
                     headerBreakdown(id, field);
                 }
             }
-            if (field["field-name"] === "address") {
-                addressExtras(id.substring(0, 2), field);
-            } else if (field["field-name"] === "radio_group") {
-                radioGroupExtras(id.substring(0, 2), field, inputs);
-            } else if (field["field-name"] === "fragment") {
-                field.fragment = $(`#${id}-textarea`).val();
-            } else if (field["field-name"] === "paragraph") {
-                field.paragraph = $(`#${id.substring(0, 12)}-textarea`).val();
+
+            field.replacements = reps;
+
+            switch (field[`field-name`]) {
+                case `radio-group`:
+                    radioGroupExtras(id.substring(0, 2), field, inputs);
+                    break;
+                case `checkbox-array`:
+                    checkboxArrayExtras(field, inputs);
+                    break;
+                case `fragment`:
+                    field.fragment = $(`#${id.substring(0, 11)}-textarea`).val();
+                    break;
+                case `paragraph`:
+                    field.paragraph = $(`#${id.substring(0, 12)}-textarea`).val();
+                    break;
+                case `top-part`:
+                    field.top = $(`#${id.substring(0, 11)}-textarea`).val();
+                    break;
+                case `error-summary`:
+                    field["error-summary"] = $(`#${id.substring(0, 16)}-textarea`).val();
+                    break;
+                case `if`:
+                    field.condition = $(`#${id}`).val();
+                    break;
+                case `elseif`:
+                    field.condition = $(`#${id}`).val();
+                    break;
             }
             fields.push(field)
         }
@@ -52,27 +90,45 @@ const buildCasaObject = () => {
     return casa;
 }
 
-let addressExtras = (prefix, field) => {
-    field.error1 = $(`#${prefix}-address-error1-value`).val();
-    field.error2 = $(`#${prefix}-address-error2-value`).val();
-    field.error3 = $(`#${prefix}-address-error3-value`).val();
-}
-
 let radioGroupExtras = (prefix, field, inputs) => {
-    field.inline = $(`#${prefix}-radio_group-radio_group-inline-yes`).prop("checked");
+    field.inline = $(`#${prefix}-radio-group-inline-yes`).prop("checked");
     let buttons = [];
+    let text;
+    let value;
+    let trigger;
     for (let i = 0; i < inputs.length; i++) {
         let id = inputs[i].id;
-        let sub = inputs[i].id.substring(18);
-        if (sub.substring(0, 4) === "text") {
-            buttons.push($(`#${id}`).val());
-        } else if (sub.substring(0, 5) === "value") {
-            buttons.push($(`#${id}`).val());
+        if (id.includes("rb-text")) {
+            text = $(`#${id}`).val();
+        } else if (id.includes("rb-value")) {
+            value = $(`#${id}`).val();
+        } else if (id.includes("rb-trigger")) {
+            trigger = ($(`#${id}`).val());
+            buttons.push([text, value, trigger])
         }
     }
     if (buttons) {
         field.buttons = buttons;
     }
+}
+
+let checkboxArrayExtras = (field, inputs) => {
+    let boxes = [];
+    let text;
+    let value;
+    for (let i = 0; i < inputs.length; i++) {
+        let id = inputs[i].id;
+        if (id.includes("cb-text")) {
+            text = $(`#${id}`).val();
+        } else if (id.includes("cb-value")) {
+            value = $(`#${id}`).val();
+            boxes.push([text, value])
+        }
+    }
+    if (boxes) {
+        field.boxes = boxes;
+    }
+
 }
 
 const headerBreakdown = (id, field) => {
@@ -102,3 +158,5 @@ const headerBreakdown = (id, field) => {
         }
     }
 }
+
+module.exports = buildtag;

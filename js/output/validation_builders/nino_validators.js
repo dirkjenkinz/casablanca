@@ -1,38 +1,39 @@
 'use strict'
 
-const nino_validators = (pageName, data) => {
-    let messages = `
-    ${data}: sf([
+const nino_validators = (pageName, tag) => {
+    let validators = `
+    ${tag}: sf([
     r.required.bind({
       errorMsg: {
-        inline: '${pageName}:${data}.validation.mandatoryInline',
-        summary: '${pageName}:${data}.validation.mandatorySummary'
+        inline: '${pageName}:${tag}.validation.mandatoryInline',
+        summary: '${pageName}:${tag}.validation.mandatorySummary'
       }
     }),
     cadsNinoValidation.bind({
       errorMsg: {
-        inline: '${pageName}:${data}.validation.invalidNinoInline',
-        summary: '${pageName}:${data}.validation.invalidNinoSummary'
+        inline: '${pageName}:${tag}.validation.invalidNinoInline',
+        summary: '${pageName}:${tag}.validation.invalidNinoSummary'
       }
     }),
     ninoValidation.bind({
       duplicateNinoPartner: {
-        inline: '${pageName}:${data}.validation.duplicateNinoPartner.inline',
-        summary: '${pageName}:${data}.validation.duplicateNinoPartner.summary'
+        inline: '${pageName}:${tag}.validation.duplicateNinoPartner.inline',
+        summary: '${pageName}:${tag}.validation.duplicateNinoPartner.summary'
       },
       duplicateNinoCaree: {
-        inline: '${pageName}:${data}.validation.duplicateNinoCaree.inline',
-        summary: '${pageName}:${data}.validation.duplicateNinoCaree.summary'
+        inline: '${pageName}:${tag}.validation.duplicateNinoCaree.inline',
+        summary: '${pageName}:${tag}.validation.duplicateNinoCaree.summary'
       }
     }),
     r.strlen.bind({
       max: 19,
       errorMsgMax: {
-        'inline': '${pageName}:${data}.validation.tooLong.inline',
-        'summary': '${pageName}:${data}.validation.tooLong.summary'
+        'inline': '${pageName}:${tag}.validation.tooLong.inline',
+        'summary': '${pageName}:${tag}.validation.tooLong.summary'
       }
     })
-  ]),
-    `
-    return messages;
+  ]),`
+    return validators;
 }
+
+module.exports = nino_validators;

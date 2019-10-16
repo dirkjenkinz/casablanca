@@ -2,7 +2,7 @@
 
 const fragment_JSON = (field) => {
   let messArray = [];
-  let message = "\n";
+  let json = "\n";
 
   let subFragments = field.fragment.split("<=");
 
@@ -15,8 +15,13 @@ const fragment_JSON = (field) => {
   })
 
   messArray.forEach(pair => {
-    message += `"${pair[0]}": "${pair[1]}",\n`
+    json += `"${pair[0].trim()}": "${pair[1].trim()}",\n`
   })
 
-  return message;
+  if (json.length > 0){
+    json+",\n"
+  }
+  return json;
 }
+
+module.exports = fragment_JSON;

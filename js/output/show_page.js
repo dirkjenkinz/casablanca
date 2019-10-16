@@ -1,87 +1,137 @@
 'use strict'
 
-const showPage = (casa, topPart) => {
-  $(".field-build").hide();
-  $(".page-build").show();
-  $(".page-details").hide();
-  $(".page-neutral").show();
-  $("#page-output").remove();
-  let page = buildPage(casa, topPart);
-  $(".page-build").append(`<textarea id="page-output" cols="100" rows="30">${page}</textarea>`);
-  window.scrollTo(0, 0); 
+const buildIfObject = require("./page_builders/if_page.js");
+const buildElseifObject = require("./page_builders/elseif_page.js");
+const buildAddressObject = require("./page_builders/address_page.js");
+const buildPhoneObject = require("./page_builders/phone_page.js");
+const buildEmailObject = require("./page_builders/email_page.js");
+const buildNameObject = require("./page_builders/name_page.js");
+const buildNinoObject = require("./page_builders/nino_page.js");
+const buildDateObject = require("./page_builders/date_page.js");
+const buildCheckboxArrayObject = require("./page_builders/checkbox_array_page.js");
+const buildParagraphObject = require("./page_builders/paragraph_page.js");
+const buildErrorSummaryObject = require("./page_builders/error_summary_page.js");
+const buildTextInputObject = require("./page_builders/text_input_page.js")
+const buildHeaderObject = require("./page_builders/header_page.js");
+const buildRadioGroupObject = require("./page_builders/radio_group_page.js");
+const buildBeginHiddenObject = require("./page_builders/begin_hidden_page.js");
+const parseFragment = require("./page_builders/fragment_page.js");
+
+const showPage = (casa, topPart, divide) => {
+    $(`.field-build`).hide();
+    $(`.page-build`).show();
+    $(`.page-details`).hide();
+    $(`.page-neutral`).show();
+    $(`#page-output`).remove();
+    $(`#summary`).hide();
+    let page = buildPage(casa, topPart, divide);
+    $(`.page-build`).append(`<textarea id="page-output" cols="120" rows="30">${page}</textarea>`);
+    window.scrollTo(0, 0);
 }
 
-const buildPage = (casa) => {
-  let pageName = `${casa.folder}-${casa["page-name"]}`;
-  let page = "";
+const buildPage = (casa, topPart, divide) => {
+        let pageName = `${casa.folder}-${casa[`page-name`]}`;
+  let page = ``;
 
-  topPart.forEach(item => {
-    page += `${item}\n`;
-  })
+
+  let firstField = casa.fields[0];
+
+  if (firstField["field-name"] === `top-part`){
+    page += `${firstField.top}\n`;
+  } else {
+    topPart.forEach(item => {
+      page += `${item}\n`;
+    })
+  }
 
   page += `{% set pageName = "${pageName}" %}\n\n`
   page += `{% block journey_form %}\n`
   page += `{{ super() }}\n\n`
   if (casa.fields) {
-    page += buildFields(casa.fields, pageName)
+    page += buildFields(casa.fields, pageName, divide)
   }
-  
   page = indentPage(page.split('\n')).trim();
   return page;
 }
 
-const buildFields = (fields, pageName) => {
-  let fieldData = "";
+const buildFields = (fields, pageName, divide) => {
+  let fieldData = ``;
   fields.forEach(field => {
-    switch (field["field-name"]) {
-      case "address":
-        fieldData += buildAddressObject(pageName, field["text-form-data"]);
+    switch (field[`field-name`]) {
+      case `address`:
+        fieldData += buildAddressObject(pageName, field);
         break;
-      case "phone":
-        fieldData += buildPhoneObject(pageName, field["text-form-data"]);
+      case `phone`:
+        fieldData += buildPhoneObject(pageName, field);
         break;
-      case "email":
-        fieldData += buildEmailObject(pageName, field["text-form-data"]);
+      case `email`:
+        fieldData += buildEmailObject(pageName, field);
         break;
-      case "name":
-        fieldData += buildNameObject(pageName, field["text-form-data"]);
+      case `name`:
+        fieldData += buildNameObject(pageName, field);
         break;
-      case "nino":
-        fieldData += buildNinoObject(pageName, field["text-form-data"]);
+      case `nino`:
+        fieldData += buildNinoObject(pageName, field);
         break;
-      case "date":
+      case `date`:
         fieldData += buildDateObject(pageName, field);
         break;
-      case "paragraph":
+      case `paragraph`:
         fieldData += buildParagraphObject(pageName, field);
         break;
-      case "header":
+      case `error-summary`:
+        fieldData += buildErrorSummaryObject(pageName, field);
+        break;
+      case `text-input`:
+        fieldData += buildTextInputObject(pageName, field);
+        break;
+      case `header`:
         fieldData += buildHeaderObject(pageName, field);
         break;
-      case "radio_group":
-        fieldData += buildRadioGroupObject(
-          pageName,
-          field["text-form-data"],
-          field["buttons"],
-          field.inline,
-          field["text-hint"]);
+      case `if`:
+        fieldData += buildIfObject(pageName, field);
+        console.log('yeah!!')
         break;
-      case "fragment":
+      case `elseif`:
+        fieldData += buildElseifObject(pageName, field);
+        break;
+      case `end-hidden`:
+        fieldData += `</div>\n\n`
+        break;
+      case `endif`:
+        fieldData += ` {% endif %}\n\n`
+        break;
+      case `else`:
+        fieldData += ` {% else %}\n\n`
+        break;
+      case `begin-hidden`:
+        fieldData += buildBeginHiddenObject(pageName, field);
+        break;
+      case `radio-group`:
+        fieldData += buildRadioGroupObject(pageName, field);
+        break;
+      case `checkbox-array`:
+        fieldData += buildCheckboxArrayObject(field);
+        break;
+      case `fragment`:
         fieldData += parseFragment(pageName, field);
         break;
     }
-  })
+      if (divide){
+        fieldData += `\n===========================================================================================\n\n`;
+      }
+  });
+
   fieldData += `{% endblock %}`
   return fieldData;
 }
 
 const indentPage = data => {
-  let b = '    ';
+  let b = `        `;
   let block = [];
-  let padding = "";
+  let padding = ``;
   let ind = 0;
-  let output = "";
-  let newLine = "";
+  let output = ``;
 
   for (let i = 0; i < 100; i++) {
     block.push(padding);
@@ -89,50 +139,58 @@ const indentPage = data => {
   }
 
   data.forEach(line => {
-
     line = line.trim();
 
-    if (line.includes("{% endif")) {
+    if (line.includes(`{% endif`)) {
       ind--;
-    } else if (line.includes("{% endblock")) {
+    } else if (line.includes(`{% else`)) {
       ind--;
-    } else if (line.includes("{% endcall")) {
+    } else if (line.includes(`{% endblock`)) {
       ind--;
-    } else if (line.includes("errors=formErrors)")) {
+    } else if (line.substring(0, 2) === `}}`) {
       ind--;
-    } else if (line.substring(0, 2) === "}}") {
+    } else if (line.substring(0, 5) === `</ul>`) {
       ind--;
-     } else if (line.substring(0, 2) === "%}") {
+    } else if (line.substring(0, 2) === `},`) {
       ind--;
-    } else if (line.substring(0, 3) === "</p") {
-      ind--
+    } else if (line.substring(0, 2) === `%}`) {
+      ind--;
+    } else if (line.substring(0, 3) === `</p`) {
+      ind--;
+    } else if (line.substring(0, 6) === `</div>`) {
+      ind--;
     }
 
     if (ind < 0) ind = 0;
 
-    if (line === `errors=formErrors`){
+    if (line === `errors=formErrors`) {
       line += ')'
-    } 
+    }
 
-    newLine = `${line.trim()}\n`;
+    output += `${block[ind]}${line}\n`
 
-    output += `${block[ind]}${newLine}`
-
-
-    if (newLine.includes("{% if")) {
+    if (line.includes(`{% if`)) {
       ind++;
-    } else if (newLine.includes("{% block")) {
+    } else if (line.includes(`{% else`)) {
       ind++;
-    } else if (newLine.includes("{% call")) {
+    } else if (line.includes(`{% block`)) {
       ind++;
-    } else if (newLine.includes("options = {")) {
+    } else if (line.includes(`{% call`)) {
       ind++;
-    } else if (newLine.includes("{{ form")) {
+    } else if (line.includes(`options = {`)) {
       ind++;
-    } else if (newLine.substring(0, 2) === "<p") {
+    } else if (line.includes(`{{ form`)) {
+      ind++;
+    } else if (line.substring(0, 2) === `<p`) {
+      ind++;
+    } else if (line.substring(0, 3) === `<ul`) {
+      ind++;
+    } else if (line.substring(0, 4) === `<div`) {
       ind++;
     }
   })
 
   return output;
 }
+
+module.exports = { showPage, buildPage };

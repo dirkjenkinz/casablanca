@@ -1,8 +1,10 @@
 'use strict'
 
-const nino_JSON = (data, hint) => {
-    let messages = `
-    "${data}NationalInsuranceNumber": {
+const nino_JSON = (field) => {
+let tag = field.tag;
+let hint = field["text-hint"];
+    let json = `
+    "${tag}NationalInsuranceNumber": {
         "label": "National Insurance number",
         "hint": "${hint}",
         "validation": {
@@ -14,5 +16,7 @@ const nino_JSON = (data, hint) => {
             }
         }
     },`
-    return messages;
+    return json+`\n`;
 }
+
+module.exports = nino_JSON;

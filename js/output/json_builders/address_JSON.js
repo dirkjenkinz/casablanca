@@ -1,16 +1,14 @@
 'use strict'
 
-const address_JSON = (casa) => {
-  let error1 = casa.error1;
-  let error2 = casa.error2;
-  let error3 = casa.error3;
-    let messages = `
+const address_JSON = (field) => {
+    let json = `
     "addressDetails": {
         "label": "Address",
         "validation": {
+            "mandatory": "Enter your address. You must complete the first two lines.",
             "errorMsgAddress1and2": {
-                "inline": "${error1} You must complete the first two lines.",
-                "summary": "${error1} You must complete the first two lines."
+                "inline": "${field.header} You must complete the first two lines.",
+                "summary": "${field.header} You must complete the first two lines."
             },
             "errorMsgPostcode": {
                 "inline": "A post code must be in the format PR2 8AE",
@@ -21,12 +19,12 @@ const address_JSON = (casa) => {
                 "summary": "Postcode - Remove any characters apart from letters or numbers"
             },
             "invalidRegexAddress": {
-                "inline": "${error2}",
-                "summary": "${error2}"
+                "inline": "Enter a valid address using only letters and numbers",
+                "summary": "Enter a valid address using only letters and numbers"
             },
             "mandatoryAndRegexErrors": {
-                "inline": "${error3}",
-                "summary": "${error3}
+              "inline": "${field.header} You must complete the first two lines and you must only use letters and numbers",
+              "summary": "${field.header} You must complete the first two lines and you must only use letters and numbers"
             },
             "errorMsgAddressTooLong": {
                 "inline": "Too many characters in address line",
@@ -37,6 +35,8 @@ const address_JSON = (casa) => {
                 "summary": "Address - Too many characters in postcode"
             }
         }
-    }`
-    return messages;
+    },\n`
+    return json;
 }
+
+module.exports = address_JSON;

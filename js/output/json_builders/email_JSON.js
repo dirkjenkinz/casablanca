@@ -1,18 +1,35 @@
 'use strict'
 
-const email_JSON = (data, hint) => {
-    let messages = `
-    "${data}": {
+const email_JSON = (field) => {
+    let header = field.header;
+    let tag = field.tag;
+
+    let json = `
+    "${tag}": {
         "emailAddress": {
-            "label": "${data} email address",
+            "label": "${tag}",
             "validation": {
                 "notifyEmailValidation": {
                     "inline": "Enter a valid email address",
-                    "summary": "${data} - Enter a valid email address"
+                    "summary": "${header} - Enter a valid email address"
                 },
                 "inline": "Enter a valid email address",
-                "summary": "${data} - Enter a valid email address"
+                "summary": "${header} - Enter a valid email address"
             }
-        },`
-    return messages;
+        },
+        "confirmEmailAddress": {
+            "label": "Confirm ${tag}",
+            "validation": {
+                "inline": "Enter a valid email address",
+                "summary": "${header} - Enter a valid email address",
+                "match": {
+                    "inline": "Emails do not match",
+                    "summary": "${header} - Emails do not match"
+                }
+            }
+          }
+      }`
+    return json.trim();
 }
+
+module.exports = email_JSON;

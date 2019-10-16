@@ -1,21 +1,40 @@
 'use strict'
 
-const radioGroup_validators = (pageName, data, buttons) => {
-    let messages = `
-    benefits: sf([
+const radioGroup_validators = (pageName, field) => {
+
+    let tag = field.tag;
+    let buttons = field.buttons;
+    let source = `source: [`;
+
+    for (let i = 0; i < buttons.length; i++) {
+        if (i === buttons.length - 1) {
+            source += `"${buttons[i][1]}"`;
+        } else {
+            source += `"${buttons[i][1]}", `;
+        }
+    }
+
+    source += `],`
+
+    let validators = `
+    ${tag}: sf([
       r.required.bind({
         errorMsg: {
-          inline: '${pageName}:${data}.validation.mandatory.inline',
-          summary: '${pageName}:${data}.validation.mandatory.summary'
+          inline: '${pageName}:${tag}.validation.mandatory.inline',
+          summary: '${pageName}:${tag}.validation.mandatory.summary'
         }
       }),
       r.inArray.bind({
-        source: ['PIP', 'DLA', 'AA', 'CAA', 'AFIP', 'None'],
+        ${source}
         errorMsg: {
-          summary: '${pageName}:${data}.validation.inArray.summary',
-          inline: '${pageName}:${data}.validation.inArray.inline'
+          summary: '${pageName}:${tag}.validation.inArray.summary',
+          inline: '${pageName}:${tag}.validation.inArray.inline'
         }
       })
-    ])`
-    return messages;
+    ]),`
+
+
+    return validators;
 }
+
+module.exports = radioGroup_validators;

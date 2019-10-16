@@ -1,19 +1,28 @@
 'use strict'
 
-const date_JSON = (data, hint) => {
-    let messages = `
-    "${data}Date": {
-        "label": "${data} date",
-        "hint": "${hint}",
-        "validation": {
-            "errorMsg":{
-                "mandatoryInline": "You must complete this section",
-                "mandatorySummary": "${data} date - You must complete this section",
-                "invalidDateInline":"Invalid value",
-                "invalidDateSummary":"${data} date - Invalid value"
-            }
-        }
-    }\n`
-    console.log(messages)
-    return messages.toString();
+const date_JSON = (field) => {
+  let header = field.header;
+  let tag = field.tag;
+  let hint = field["text-hint"];
+
+  let json = `"${tag}": {\n`;
+
+  if (header !== "") {
+    json += `"label": "${header}",\n`
+  }
+
+  if (hint !== "") {
+    json += `"hint": "${hint}",\n`
+  }
+
+  json += `"validation": {\n`
+  json += `"mandatoryInline": "You must complete this section",\n`
+  json += `"mandatorySummary": "${header} - You must complete this section",\n`
+  json += `"invalidDateInline":"Invalid value",\n`
+  json += `"invalidDateSummary":"${header} - Invalid value"\n`
+  json += `}\n`
+  json += `},\n`
+  return json;
 }
+
+module.exports = date_JSON;

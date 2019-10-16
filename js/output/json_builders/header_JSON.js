@@ -1,9 +1,10 @@
 'use strict'
 
 const header_JSON = (field) => {
-  console.log('>', field)
-    let data = field["text-form-data"];
-    let text = field["text-header"]
-    let messages = `"${data}.text":${text}\n`
-    return messages;
+    let tag = field.tag;
+    let text = field.header
+    let json = `"${tag}.text": "${text}"\n`
+    return json.trim();
 }
+
+module.exports = header_JSON;

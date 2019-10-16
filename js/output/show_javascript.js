@@ -6,9 +6,10 @@ const showJavaScript = (casa) => {
     $(".page-details").hide();
     $(".page-neutral").show();
     $("#page-output").remove();
+    $(`#summary`).hide();
     let javaScript = buildJavaScript(casa)
-    $(".page-build").append(`<textarea id="page-output" cols="100" rows="30">${javaScript}</textarea>`);
-    window.scrollTo(0, 0); 
+    $(".page-build").append(`<textarea id="page-output" cols="120" rows="30">${javaScript}</textarea>`);
+    window.scrollTo(0, 0);
 }
 
 const buildJavaScript = (casa) => {
@@ -45,3 +46,5 @@ const buildJavaScript = (casa) => {
 
     return javascript;
 }
+
+module.exports = { showJavaScript, buildJavaScript };

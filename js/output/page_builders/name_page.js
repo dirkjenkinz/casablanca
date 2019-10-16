@@ -1,55 +1,46 @@
 'use strict'
 
-const buildNameObject = (pageName, data) => {
+const { buildOptions } = require("./page_utilities");
+
+const buildNameObject = (pageName, field) => {
+  let tag = field.tag;
+  let options1 = buildOptions(pageName, tag, field, 20, false, true);
+  let options2 = buildOptions(pageName, tag, field, 35, false, true);
+
   let nameObject = `{{ form.text(\n`;
-  nameObject += `formData.${data}Title,\n`;
-  nameObject += `"${data}Title",\n`;
-  nameObject += `t("${pageName}:${data}Title.label"),\n`;
-  nameObject += `options = {\n`;
-  nameObject += `trim: true,\n`;
-  nameObject += `maxlength: 20\n`;
-  nameObject += `},\n`;
-  nameObject += `errors = formErrors, validationVariables = validationVariables)\n`;
+  nameObject += `formData.${tag}Title,\n`;
+  nameObject += `"${tag}Title",\n`;
+  nameObject += `t("${pageName}:${tag}Title.label"),\n`;
+  nameObject += options1;
+  nameObject += `errors = formErrors,\n`;
+  nameObject += `validationVariables = validationVariables)\n`;
   nameObject += `}}\n\n`;
-  nameObject += `{\n`;
-  nameObject += `{\n`;
-  nameObject += `form.text(\n`;
-  nameObject += `formData.${ data } FirstName,\n`;
-  nameObject += `"${data}FirstName",\n`;
-  nameObject += `t("$${pageName}:${data}FirstName.label"),\n`;
-  nameObject += `options = {\n`;
-  nameObject += `trim: true,\n`;
-  nameObject += `maxlength: 35\n`;
-  nameObject += `},\n`;
-  nameObject += `errors = formErrors, validationVariables = validationVariables)`
-  nameObject += `}\n`;
-  nameObject += `}\n\n`;
-  nameObject += `{\n`;
-  nameObject += `{\n`;
-  nameObject += `form.text(`
-  nameObject += `formData.${ data } MiddleName,`
-  nameObject += `"${data}MiddleName",\n`;
-  nameObject += `t("$${pageName}:${data}MiddleName.label"),\n`;
-  nameObject += `options = {\n`;
-  nameObject += `trim: true,\n`;
-  nameObject += `maxlength: 35\n`;
-  nameObject += `},\n`;
-  nameObject += `errors = formErrors, validationVariables = validationVariables)\n`;
-  nameObject += `}\n`;
-  nameObject += `}\n\n`;
-  nameObject += `{\n`;
-  nameObject += `{\n`;
-  nameObject += `form.text(`
-  nameObject += `formData.${ data } LastName,`
-  nameObject += `"${data}LastName",\n`;
-  nameObject += `t("$${pageName}:${data}LastName.label"),\n`;
-  nameObject += `options = {\n`;
-  nameObject += `trim: true,\n`;
-  nameObject += `maxlength: 35\n`;
-  nameObject += `},\n`;
-  nameObject += `errors = formErrors, validationVariables = validationVariables)\n`;
-  nameObject += `}\n`;
-  nameObject += `}\n\n`;
+  nameObject += `{{ form.text(\n`;
+  nameObject += `formData.${tag}FirstName,\n`;
+  nameObject += `"${tag}FirstName",\n`;
+  nameObject += `t("$${pageName}:${tag}FirstName.label"),\n`;
+  nameObject += options2;
+  nameObject += `errors = formErrors,\n`;
+  nameObject += `validationVariables = validationVariables)\n`;
+  nameObject += `}}\n\n`;
+  nameObject += `{{ form.text(`
+  nameObject += `formData.${tag}MiddleName,`
+  nameObject += `"${tag}MiddleName",\n`;
+  nameObject += `t("$${pageName}:${tag}MiddleName.label"),\n`;
+  nameObject += options2;
+  nameObject += `errors = formErrors,\n`;
+  nameObject += `validationVariables = validationVariables)\n`;
+  nameObject += `}}\n\n`;
+  nameObject += `{{ form.text(`
+  nameObject += `formData.${tag}LastName,`
+  nameObject += `"${tag}LastName",\n`;
+  nameObject += `t("$${pageName}:${tag}LastName.label"),\n`;
+  nameObject += options2;
+  nameObject += `errors = formErrors,\n`;
+  nameObject += `validationVariables = validationVariables)\n`;
+  nameObject += `}},\n\n`;
 
   return nameObject;
 }
+
+module.exports = buildNameObject;
