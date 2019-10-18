@@ -12,7 +12,7 @@ const buildRadioGroup = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-radio-group`;
     let radio_group = buildTopOfField(prefix, "Radio Group", "radio-group")
-    radio_group += `<div class="row inline" id="${prefix}-radio-group-inline">
+    radio_group += `<hr><div class="row inline" id="${prefix}-radio-group-inline">
                       <div class="col"></div>
                       <div class="col-md-1">Inline:</div>
                       <div class="col-md-3" id="${prefix}-radio-group-inline-buttons">
@@ -21,7 +21,7 @@ const buildRadioGroup = () => {
                           <input type="radio" name="${prefix}-opt_inline" id="${prefix}-radio-group-inline-no" checked>&nbsp;No
                       </div>
                       <div class="col"></div>
-                    </div>`
+                    </div><hr>`
     radio_group += `<div class="row">
                       <div class="col-md-1"></div>
                       <div class="col">

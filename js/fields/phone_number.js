@@ -1,14 +1,13 @@
 "use strict"
 
 const { getCode } = require("../codes");
-const { buildTopOfField } = require("./partials");
+const buildField = require("./build_field")
 const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildPhoneNumber = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-phone`;
-    let phone = buildTopOfField(prefix, "Phone Number", "phone")
-    phone += `</div></div></div>`
+    let phone = buildField(prefix, "Phone Number", "phone", ["tag", "header", "hint", "target", "replacements"])
     $(`.field-build`).append(phone);
     $(`#${prefix}-replacements`).hide();
     $(`#elements`).append(addElement("Phone #", prefix));

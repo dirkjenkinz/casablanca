@@ -19,6 +19,7 @@ const parseFragment = require("./page_builders/fragment_page.js");
 
 const showPage = (casa, topPart, divide) => {
     $(`.field-build`).hide();
+    $(`#show-all`).hide();
     $(`.page-build`).show();
     $(`.page-details`).hide();
     $(`.page-neutral`).show();
@@ -30,27 +31,31 @@ const showPage = (casa, topPart, divide) => {
 }
 
 const buildPage = (casa, topPart, divide) => {
+
         let pageName = `${casa.folder}-${casa[`page-name`]}`;
   let page = ``;
 
+    let firstField = casa.fields[0];
 
-  let firstField = casa.fields[0];
+    if (firstField){
 
-  if (firstField["field-name"] === `top-part`){
-    page += `${firstField.top}\n`;
-  } else {
-    topPart.forEach(item => {
-      page += `${item}\n`;
-    })
+    if (firstField["field-name"] === `top-part`) {
+      page += `${firstField.top}\n`;
+    } else {
+      topPart.forEach(item => {
+        page += `${item}\n`;
+      })
+    }
+
+    page += `{% set pageName = "${pageName}" %}\n\n`
+    page += `{% block journey_form %}\n`
+    page += `{{ super() }}\n\n`
+    if (casa.fields) {
+      page += buildFields(casa.fields, pageName, divide)
+    }
+    page = indentPage(page.split('\n')).trim();
+
   }
-
-  page += `{% set pageName = "${pageName}" %}\n\n`
-  page += `{% block journey_form %}\n`
-  page += `{{ super() }}\n\n`
-  if (casa.fields) {
-    page += buildFields(casa.fields, pageName, divide)
-  }
-  page = indentPage(page.split('\n')).trim();
   return page;
 }
 
@@ -90,7 +95,6 @@ const buildFields = (fields, pageName, divide) => {
         break;
       case `if`:
         fieldData += buildIfObject(pageName, field);
-        console.log('yeah!!')
         break;
       case `elseif`:
         fieldData += buildElseifObject(pageName, field);
@@ -117,9 +121,9 @@ const buildFields = (fields, pageName, divide) => {
         fieldData += parseFragment(pageName, field);
         break;
     }
-      if (divide){
-        fieldData += `\n===========================================================================================\n\n`;
-      }
+    if (divide) {
+      fieldData += `\n===========================================================================================\n\n`;
+    }
   });
 
   fieldData += `{% endblock %}`
@@ -180,6 +184,8 @@ const indentPage = data => {
     } else if (line.includes(`options = {`)) {
       ind++;
     } else if (line.includes(`{{ form`)) {
+      ind++;
+    } else if (line.includes(`{{ address`)) {
       ind++;
     } else if (line.substring(0, 2) === `<p`) {
       ind++;

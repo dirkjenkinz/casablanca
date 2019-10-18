@@ -1,19 +1,18 @@
 "use strict"
 
 const { getCode } = require("../codes");
-const { buildTopOfField } = require("./partials");
+const buildField = require("./build_field");
 const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildAddress = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-address`;
-    let date = buildTopOfField(prefix, "Address", "address");
-    date += `</div></div></div>`
-    $(`.field-build`).append(date);
+    let address = buildField(prefix, "Address", "address", ["tag", "header", "hint", "target", "replacements"])
+    $(`.field-build`).append(address);
     $(`#${prefix}-replacements`).hide();
     $(`#elements`).append(addElement("Address", prefix));
     showSelectedElement();
-    return date;
+    return address;
 }
 
 module.exports = buildAddress;

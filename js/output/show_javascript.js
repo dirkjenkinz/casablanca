@@ -2,6 +2,7 @@
 
 const showJavaScript = (casa) => {
     $(".field-build").hide();
+    $(`#show-all`).hide();
     $(".page-build").show();
     $(".page-details").hide();
     $(".page-neutral").show();

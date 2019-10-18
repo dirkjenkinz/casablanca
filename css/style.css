@@ -240,7 +240,7 @@ hr {
 }
 
 .tab button {
-    background-color: grey;
+    background-color: slategrey;
     float: left;
     border: 1px solid black;
     outline: none;
@@ -254,15 +254,9 @@ hr {
     background-color: lightblue;
 }
 
-
-/* Create an active/current tablink class */
-
 .tab button.active {
     background-color: #ccc;
 }
-
-
-/* Style the tab content */
 
 .tabcontent {
     display: none;
@@ -278,5 +272,49 @@ hr {
 }
 
 .rep-btn-add {
-  margin: 10px 0 0 0; 
+    margin: 10px 0 0 0;
+}
+
+.top-row {
+    border: double red 2px;
+    background: black;
+    color: white;
+    margin: 10px 10px -10px 10px;
+}
+
+.dividers {
+    background: lightgrey;
+    border: black 3px solid;
+}
+
+.field,
+.btn-casa {
+    background: rgb(83, 119, 173);
+}
+
+.btn-casa {
+    font-weight: bold;
+}
+
+.fragment,
+.btn-fragment {
+    background: rgb(19, 238, 190)
+}
+
+.begin-hidden,
+.end-hidden {
+    background: grey;
+    font-weight: bold;
+}
+
+.if,
+.elseif,
+.endif,
+.else {
+    background: red;
+    font-weight: bold;
+}
+
+.field-label {
+    text-align: right;
 }

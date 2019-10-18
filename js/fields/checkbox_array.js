@@ -12,13 +12,13 @@ const buildCheckboxArray = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-checkbox-array`;
     let checkbox_array = buildTopOfField(prefix, "Checkbox Array", "checkbox-array")
-    checkbox_array += `<br/><div class="row">
+    checkbox_array += `<hr><div class="row">
                       <div class="col-md-1"></div>
                       <div class="col">
                         <button class="${BTN} btn-cb-add" id="${prefix}-cb-add-1">Add a checkbox</button>
                       </div>
                       <div class="col-md-1"></div>
-                    </div><br/>`
+                    </div><br>`
     checkbox_array += `<div id="${prefix}-checkbox-area"></div>`
     checkbox_array += `</div></div></div>`
     $(`.field-build`).append(checkbox_array);

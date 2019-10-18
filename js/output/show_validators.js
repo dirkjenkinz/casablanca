@@ -13,6 +13,7 @@ const checkboxArray_validators = require("./validation_builders/checkboxArray_va
 
 const showValidators = (casa, divide) => {
     $(".field-build").hide();
+    $(`#show-all`).hide();
     $(".page-build").show();
     $(".page-details").hide();
     $(".page-neutral").show();

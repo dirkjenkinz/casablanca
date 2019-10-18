@@ -15,8 +15,10 @@ const radioGroup_JSON = require("./json_builders/radioGroup_JSON");
 const checkboxArray_JSON = require("./json_builders/checkboxArray_JSON");
 
 const showJSON = (casa, divide) => {
-  console.log(divide)
+    console.log(divide)
     $('.field-build').hide();
+    $(`#show-all`).hide();
+    $(`#show-all`).hide();
     $('.json-build').show();
     $('.page-details').hide();
     $('.page-neutral').show();
@@ -30,7 +32,7 @@ const showJSON = (casa, divide) => {
 const buildJSON = (casa, divide) => {
     let header = casa['page-header'];
     let json = `{\n`;
-    json += `"pageHeader": "${header}",`
+    json += `"pageHeader": "${header}",\n`
     json += buildMessages(casa.fields, divide);
     json = indentJSON(json.split('\n')).trim();
 
@@ -90,9 +92,9 @@ const buildMessages = (fields, divide) => {
                 json += checkboxArray_JSON(field);
                 break;
         }
-        if (divide){
-        json += `\n===========================================================================================\n\n`;
-      }
+        if (divide) {
+            json += `\n===========================================================================================\n\n`;
+        }
     })
     return json;
 }

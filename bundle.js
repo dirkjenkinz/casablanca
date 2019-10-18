@@ -1,7 +1,7 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 `use strict`
 
-const { save_file, file_list, delete_file, load_casa, build_display } = require("./js/input_output/file_handler")
+const { save_file, file_list } = require("./js/input_output/file_handler")
 const { buildCodes, getCode } = require("./js/codes");
 const buildTopPart = require("./js/fields/top_part");
 const buildBeginHidden = require("./js/fields/begin_hidden");
@@ -29,177 +29,7 @@ const { showJSON } = require("./js/output/show_JSON");
 const { showValidators } = require("./js/output/show_validators");
 const { showJavaScript } = require("./js/output/show_javascript");
 const exportFiles = require(`./js/input_output/export`);
-
-let topPart = [
-    `{% extends "cads/layouts/journey-claim.html" %}`,
-    `{% import "casa/macros/form.html" as form %}`
-];
-
-const buildTopPartDisplay = () => {
-    let tp = `<div class="row"><div class="col"><h6>Default Top Part:</h6><div></div>`
-
-    topPart.forEach(item => {
-        tp += `<div class="row"><div class="col">${item}</div></div>`
-    })
-
-    tp += `<br><br><br>`
-    tp += `<div class="row"><div class="col">Use the "Top Part" field to override these defaults.</div></div>`
-
-    $(`#top-parts`).append(tp);
-}
-
-const initView = () => {
-    $(`.page-build`).hide();
-    $(`.page-neutral`).hide();
-    $(`.json-build`).hide();
-    $(`.validator-build`).hide();
-    $(`.javascript-build`).hide();
-    $(`#file-display`).hide();
-}
-
-const flipView = () => {
-    $(`.field-build`).show();
-    $(`.page-details`).show();
-    $(`#main-display`).show();
-    $(`#summary`).show();
-    $(`.page-build`).hide();
-    $(`.page-neutral`).hide();
-    $(`.json-build`).hide();
-    $(`.validator-build`).hide();
-    $(`.javascript-build`).hide();
-    $(`#file-display`).hide();
-}
-
-const deleteButton = (id) => {
-    let r = confirm("Are you sure you want to delete this element?");
-    if (r == true) {
-        let field = id.substring(0, id.length - 11);
-        $(`#${field}`).remove();
-        field = field + "-element";
-        $(`#${field}`).remove();
-    }
-}
-
-const changeSelection = (id) => {
-    let children = $("#elements").children();
-    for (let i = 0; i < children.length; i++) {
-        let thisID = children[i].id;
-        $(`#${thisID}-btn`).removeClass("selected");
-    }
-    $(`#${id}`).addClass("selected");
-
-    children = $(".field-build").children();
-    for (let i = 0; i < children.length; i++) {
-        let thisID = children[i].id;
-        $(`#${thisID}`).hide();
-    }
-    id = id.replace("-element-btn", "");
-    $(`#${id}`).show();
-}
-
-const showAll = () => {
-    let casa = buildData();
-    $("#elements").empty();
-    build_display(casa);
-    children = $(".field-build").children();
-    for (let i = 0; i < children.length; i++) {
-        let thisID = children[i].id;
-        $(`#${thisID}`).show();
-    }
-}
-
-const keyUp = e => {
-    let f = `Entity: ${$("#folder").val()}-${$("#page-name").val()}`;
-    $(`#folder-and-page`).text(f);
-    if (e.target.id.substring(3, 11) === `fragment` ||
-        e.target.id.substring(3, 12) === `paragraph` ||
-        e.target.id.substring(3, 11) === `top-part` ||
-        e.target.id.substring(3, 16) === `error-summary` |
-        e.target.id.substring(3, 8) === `input`
-    ) {
-        if (e.keyCode === 13) {
-            let $txt = $($(`#${e.target.id}`));
-            let caretPos = $txt[0].selectionStart;
-            let textAreaTxt = $txt.val();
-            let txtToAdd = "\n";
-            $txt.val(textAreaTxt.substring(0, caretPos) + txtToAdd + textAreaTxt.substring(caretPos));
-        }
-    }
-}
-
-const moveUp = id => {
-    id = id.replace("-arrow", "");
-    id = id.substring(0, id.length - 3);
-    let casa = buildData();
-    let children = ($(`.field-build`).children());
-    let index;
-    for (let i = 0; i < children.length; i++) {
-        if (children[i].id === id) {
-            index = i;
-        }
-    }
-    if (index > 0) {
-        let hold = casa.fields[index - 1];
-        casa.fields[index - 1] = casa.fields[index];
-        casa.fields[index] = hold;
-        $("#elements").empty();
-        build_display(casa);
-    }
-}
-
-const moveDown = id => {
-    id = id.replace("-arrow", "");
-    id = id.substring(0, id.length - 5);
-    let casa = buildData();
-    let children = ($(`.field-build`).children());
-    let index;
-    for (let i = 0; i < children.length; i++) {
-        if (children[i].id === id) {
-            index = i;
-        }
-    }
-    if (index < children.length - 1) {
-        let hold = casa.fields[index + 1];
-        casa.fields[index + 1] = casa.fields[index];
-        casa.fields[index] = hold;
-        $("#elements").empty();
-        build_display(casa);
-    }
-}
-
-const bodyClick = e => {
-    let id = e.target.id;
-
-    if (id) {
-        if (id.includes(`-ftype`)) {
-            id = id.replace(`ftype`, `element-btn`);
-            $(`#${id}`).click();
-        } else if (id.includes("-up")) {
-            moveUp(id)
-        } else if (id.includes("-down")) {
-            moveDown(id)
-        } else if (id === "return-to-build") {
-            flipView();
-        } else if (id.includes("element-btn")) {
-            changeSelection(id);
-        } else if ($(`#${id}`).hasClass(`delete-btn`)) {
-            deleteButton(id);
-        } else if ($(`#${id}`).hasClass(`load-btn`)) {
-            load_casa(id);
-        } else if ($(`#${id}`).hasClass(`del-file-btn`)) {
-            delete_file(id);
-        } else if ($(`#${id}`).hasClass(`replacements-btn`)) {
-            if ($(`#${id}`).text() === "Show Replacements") {
-                $(`#${id}`).text("Hide Replacements")
-            } else {
-                $(`#${id}`).text("Show Replacements")
-            }
-
-            id = id.replace(`-btn`, ``);
-            $(`#${id}`).toggle();
-        }
-    }
-}
+const { initView, bodyClick, buildTopPartDisplay, keyUp, topPart, showAll } = require("./js/control");
 
 $(
     $(window).keydown(function(event) {
@@ -324,7 +154,7 @@ $(
     }),
     buildTopPartDisplay()
 );
-},{"./js/codes":2,"./js/fields/address":3,"./js/fields/begin_hidden":4,"./js/fields/checkbox_array":5,"./js/fields/date":6,"./js/fields/else":8,"./js/fields/elseif":9,"./js/fields/email":10,"./js/fields/end_hidden":11,"./js/fields/endif":12,"./js/fields/error_summary":13,"./js/fields/fragment":14,"./js/fields/header":15,"./js/fields/if":16,"./js/fields/name":17,"./js/fields/nino":18,"./js/fields/paragraph":19,"./js/fields/phone_number":21,"./js/fields/radio_group":22,"./js/fields/text_input":23,"./js/fields/top_part":24,"./js/input_output/export":25,"./js/input_output/file_handler":26,"./js/output/build_data":27,"./js/output/show_JSON":58,"./js/output/show_javascript":59,"./js/output/show_page":60,"./js/output/show_validators":61}],2:[function(require,module,exports){
+},{"./js/codes":2,"./js/control":3,"./js/fields/address":4,"./js/fields/begin_hidden":5,"./js/fields/checkbox_array":7,"./js/fields/date":8,"./js/fields/else":10,"./js/fields/elseif":11,"./js/fields/email":12,"./js/fields/end_hidden":13,"./js/fields/endif":14,"./js/fields/error_summary":15,"./js/fields/fragment":16,"./js/fields/header":17,"./js/fields/if":18,"./js/fields/name":19,"./js/fields/nino":20,"./js/fields/paragraph":21,"./js/fields/phone_number":23,"./js/fields/radio_group":24,"./js/fields/text_input":25,"./js/fields/top_part":26,"./js/input_output/export":27,"./js/input_output/file_handler":28,"./js/output/build_data":29,"./js/output/show_JSON":60,"./js/output/show_javascript":61,"./js/output/show_page":62,"./js/output/show_validators":63}],2:[function(require,module,exports){
 'use strict'
 
   let codes = [];
@@ -348,68 +178,470 @@ const getCode = () => {
 
 module.exports = {buildCodes, getCode}
 },{}],3:[function(require,module,exports){
+`use strict`
+
+const { delete_file, load_casa, build_display } = require("./input_output/file_handler");
+const buildData = require("./output/build_data");
+
+let topPart = [
+    `{% extends "cads/layouts/journey-claim.html" %}`,
+    `{% import "casa/macros/form.html" as form %}`
+];
+
+const buildTopPartDisplay = () => {
+    let tp = `<div class="row"><div class="col"><h6>Default Top Part:</h6><div></div>`;
+
+    topPart.forEach(item => {
+        tp += `<div class="row"><div class="col">${item}</div></div>`
+    });
+
+    tp += `<br><br><br>`;
+    tp += `<div class="row"><div class="col">Use the "Top Part" field to override these defaults.</div></div>`;
+
+    $(`#top-parts`).append(tp);
+}
+
+const initView = () => {
+    $(`.page-build`).hide();
+    $(`.page-neutral`).hide();
+    $(`.json-build`).hide();
+    $(`.validator-build`).hide();
+    $(`.javascript-build`).hide();
+    $(`#file-display`).hide();
+}
+
+const flipView = () => {
+    $(`.field-build`).show();
+    $(`#show-all`).show();
+    $(`.page-details`).show();
+    $(`#main-display`).show();
+    $(`#summary`).show();
+    $(`.page-build`).hide();
+    $(`.page-neutral`).hide();
+    $(`.json-build`).hide();
+    $(`.validator-build`).hide();
+    $(`.javascript-build`).hide();
+    $(`#file-display`).hide();
+}
+
+const deleteButton = (id) => {
+    let r = confirm("Are you sure you want to delete this element?");
+    if (r == true) {
+        let field = id.substring(0, id.length - 11);
+        $(`#${field}`).remove();
+        field = field + "-element";
+        $(`#${field}`).remove();
+    }
+}
+
+const changeSelection = (id) => {
+    let children = $("#elements").children();
+    for (let i = 0; i < children.length; i++) {
+        let thisID = children[i].id;
+        $(`#${thisID}-btn`).removeClass("selected");
+    }
+    $(`#${id}`).addClass("selected");
+
+    children = $(".field-build").children();
+    for (let i = 0; i < children.length; i++) {
+        let thisID = children[i].id;
+        $(`#${thisID}`).hide();
+    }
+    id = id.replace("-element-btn", "");
+    $(`#${id}`).show();
+}
+
+const showAll = () => {
+    let casa = buildData();
+    $("#elements").empty();
+    build_display(casa);
+    children = $(".field-build").children();
+    for (let i = 0; i < children.length; i++) {
+        let thisID = children[i].id;
+        $(`#${thisID}`).show();
+    }
+}
+
+const keyUp = e => {
+    let f = `Entity: ${$("#folder").val()}-${$("#page-name").val()}`;
+    $(`#folder-and-page`).text(f);
+    if (e.target.id.substring(3, 11) === `fragment` ||
+        e.target.id.substring(3, 12) === `paragraph` ||
+        e.target.id.substring(3, 11) === `top-part` ||
+        e.target.id.substring(3, 16) === `error-summary` |
+        e.target.id.substring(3, 8) === `input`
+    ) {
+        if (e.keyCode === 13) {
+            let $txt = $($(`#${e.target.id}`));
+            let caretPos = $txt[0].selectionStart;
+            let textAreaTxt = $txt.val();
+            let txtToAdd = "\n";
+            $txt.val(textAreaTxt.substring(0, caretPos) + txtToAdd + textAreaTxt.substring(caretPos));
+        }
+    }
+}
+
+const moveUp = id => {
+    id = id.replace("-arrow", "");
+    id = id.substring(0, id.length - 3);
+    let casa = buildData();
+    let children = ($(`.field-build`).children());
+    let index;
+    for (let i = 0; i < children.length; i++) {
+        if (children[i].id === id) {
+            index = i;
+        }
+    }
+    if (index > 0) {
+        let hold = casa.fields[index - 1];
+        casa.fields[index - 1] = casa.fields[index];
+        casa.fields[index] = hold;
+        $("#elements").empty();
+        build_display(casa);
+        children = ($(`.field-build`).children());
+        let newID = (children[index - 1].id);
+        $(`#${newID}-element-btn`).click();
+    }
+}
+
+const moveDown = id => {
+    id = id.replace("-arrow", "");
+    id = id.substring(0, id.length - 5);
+    let casa = buildData();
+    let children = ($(`.field-build`).children());
+    let index;
+    for (let i = 0; i < children.length; i++) {
+        if (children[i].id === id) {
+            index = i;
+        }
+    }
+    if (index < children.length - 1) {
+        let hold = casa.fields[index + 1];
+        casa.fields[index + 1] = casa.fields[index];
+        casa.fields[index] = hold;
+        $("#elements").empty();
+        build_display(casa);
+        children = ($(`.field-build`).children());
+        let newID = (children[index + 1].id);
+        $(`#${newID}-element-btn`).click();
+    }
+}
+
+const bodyClick = e => {
+    let id = e.target.id;
+
+    if (id) {
+        if (id.includes(`-ftype`)) {
+            id = id.replace(`ftype`, `element-btn`);
+            $(`#${id}`).click();
+        } else if (id.includes("-up")) {
+            moveUp(id)
+        } else if (id.includes("-down")) {
+            moveDown(id)
+        } else if (id === "return-to-build") {
+            flipView();
+        } else if (id.includes("element-btn")) {
+            changeSelection(id);
+        } else if ($(`#${id}`).hasClass(`delete-btn`)) {
+            deleteButton(id);
+        } else if ($(`#${id}`).hasClass(`load-btn`)) {
+            load_casa(id);
+        } else if ($(`#${id}`).hasClass(`del-file-btn`)) {
+            delete_file(id);
+        } else if ($(`#${id}`).hasClass(`replacements-btn`)) {
+            if ($(`#${id}`).text() === "Show Replacements") {
+                $(`#${id}`).text("Hide Replacements")
+            } else {
+                $(`#${id}`).text("Show Replacements")
+            }
+
+            id = id.replace(`-btn`, ``);
+            $(`#${id}`).toggle();
+        }
+    }
+}
+
+module.exports = {
+    initView,
+    bodyClick,
+    buildTopPartDisplay,
+    keyUp,
+    topPart,
+    showAll
+};
+},{"./input_output/file_handler":28,"./output/build_data":29}],4:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
-const { buildTopOfField } = require("./partials");
+const buildField = require("./build_field");
 const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildAddress = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-address`;
-    let date = buildTopOfField(prefix, "Address", "address");
-    date += `</div></div></div>`
-    $(`.field-build`).append(date);
+    let address = buildField(prefix, "Address", "address", ["tag", "header", "hint", "target", "replacements"])
+    $(`.field-build`).append(address);
     $(`#${prefix}-replacements`).hide();
     $(`#elements`).append(addElement("Address", prefix));
     showSelectedElement();
-    return date;
+    return address;
 }
 
 module.exports = buildAddress;
-},{"../codes":2,"./elements.js":7,"./partials":20}],4:[function(require,module,exports){
+},{"../codes":2,"./build_field":6,"./elements.js":9}],5:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
-const { addElement, showSelectedElement} = require("./elements.js");
+const buildField = require("./build_field")
+const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildBeginHidden = () => {
-  let fieldID = getCode();
-  let prefix = `${fieldID}-begin-hidden`;
-  let beginHidden = buildTopOfField(prefix);
-  beginHidden += `</div></div></div>`
-  $(`.field-build`).append(beginHidden);
-  $(`#elements`).append(addElement("Begin Hidden Field", prefix));
-  showSelectedElement();
-  return beginHidden;
+    let fieldID = getCode();
+    let prefix = `${fieldID}-begin-hidden`;
+    let beginHidden = buildField(prefix, "Begin Hidden", "addbegin-hidden", ["tag", "blanked"])
+    $(`.field-build`).append(beginHidden);
+    $(`#${prefix}-replacements`).hide();
+    $(`#elements`).append(addElement("Begin Hidden", prefix));
+    showSelectedElement();
+    return beginHidden;
 }
 
-const buildTopOfField = (prefix) => {
-    let top = `<div id="${prefix}" class="field begin-hidden">`;
-    top += `<div class="row">`
-    top += `<div class="col-md-3 field-type page-label">Begin Hidden Field</div>`
-    top += `<div class="col-md-1">Tag:</div>`
-    top += `<div class="col" id="${prefix}-tag">`
-    top += `<input type="text" id="${prefix}-tag-value" size="40" />`
-    top += `</div>`
-    top += `<div class="col-md-1"></div>`
-    top += `</div>`
+module.exports = buildBeginHidden;
+},{"../codes":2,"./build_field":6,"./elements.js":9}],6:[function(require,module,exports){
+"use strict"
 
-    top += `<div id="${prefix}-details" class="collapse show">`
-    top += `<div class="row">`
-    top += `<div class="col-md-2">`
-    top += `</div>`
-    top += `<div class="col-md-2 page-label">Blanked By:</div>`
+const BTN = "button btn-danger btn-sm btn-block";
+const BTN2 = "button btn-primary btn-sm btn-block";
+
+const buildField = (prefix, fieldName, type, lines) => {
+    let fieldObject = addLabel(prefix, fieldName, type);
+
+    if (lines.includes("tag")) {
+        fieldObject += addTag(prefix);
+    }
+
+    fieldObject += `</div>`
+
+    if (lines.includes("header")) {
+        fieldObject += addHeader(prefix)
+    }
+
+    if (lines.includes("hint")) {
+        fieldObject += addHint(prefix)
+    }
+
+    if (lines.includes("target")) {
+        fieldObject += addTarget(prefix)
+    };
+
+    if (lines.includes("textarea-small")) {
+        fieldObject += addTextArea(prefix, 8)
+    }
+
+    if (lines.includes("textarea-medium")) {
+        fieldObject += addTextArea(prefix, 12)
+    }
+
+    if (lines.includes("textarea-large")) {
+        fieldObject += addTextArea(prefix, 16)
+    }
+
+    if (lines.includes("length")) {
+        fieldObject += addLength(prefix)
+    }
+
+    if (lines.includes("blanked")) {
+        fieldObject += addBlanked(prefix)
+    }
+
+    if (lines.includes("replacements")) {
+        fieldObject += addReplacements(prefix)
+    };
+
+    fieldObject += `</div></div></div>`
+
+    return fieldObject;
+}
+
+const addLabel = (prefix, fieldName, type) => {
+    let top = `<div id="${prefix}" class="field ${type}">`;
+    top += `<div class="row">`;
+    top += `<div class="col-md-2 field-type" id="${prefix}-ftype" >${fieldName}</div>`;
+    return top;
+}
+
+const addTag = prefix => {
+    let top = `<div class="col-md-1 field-label">Tag:</div>`;
+    top += `<div class="col" id="${prefix}-tag">`;
+    top += `<input type="text" id="${prefix}-tag-value" size="40" />`;
+    top += `</div>`;
+    top += `<div class="col-md-1"></div>`;
+    return top;
+}
+
+const addHeader = prefix => {
+    let top = `<div id="${prefix}-details">`;
+    top += `<div class="row">`;
+    top += `<div class="col-md-2">`;
+    top += `</div>`;
+    top += `<div class="col-md-1 field-label">Header:</div>`;
+    top += `<div class="col" id="${prefix}-form-header">`;
+    top += `<input type="text" id="${prefix}-header-value" size="60" />`;
+    top += `</div>`;
+    top += `</div>`;
+    return top;
+}
+
+const addHint = prefix => {
+    let top = `<div class="row">`;
+    top += `<div class="col-md-2">`;
+    top += `</div>`;
+    top += `<div class="col-md-1 field-label">Hint:</div>`;
+    top += `<div class="col" id="${prefix}-form-hint">`;
+    top += `<input type="text" id="${prefix}-text-hint-value" size="60" />`;
+    top += `</div>`;
+    top += `<div class="col-md-1"></div>`;
+    top += `</div>`;
+    return top;
+}
+
+const addBlanked = prefix => {
+    let top = `<div class="row">`;
+    top += `<div class="col-md-1">`;
+    top += `</div>`;
+    top += `<div class="col-md-2 blanked field-label">Blanked by:</div>`;
     top += `<div class="col" id="${prefix}-blanked-by">`
     top += `<input type="text" id="${prefix}-blanked-by-value" size="60" />`
+    top += `</div>`;
+    top += `<div class="col-md-1"></div>`;
+    top += `</div>`;
+    return top;
+}
+
+const addTarget = prefix => {
+    let top = `<div class="row">`;
+    top += `<div class="col-md-2"></div>`;
+    top += `<div class="col-md-1 field-label">Target:</div>`;
+    top += `<div class="col" id="${prefix}-target">`;
+    top += `<input type="text" id="${prefix}-target-value" size="60" />`;
+    top += `</div>`;
+    top += `<div class="col-md-1"></div>`;
+    top += `</div>`;
+    return top;
+}
+
+const addLength = prefix => {
+    let top = `<div class="row">`;
+    top += `<div class="col-md-1"></div>`;
+    top += `<div class="col-md-2 field-label">Text Length:</div>`;
+    top += `<div class="col" id="${prefix}-length">`;
+    top += `<input type="text" id="${prefix}-length-value" size="3" />`;
+    top += `</div>`;
+    top += `<div class="col-md-1"></div>`;
+    top += `</div>`;
+    return top;
+}
+
+const addTextArea = (prefix, length) => {
+    let top = `<br/><div id="${prefix}-details">`
+    top += `<div class="row">`
+    top += `<div class="col-md-1"></div>`
+    top += `<div class="col">`
+    top += `<textarea class="form-control rounded-0" id="${prefix}-textarea" rows="${length}"></textarea>`
     top += `</div>`
-    top += `</div>` // end of row
+    top += `<div class="col-md-2"></div>`
+    top += `</div><br>`
+    return top;
+}
+
+const addReplacements = prefix => {
+    let top = `<br><div class="row" id="${prefix}-replacements-start">`;
+    top += `<div class="col-md-3">`;
+    top += `<button class="${BTN2} replacements-btn" id="${prefix}-replacements-btn">Show Replacements</button>`;
+    top += `</div>`;
+    top += `</div><br>`;
+
+    top += `<div class="replacements" id="${prefix}-replacements">`;
+    top += `<div class="row replace-row">`;
+    top += `<div class="col-md-2">Field</div>`;
+    top += `<div class="col-md-4">From</div>`;
+    top += `<div class="col-md-4">To</div>`;
+    top += `<div class="col"></div>`;
+    top += `</div>`;
+
+    top += `<div class="replacements-fld">`
+
+    for (let count = 0; count < 2; count++) {
+        top += `<div class="row replace-row" id="${prefix}-replace-${count}">`;
+        top += `<div class="col-md-2">`;
+        top += `<input type="radio" name="${prefix}-field-${count}" id="${prefix}-header-${count}" value="header">&nbsp;&nbsp;Header&nbsp;&nbsp;&nbsp;`;
+        top += `<input type="radio" name="${prefix}-field-${count}" id="${prefix}-hint-${count}" value="hint">&nbsp;&nbsp;Hint`;
+        top += `</div>`;
+
+        top += `<div class="col-md-4"><input type="text" id="${prefix}-left-${count}" size="32"></div>`;
+        top += `<div class="col-md-4"><input type="text" id="${prefix}-right-${count}" size="32"></div>`;
+        top += `<div class="col">`
+        top += `<button class="${BTN}" id="${prefix}-del-rep-btn-${count}">Delete</button>`;
+        top += `</div></div>`;
+    }
+
+    top += `</div>`
+
+    top += `<div class="row">`
+    top += `<div class="col-md-8"></div>`;
+    top += `<div class="col-md-3">`;
+    top += `<button class="${BTN2} rep-btn-add" id="${prefix}-rep-btn-add">Add a Replacement Field</button>`;
+    top += `</div>`
+    top += `</div>`;
+
+    top += `</div>`;
 
     return top;
 }
 
-module.exports = buildBeginHidden;
-},{"../codes":2,"./elements.js":7}],5:[function(require,module,exports){
+const replacementAdd = (id) => {
+    let prefix = id.substring(0, id.indexOf(`-rep`));
+    let children = $(".replacements-fld").children();
+    let next = 0;
+
+    if (children.length > 0) {
+        let lastLine = children[children.length - 1].id;
+        next = parseInt(lastLine.substring(lastLine.indexOf('replace-') + 8)) + 1;
+    }
+
+    let newLine = `<div class="row replace-row" id="${prefix}-replace-${next}">`;
+    newLine += `<div class="col-md-2">`;
+    newLine += `<input type="radio" name="${prefix}-fld-${next}" id="${prefix}-header-${next}" value="header">&nbsp;&nbsp;Header&nbsp;&nbsp;&nbsp;`;
+    newLine += `<input type="radio" name="${prefix}-fld-${next}" id="${prefix}-hint-${next}" value="hint">&nbsp;&nbsp;Hint`;
+    newLine += `</div>`;
+
+    newLine += `<div class="col-md-4"><input type="text" id="${prefix}-left-${next}" size="32"></div>`;
+    newLine += `<div class="col-md-4"><input type="text" id="${prefix}-right-${next}" size="32"></div>`;
+    newLine += `<div class="col">`
+    newLine += `<button class="${BTN}" id="${prefix}-del-rep-btn-${next}">Delete</button>`;
+    newLine += `</div></div>`;
+    $(".replacements-fld").append(newLine)
+}
+
+const replacementDelete = id => {
+    let cnt = id.substring(id.length - 1);
+    let prefix = id.substring(0, id.indexOf('-del'))
+    $(`#${prefix}-replace-${cnt}`).remove()
+}
+
+$(
+    $("body").click((e) => {
+        let id = e.target.id;
+        if (id.includes("-del-rep-")) {
+            replacementDelete(id);
+        } else if (id.includes(`rep-btn-add`)) {
+            replacementAdd(id);
+        }
+    })
+)
+
+module.exports = buildField;
+},{}],7:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
@@ -424,13 +656,13 @@ const buildCheckboxArray = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-checkbox-array`;
     let checkbox_array = buildTopOfField(prefix, "Checkbox Array", "checkbox-array")
-    checkbox_array += `<br/><div class="row">
+    checkbox_array += `<hr><div class="row">
                       <div class="col-md-1"></div>
                       <div class="col">
                         <button class="${BTN} btn-cb-add" id="${prefix}-cb-add-1">Add a checkbox</button>
                       </div>
                       <div class="col-md-1"></div>
-                    </div><br/>`
+                    </div><br>`
     checkbox_array += `<div id="${prefix}-checkbox-area"></div>`
     checkbox_array += `</div></div></div>`
     $(`.field-build`).append(checkbox_array);
@@ -483,18 +715,17 @@ $(
 )
 
 module.exports = { buildCheckboxArray, checkbox_array_addCheckbox }
-},{"../codes":2,"./elements.js":7,"./partials":20}],6:[function(require,module,exports){
+},{"../codes":2,"./elements.js":9,"./partials":22}],8:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
-const { buildTopOfField } = require("./partials");
+const buildField = require("./build_field");
 const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildDate = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-date`;
-    let date = buildTopOfField(prefix, "Date", "date");
-    date += `</div></div></div>`
+    let date = buildField(prefix, "Date", "date", ["tag", "header", "hint", "target", "replacements"])
     $(`.field-build`).append(date);
     $(`#${prefix}-replacements`).hide();
     $(`#elements`).append(addElement("Date", prefix));
@@ -503,7 +734,7 @@ const buildDate = () => {
 }
 
 module.exports = buildDate;
-},{"../codes":2,"./elements.js":7,"./partials":20}],7:[function(require,module,exports){
+},{"../codes":2,"./build_field":6,"./elements.js":9}],9:[function(require,module,exports){
 const addElement = (element, prefix) => {
     let elementRow = `
   <div class="row element-row"  id="${prefix}-element">
@@ -539,7 +770,7 @@ const showSelectedElement = () => {
 }
 
 module.exports = { addElement, showSelectedElement };
-},{}],8:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
@@ -567,49 +798,48 @@ const buildTopOfField = (prefix) => {
 }
 
 module.exports = buildElse;
-},{"../codes":2,"./elements.js":7}],9:[function(require,module,exports){
+},{"../codes":2,"./elements.js":9}],11:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
-const { addElement, showSelectedElement} = require("./elements.js");
+const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildElseIf = () => {
-  let fieldID = getCode();
-  let prefix = `${fieldID}-elseif`;
-  let _elseif = buildTopOfField(prefix)
-  _elseif += `</div></div></div>`
-  $(`.field-build`).append(_elseif);
-  $(`#elements`).append(addElement("Else If", prefix));
-  showSelectedElement();
-  return _elseif;
+    let fieldID = getCode();
+    let prefix = `${fieldID}-elseif`;
+    let _elseif = buildTopOfField(prefix)
+    _elseif += `</div></div></div>`
+    $(`.field-build`).append(_elseif);
+    $(`#elements`).append(addElement("Else If", prefix));
+    showSelectedElement();
+    return _elseif;
 }
 
 const buildTopOfField = (prefix) => {
-  let top = `<div id="${prefix}" class="field "elseif">`;
-  top += `<div class="row">`;
-  top += `<div class="col-md-2 field-type">Else If</div>`;
-  top += `<div class="col-md-1">Condition:</div>`;
-  top += `<div class="col" id="${prefix}-condition">`;
-  top += `<input type="text" id="${prefix}-condition-value" size="60" />`;
-  top += `</div>`;
-  top += `<div class="col-md-1"></div>`;
-  top += `</div>`; // end of row
-  return top;
+    let top = `<div id="${prefix}" class="field elseif">`;
+    top += `<div class="row">`;
+    top += `<div class="col-md-2 field-type">Else If</div>`;
+    top += `<div class="col-md-1">Condition:</div>`;
+    top += `<div class="col" id="${prefix}-condition">`;
+    top += `<input type="text" id="${prefix}-condition-value" size="60" />`;
+    top += `</div>`;
+    top += `<div class="col-md-1"></div>`;
+    top += `</div>`; // end of row
+    return top;
 }
 
 module.exports = buildElseIf;
-},{"../codes":2,"./elements.js":7}],10:[function(require,module,exports){
+},{"../codes":2,"./elements.js":9}],12:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
-const { buildTopOfField } = require("./partials");
+const buildField = require("./build_field")
 const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildEmail = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-email`;
-    let email = buildTopOfField(prefix, "Email", "email")
-    email += `</div></div></div>`
+    let email = buildField(prefix, "Email", "email", ["tag", "header", "hint", "replacements"])
     $(`.field-build`).append(email);
     $(`#${prefix}-replacements`).hide();
     $(`#elements`).append(addElement("Email", prefix));
@@ -618,7 +848,7 @@ const buildEmail = () => {
 }
 
 module.exports = buildEmail;
-},{"../codes":2,"./elements.js":7,"./partials":20}],11:[function(require,module,exports){
+},{"../codes":2,"./build_field":6,"./elements.js":9}],13:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
@@ -646,7 +876,7 @@ const buildTopOfField = (prefix) => {
 }
 
 module.exports = buildEndHidden;
-},{"../codes":2,"./elements.js":7}],12:[function(require,module,exports){
+},{"../codes":2,"./elements.js":9}],14:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
@@ -674,85 +904,43 @@ const buildTopOfField = (prefix) => {
 }
 
 module.exports = buildEndIf;
-},{"../codes":2,"./elements.js":7}],13:[function(require,module,exports){
+},{"../codes":2,"./elements.js":9}],15:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
+const buildField = require("./build_field");
 const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildErrorSummary = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-error-summary`;
-    let error_summary = buildTopOfField(prefix);
-    error_summary += `</div></div></div>`;
-    $(`.field-build`).append(error_summary);
-    $(`#elements`).append(addElement("Error Summary", prefix));
+    let errorSummary = buildField(prefix, "Error Summary", "error-summary", ["tag", "textarea-medium"])
+    $(`.field-build`).append(errorSummary);
+    $(`#elements`).append(addElement("Code", prefix));
     showSelectedElement();
-    return error_summary;
-}
-
-const buildTopOfField = (prefix) => {
-    let top = `<div id="${prefix}" class="field "error-summary">`;
-    top += `<div class="row">`;
-    top += `<div class="col-md-2 field-type">Error Summary</div>`;
-    top += `<div class="col-md-1">Tag:</div>`;
-    top += `<div class="col" id="${prefix}-tag">`;
-    top += `<input type="text" id="${prefix}-tag-value" size="40" />`;
-    top += `</div>`;
-    top += `<div class="col-md-1"></div>`;
-    top += `</div>`; // end of row
-    top += `<br/><div id="${prefix}-details">`;
-    top += `<div class="row">`
-    top += `<div class="col-md-1"></div>`
-    top += `<div class="col">`
-    top += `<textarea class="form-control rounded-0" id="${prefix}-textarea" rows="20"></textarea>`
-    top += `</div>`
-    top += `<div class="col-md-2"></div>`
-    top += `</div>`; // end of row
-    return top;
+    return errorSummary;
 }
 
 module.exports = buildErrorSummary;
-},{"../codes":2,"./elements.js":7}],14:[function(require,module,exports){
+},{"../codes":2,"./build_field":6,"./elements.js":9}],16:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
+const buildField = require("./build_field");
 const { addElement, showSelectedElement } = require("./elements.js");
-const BTN = "button btn-primary btn-sm btn-block";
 
 const buildFragment = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-fragment`;
-    let fragment = buildTop(prefix)
-    fragment += `</div></div></div>`
+    let fragment = buildField(prefix, "Fragment", "fragment", ["tag", "textarea-large"])
     $(`.field-build`).append(fragment);
     $(`#elements`).append(addElement("Code", prefix));
     showSelectedElement();
     return fragment;
 }
 
-const buildTop = (prefix) => {
-    let top = `<div id="${prefix}" class="field fragment">`;
-    top += `<div class="row">`
-    top += `<div class="col-md-2 field-type">Code Fragment</div>`
-    top += `<div class="col"></div>`
-    top += `<div class="col-md-1"></div>`
-    top += `<div class="col-md-1"></div>`
-    top += `<div class="col-md-1"></div>`
-    top += `</div>` // end of row
-    top += `<br/><div id="${prefix}-details">`
-    top += `<div class="row">`
-    top += `<div class="col-md-1"></div>`
-    top += `<div class="col">`
-    top += `<textarea class="form-control rounded-0" id="${prefix}-textarea" rows="16"></textarea>`
-    top += `</div>`
-    top += `<div class="col-md-2"></div>`
-    top += `</div><br>` // end of row
-    return top;
-}
-
 module.exports = buildFragment;
-},{"../codes":2,"./elements.js":7}],15:[function(require,module,exports){
+},{"../codes":2,"./build_field":6,"./elements.js":9}],17:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
@@ -815,97 +1003,67 @@ const buildhdrTop = (prefix, fieldType, type, headerSize) => {
 }
 
 module.exports = buildHeader;
-},{"../codes":2,"./elements.js":7}],16:[function(require,module,exports){
+},{"../codes":2,"./elements.js":9}],18:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
-const { addElement, showSelectedElement} = require("./elements.js");
+const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildIf = () => {
-  let fieldID = getCode();
-  let prefix = `${fieldID}-if`;
-  let _if = buildTopOfField(prefix)
-  _if += `</div></div></div>`
-  $(`.field-build`).append(_if);
-  $(`#elements`).append(addElement("If", prefix));
-  showSelectedElement();
-  return _if;
+    let fieldID = getCode();
+    let prefix = `${fieldID}-if`;
+    let _if = buildTopOfField(prefix)
+    _if += `</div></div></div>`
+    $(`.field-build`).append(_if);
+    $(`#elements`).append(addElement("If", prefix));
+    showSelectedElement();
+    return _if;
 }
 
 const buildTopOfField = (prefix) => {
-  let top = `<div id="${prefix}" class="field "if">`;
-  top += `<div class="row">`;
-  top += `<div class="col-md-2 field-type">If</div>`;
-  top += `<div class="col-md-1">Condition:</div>`;
-  top += `<div class="col" id="${prefix}-condition">`;
-  top += `<input type="text" id="${prefix}-condition-value" size="60" />`;
-  top += `</div>`;
-  top += `<div class="col-md-1"></div>`;
-  top += `</div>`; // end of row
-  return top;
+    let top = `<div id="${prefix}" class="field if">`;
+    top += `<div class="row">`;
+    top += `<div class="col-md-2 field-type">If</div>`;
+    top += `<div class="col-md-1">Condition:</div>`;
+    top += `<div class="col" id="${prefix}-condition">`;
+    top += `<input type="text" id="${prefix}-condition-value" size="60" />`;
+    top += `</div>`;
+    top += `<div class="col-md-1"></div>`;
+    top += `</div>`; // end of row
+    return top;
 }
 
 module.exports = buildIf;
-},{"../codes":2,"./elements.js":7}],17:[function(require,module,exports){
+},{"../codes":2,"./elements.js":9}],19:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
+const buildField = require("./build_field");
 const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildName = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-name`;
-    name = buildTopOfField(prefix);
-    name += `</div></div></div>`
+    let name = buildField(prefix, "Name", "name", ["tag", "header", "hint", "target", "replacements"])
     $(`.field-build`).append(name);
     $(`#${prefix}-replacements`).hide();
-
     $(`#elements`).append(addElement("Name", prefix));
-    $(`#${prefix}-replacements`).hide();
-
     showSelectedElement();
     return name;
 }
 
-const buildTopOfField = prefix => {
-    let top = `<div id="${prefix}" class="field name">`;
-    top += `<div class="row">`
-    top += `<div class="col-md-2 field-type" id="${prefix}-ftype" >Name</div>`
-    top += `<div class="col-md-1">Tag:</div>`
-    top += `<div class="col" id="${prefix}-tag">`
-    top += `<input type="text" id="${prefix}-tag-value" size="40" />`
-    top += `</div>`
-    top += `<div class="col-md-1"></div>`
-    top += `</div>` // end of row
-
-    top += `<div id="${prefix}-details">`;
-    top += `<div class="row">`;
-    top += `<div class="col-md-2">`;
-    top += `</div>`;
-    top += `<div class="col-md-1">Header:</div>`;
-    top += `<div class="col" id="${prefix}-form-header">`;
-    top += `<input type="text" id="${prefix}-header-value" size="60" />`;
-    top += `</div>`;
-    top += `</div>`; // end of row 
-
-    top += `</div>`;
-
-    return top;
-}
-
 module.exports = buildName;
-},{"../codes":2,"./elements.js":7}],18:[function(require,module,exports){
+},{"../codes":2,"./build_field":6,"./elements.js":9}],20:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
+const buildField = require("./build_field")
 const { addElement, showSelectedElement } = require("./elements.js");
-const BTN = "button btn-danger btn-sm btn-block";
 
 const buildNino = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-nino`;
-    let nino = buildTopOfField(prefix, "NINO", "nino")
-    nino += `</div></div></div>`
+    let nino = buildField(prefix, "NINO", "nino", ["tag", "header", "replacements"])
     $(`.field-build`).append(nino);
     $(`#${prefix}-replacements`).hide();
     $(`#elements`).append(addElement("NINO", prefix));
@@ -913,10 +1071,52 @@ const buildNino = () => {
     return nino;
 }
 
-const buildTopOfField = prefix => {
-    let top = `<div id="${prefix}" class="field nino">`;
+module.exports = buildNino;
+},{"../codes":2,"./build_field":6,"./elements.js":9}],21:[function(require,module,exports){
+"use strict"
+
+const { getCode } = require("../codes");
+const buildField = require("./build_field");
+const { addElement, showSelectedElement } = require("./elements.js");
+
+const buildParagraph = () => {
+    let fieldID = getCode();
+    let prefix = `${fieldID}-paragraph`;
+    let paragraph = buildField(prefix, "Paragraph", "paragraph", ["tag", "textarea-large"])
+    $(`.field-build`).append(paragraph);
+    $(`#elements`).append(addElement("Code", prefix));
+    showSelectedElement();
+    return paragraph;
+}
+
+module.exports = buildParagraph;
+},{"../codes":2,"./build_field":6,"./elements.js":9}],22:[function(require,module,exports){
+"use strict"
+
+const BTN = "button btn-danger btn-sm btn-block";
+const BTN2 = "button btn-primary btn-sm btn-block";
+
+const buildInputRow = (label, name, button, btnID, size = 60) => {
+    let row = `<div class="row" id="${name}"><div class="col-md-2 right-justify">`;
+    row += label + `</div><div class="col"><input type="text" id="${name}-value" `;
+    if (button) {
+        row += `size="${size}"></div>
+              <div class="col-md-2">
+                <button class="button btn-primary btn-sm btn-block" id="${btnID}">
+                  ${button}
+                </button>
+              </div>
+            </div>`
+    } else {
+        row += `size="${size}"></div><div class="col-md-1"></div></div>`
+    }
+    return row
+}
+
+const buildTopOfField = (prefix, fieldType, type) => {
+    let top = `<div id="${prefix}" class="field ${type}">`;
     top += `<div class="row">`
-    top += `<div class="col-md-2 field-type" id="${prefix}-ftype" >NINO</div>`
+    top += `<div class="col-md-2 field-type" id="${prefix}-ftype" >${fieldType}</div>`
     top += `<div class="col-md-1">Tag:</div>`
     top += `<div class="col" id="${prefix}-tag">`
     top += `<input type="text" id="${prefix}-tag-value" size="40" />`
@@ -934,9 +1134,28 @@ const buildTopOfField = prefix => {
     top += `</div>`;
     top += `</div>`; // end of row 
 
+    top += `<div class="row">`;
+    top += `<div class="col-md-2">`;
+    top += `</div>`;
+    top += `<div class="col-md-1">Hint:</div>`;
+    top += `<div class="col" id="${prefix}-form-hint">`;
+    top += `<input type="text" id="${prefix}-text-hint-value" size="60" />`;
+    top += `</div>`;
+    top += `<div class="col-md-1"></div>`;
+    top += `</div>`; // end of row
+
+    top += `<div class="row">`;
+    top += `<div class="col-md-2"></div>`;
+    top += `<div class="col-md-1">Target:</div>`;
+    top += `<div class="col" id="${prefix}-target">`;
+    top += `<input type="text" id="${prefix}-target-value" size="60" />`;
+    top += `</div>`;
+    top += `<div class="col-md-1"></div>`;
+    top += `</div><br>`; // end of row
+
     top += `<div class="row" id="${prefix}-replacements-start">`;
     top += `<div class="col-md-3">`;
-    top += `<button class="${BTN} replacements-btn" id="${prefix}-replacements-btn">Show Replacements</button>`;
+    top += `<button class="${BTN2} replacements-btn" id="${prefix}-replacements-btn">Show Replacements</button>`;
     top += `</div>`;
     top += `</div><br>`;
 
@@ -948,8 +1167,11 @@ const buildTopOfField = prefix => {
     top += `<div class="col"></div>`;
     top += `</div>`;
 
-    for (let count = 0; count < 10; count++) {
-        top += `<div class="row replace-row" id="replace-${count}">`;
+    top += `<div class="replacements-fld">`
+
+
+    for (let count = 0; count < 2; count++) {
+        top += `<div class="row replace-row" id="${prefix}-replace-${count}">`;
         top += `<div class="col-md-2">`;
         top += `<input type="radio" name="${prefix}-field-${count}" id="${prefix}-header-${count}" value="header">&nbsp;&nbsp;Header&nbsp;&nbsp;&nbsp;`;
         top += `<input type="radio" name="${prefix}-field-${count}" id="${prefix}-hint-${count}" value="hint">&nbsp;&nbsp;Hint`;
@@ -958,175 +1180,31 @@ const buildTopOfField = prefix => {
         top += `<div class="col-md-4"><input type="text" id="${prefix}-left-${count}" size="32"></div>`;
         top += `<div class="col-md-4"><input type="text" id="${prefix}-right-${count}" size="32"></div>`;
         top += `<div class="col">`
-        top += `<button class="${BTN} rep-del-btn" id="${prefix}-del-rep-btn">Delete</button>`;
-        top += `</div>`;
-        top += `</div>`;
+        top += `<button class="${BTN}" id="${prefix}-del-rep-btn-${count}">Delete</button>`;
+        top += `</div></div>`;
     }
 
+    top += `</div>`
+
+    top += `<div class="row">`
+    top += `<div class="col-md-8"></div>`;
+    top += `<div class="col-md-3">`;
+    top += `<button class="${BTN2} rep-btn-add" id="${prefix}-rep-btn-add">Add a Replacement Field</button>`;
+    top += `</div>`
+    top += `</div>`;
+
     top += `</div>`;
 
     return top;
-}
-
-module.exports = buildNino;
-},{"../codes":2,"./elements.js":7}],19:[function(require,module,exports){
-"use strict"
-
-const { getCode } = require("../codes");
-const { addElement, showSelectedElement } = require("./elements.js");
-const BTN = "button btn-primary btn-sm btn-block";
-
-const buildParagraph = () => {
-    let fieldID = getCode();
-    let prefix = `${fieldID}-paragraph`;
-    let paragraph = buildParagraphTop(prefix);
-    paragraph += `</div></div></div>`
-    $(`.field-build`).append(paragraph);
-    $(`#elements`).append(addElement("Paragraph", prefix));
-    showSelectedElement();
-    return paragraph;
-}
-
-const buildParagraphTop = (prefix) => {
-    let top = `<div id="${prefix}" class="field paragraph">`;
-    top += `<div class="row">`
-    top += `<div class="col-md-2 field-type">Paragraph</div>`
-    top += `<div class="col-md-1">Tag:</div>`
-    top += `<div class="col" id="${prefix}-tag">`
-    top += `<input type="text" id="${prefix}-tag-value" size="40" />`
-    top += `</div>`
-    top += `<div class="col-md-1"></div>`
-    top += `</div>` // end of row
-    top += `<br><div id="${prefix}-details">`
-    top += `<div class="row">`
-    top += `<div class="col-md-1"></div>`
-    top += `<div class="col">`
-    top += `<textarea class="form-control rounded-0" id="${prefix}-textarea" rows="16"></textarea>`
-    top += `</div>`
-    top += `<div class="col-md-2"></div>`
-    top += `</div><br>` // end of row
-    return top;
-}
-
-module.exports = buildParagraph;
-},{"../codes":2,"./elements.js":7}],20:[function(require,module,exports){
-"use strict"
-
-const BTN = "button btn-danger btn-sm btn-block";
-const BTN2 = "button btn-primary btn-sm btn-block";
-
-const buildInputRow = (label, name, button, btnID, size = 60) => {
-  let row = `<div class="row" id="${name}"><div class="col-md-2 right-justify">`;
-  row += label + `</div><div class="col"><input type="text" id="${name}-value" `;
-  if (button) {
-    row += `size="${size}"></div>
-              <div class="col-md-2">
-                <button class="button btn-primary btn-sm btn-block" id="${btnID}">
-                  ${button}
-                </button>
-              </div>
-            </div>`
-  } else {
-    row += `size="${size}"></div><div class="col-md-1"></div></div>`
-  }
-  return row
-}
-
-const buildTopOfField = (prefix, fieldType, type) => {
-  let top = `<div id="${prefix}" class="field ${type}">`;
-  top += `<div class="row">`
-  top += `<div class="col-md-2 field-type" id="${prefix}-ftype" >${fieldType}</div>`
-  top += `<div class="col-md-1">Tag:</div>`
-  top += `<div class="col" id="${prefix}-tag">`
-  top += `<input type="text" id="${prefix}-tag-value" size="40" />`
-  top += `</div>`
-  top += `<div class="col-md-1"></div>`
-  top += `</div>` // end of row
-
-  top += `<div id="${prefix}-details">`;
-  top += `<div class="row">`;
-  top += `<div class="col-md-2">`;
-  top += `</div>`;
-  top += `<div class="col-md-1">Header:</div>`;
-  top += `<div class="col" id="${prefix}-form-header">`;
-  top += `<input type="text" id="${prefix}-header-value" size="60" />`;
-  top += `</div>`;
-  top += `</div>`; // end of row 
-
-  top += `<div class="row">`;
-  top += `<div class="col-md-2">`;
-  top += `</div>`;
-  top += `<div class="col-md-1">Hint:</div>`;
-  top += `<div class="col" id="${prefix}-form-hint">`;
-  top += `<input type="text" id="${prefix}-text-hint-value" size="60" />`;
-  top += `</div>`;
-  top += `<div class="col-md-1"></div>`;
-  top += `</div>`; // end of row
-
-  top += `<div class="row">`;
-  top += `<div class="col-md-2"></div>`;
-  top += `<div class="col-md-1">Target:</div>`;
-  top += `<div class="col" id="${prefix}-target">`;
-  top += `<input type="text" id="${prefix}-target-value" size="60" />`;
-  top += `</div>`;
-  top += `<div class="col-md-1"></div>`;
-  top += `</div><br>`; // end of row
-
-  top += `<div class="row" id="${prefix}-replacements-start">`;
-  top += `<div class="col-md-3">`;
-  top += `<button class="${BTN2} replacements-btn" id="${prefix}-replacements-btn">Show Replacements</button>`;
-  top += `</div>`;
-  top += `</div><br>`;
-
-  top += `<div class="replacements" id="${prefix}-replacements">`;
-  top += `<div class="row replace-row">`;
-  top += `<div class="col-md-2">Field</div>`;
-  top += `<div class="col-md-4">From</div>`;
-  top += `<div class="col-md-4">To</div>`;
-  top += `<div class="col"></div>`;
-  top += `</div>`;
-
-  top += `<div class="replacements-field">`
-
-
-  for (let count = 0; count < 2; count++) {
-    top += `<div class="row replace-row" id="${prefix}-replace-${count}">`;
-    top += `<div class="col-md-2">`;
-    top += `<input type="radio" name="${prefix}-field-${count}" id="${prefix}-header-${count}" value="header">&nbsp;&nbsp;Header&nbsp;&nbsp;&nbsp;`;
-    top += `<input type="radio" name="${prefix}-field-${count}" id="${prefix}-hint-${count}" value="hint">&nbsp;&nbsp;Hint`;
-    top += `</div>`;
-
-    top += `<div class="col-md-4"><input type="text" id="${prefix}-left-${count}" size="32"></div>`;
-    top += `<div class="col-md-4"><input type="text" id="${prefix}-right-${count}" size="32"></div>`;
-    top += `<div class="col">`
-    top += `<button class="${BTN}" id="${prefix}-del-rep-btn-${count}">Delete</button>`;
-    top += `</div></div>`;
-  }
-
-  top += `</div>`
-
-  top += `<div class="row">`
-  top += `<div class="col-md-8"></div>`;
-  top += `<div class="col-md-3">`;
-  top += `<button class="${BTN2} rep-btn-add" id="${prefix}-rep-btn-add">Add a Replacement Field</button>`;
-  top += `</div>`
-  top += `</div>`;
-
-  top += `</div>`;
-
-  return top;
 }
 
 const replacementAdd = (id) => {
-  console.log(id)
 
-  // AA-address-rep-btn-add
-
-  let prefix = id.substring(0, id.indexOf(`-rep`));
-  let children = $(".replacements-fld").children();
-  let lastLine = children[children.length - 1].id;
-  let next = parseInt(lastLine.substring(lastLine.indexOf('replace-') + 8)) + 1;
-  let newLine =  `<div class="row replace-row" id="${prefix}-replace-${next}">`;
+    let prefix = id.substring(0, id.indexOf(`-rep`));
+    let children = $(".replacements-fld").children();
+    let lastLine = children[children.length - 1].id;
+    let next = parseInt(lastLine.substring(lastLine.indexOf('replace-') + 8)) + 1;
+    let newLine = `<div class="row replace-row" id="${prefix}-replace-${next}">`;
     newLine += `<div class="col-md-2">`;
     newLine += `<input type="radio" name="${prefix}-fld-${next}" id="${prefix}-header-${next}" value="header">&nbsp;&nbsp;Header&nbsp;&nbsp;&nbsp;`;
     newLine += `<input type="radio" name="${prefix}-fld-${next}" id="${prefix}-hint-${next}" value="hint">&nbsp;&nbsp;Hint`;
@@ -1137,39 +1215,27 @@ const replacementAdd = (id) => {
     newLine += `<div class="col">`
     newLine += `<button class="${BTN}" id="${prefix}-del-rep-btn-${next}">Delete</button>`;
     newLine += `</div></div>`;
-    $(".replacements-field").append(newLine)
+    $(".replacements-fld").append(newLine)
 }
 
 const replacementDelete = id => {
-  let cnt = id.substring(id.length - 1);
-  let prefix = id.substring(0, id.indexOf('-del'))
-  $(`#${prefix}-replace-${cnt}`).remove()
+    let cnt = id.substring(id.length - 1);
+    let prefix = id.substring(0, id.indexOf('-del'))
+    $(`#${prefix}-replace-${cnt}`).remove()
 }
 
-$(
-  $("body").click((e) => {
-    let id = e.target.id;
-    if (id.includes("-del-rep-")) {
-      replacementDelete(id);
-    } else if (id.includes(`rep-btn-add`)) {
-      replacementAdd(id);
-    }
-  })
-)
-
 module.exports = { buildInputRow, buildTopOfField };
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
-const { buildTopOfField } = require("./partials");
+const buildField = require("./build_field")
 const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildPhoneNumber = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-phone`;
-    let phone = buildTopOfField(prefix, "Phone Number", "phone")
-    phone += `</div></div></div>`
+    let phone = buildField(prefix, "Phone Number", "phone", ["tag", "header", "hint", "target", "replacements"])
     $(`.field-build`).append(phone);
     $(`#${prefix}-replacements`).hide();
     $(`#elements`).append(addElement("Phone #", prefix));
@@ -1178,7 +1244,7 @@ const buildPhoneNumber = () => {
 }
 
 module.exports = buildPhoneNumber;
-},{"../codes":2,"./elements.js":7,"./partials":20}],22:[function(require,module,exports){
+},{"../codes":2,"./build_field":6,"./elements.js":9}],24:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
@@ -1193,7 +1259,7 @@ const buildRadioGroup = () => {
     let fieldID = getCode();
     let prefix = `${fieldID}-radio-group`;
     let radio_group = buildTopOfField(prefix, "Radio Group", "radio-group")
-    radio_group += `<div class="row inline" id="${prefix}-radio-group-inline">
+    radio_group += `<hr><div class="row inline" id="${prefix}-radio-group-inline">
                       <div class="col"></div>
                       <div class="col-md-1">Inline:</div>
                       <div class="col-md-3" id="${prefix}-radio-group-inline-buttons">
@@ -1202,7 +1268,7 @@ const buildRadioGroup = () => {
                           <input type="radio" name="${prefix}-opt_inline" id="${prefix}-radio-group-inline-no" checked>&nbsp;No
                       </div>
                       <div class="col"></div>
-                    </div>`
+                    </div><hr>`
     radio_group += `<div class="row">
                       <div class="col-md-1"></div>
                       <div class="col">
@@ -1276,26 +1342,18 @@ $(
 )
 
 module.exports = { buildRadioGroup, radio_group_addRadioButton }
-},{"../codes":2,"./elements.js":7,"./partials":20}],23:[function(require,module,exports){
+},{"../codes":2,"./elements.js":9,"./partials":22}],25:[function(require,module,exports){
 "use strict"
 
 const { getCode } = require("../codes");
-const { buildTopOfField } = require("./partials");
+const buildField = require("./build_field")
 const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildTextInput = () => {
     let fieldID = getCode();
-    let prefix = `${fieldID}-textInput`;
-    let text_input = buildTopOfField(prefix, "Text Input", "textInput");
-
-    length = `<div class="row" id="${prefix}-length"><div class="col-md-3 right-justify">`;
-    length += `Text Length: </div><div class="col"><input type="text" id="${prefix}-length-value" `;
-    length += `size="3"></div><div class="col-md-1"></div></div><br>`
-
-
-    text_input += `</div></div></div>`
+    let prefix = `${fieldID}-textInpur`;
+    let text_input = buildField(prefix, "Text Input", "textInput", ["tag", "header", "hint", "target", "replacements", "length"])
     $(`.field-build`).append(text_input);
-    $(`#${prefix}-replacements-start`).before(length);
     $(`#${prefix}-replacements`).hide();
     $(`#elements`).append(addElement("Text Input", prefix));
     showSelectedElement();
@@ -1303,46 +1361,30 @@ const buildTextInput = () => {
 }
 
 module.exports = buildTextInput;
-},{"../codes":2,"./elements.js":7,"./partials":20}],24:[function(require,module,exports){
+},{"../codes":2,"./build_field":6,"./elements.js":9}],26:[function(require,module,exports){
 "use strict"
-
 const { getCode } = require("../codes");
+const buildField = require("./build_field");
 const { addElement, showSelectedElement } = require("./elements.js");
 
 const buildTopPart = () => {
-    let fieldID = getCode();
-    let prefix = `${fieldID}-top-part`;
-    let top_part = buildTopOfField(prefix);
-    top_part += `</div></div></div>`;
-    $(`.field-build`).prepend(top_part);
-    $(`#elements`).prepend(addElement("Top Part", prefix));
-    showSelectedElement();
-    $(`#${prefix}-element-btn`).click()
-    return top_part;
-}
 
-const buildTopOfField = (prefix) => {
-    let top = `<div id="${prefix}" class="field top-part">`;
-    top += `<div class="row">`
-    top += `<div class="col-md-2 field-type">Top Part</div>`
-    top += `<div class="col"></div>`
-    top += `<div class="col-md-1"></div>`
-    top += `<div class="col-md-1"></div>`
-    top += `<div class="col-md-1"></div>`
-    top += `</div>` // end of row
-    top += `<br/><div id="${prefix}-details">`
-    top += `<div class="row">`
-    top += `<div class="col-md-1"></div>`
-    top += `<div class="col">`
-    top += `<textarea class="form-control rounded-0" id="${prefix}-textarea" rows="10"></textarea>`
-    top += `</div>`
-    top += `<div class="col-md-2"></div>`
-    top += `</div><br>` // end of row
-    return top;
+    let children = $("#elements").children();
+    if (children.length === 0 || !children[0].id.includes(`-top-part-`)) {
+
+        let fieldID = getCode();
+        let prefix = `${fieldID}-top-part`;
+        let top_part = buildField(prefix, "Top Part", "top-part", ["tag", "textarea-small"])
+        $(`.field-build`).prepend(top_part);
+        $(`#elements`).prepend(addElement("Top Part", prefix));
+        showSelectedElement();
+        $(`#${prefix}-element-btn`).click()
+        return top_part;
+    }
 }
 
 module.exports = buildTopPart;
-},{"../codes":2,"./elements.js":7}],25:[function(require,module,exports){
+},{"../codes":2,"./build_field":6,"./elements.js":9}],27:[function(require,module,exports){
 'use strict'
 
 const fs = require('browserify-fs');
@@ -1372,7 +1414,7 @@ const exportFiles = (casa, topPart) => {
 };
 
 module.exports = exportFiles;
-},{"../output/show_JSON.js":58,"../output/show_javascript.js":59,"../output/show_page.js":60,"../output/show_validators.js":61,"browserify-fs":86}],26:[function(require,module,exports){
+},{"../output/show_JSON.js":60,"../output/show_javascript.js":61,"../output/show_page.js":62,"../output/show_validators.js":63,"browserify-fs":88}],28:[function(require,module,exports){
 "use strict"
 
 const BTN = "button btn-primary btn-sm btn-block";
@@ -1718,7 +1760,7 @@ module.exports = {
     load_casa,
     build_display
 }
-},{"../fields/address":3,"../fields/begin_hidden":4,"../fields/checkbox_array":5,"../fields/date":6,"../fields/else":8,"../fields/elseif":9,"../fields/email":10,"../fields/end_hidden":11,"../fields/endif":12,"../fields/error_summary":13,"../fields/fragment":14,"../fields/header":15,"../fields/if":16,"../fields/name":17,"../fields/nino":18,"../fields/paragraph":19,"../fields/phone_number":21,"../fields/radio_group":22,"../fields/text_input":23,"../fields/top_part":24,"../output/build_data":27}],27:[function(require,module,exports){
+},{"../fields/address":4,"../fields/begin_hidden":5,"../fields/checkbox_array":7,"../fields/date":8,"../fields/else":10,"../fields/elseif":11,"../fields/email":12,"../fields/end_hidden":13,"../fields/endif":14,"../fields/error_summary":15,"../fields/fragment":16,"../fields/header":17,"../fields/if":18,"../fields/name":19,"../fields/nino":20,"../fields/paragraph":21,"../fields/phone_number":23,"../fields/radio_group":24,"../fields/text_input":25,"../fields/top_part":26,"../output/build_data":29}],29:[function(require,module,exports){
 "use strict"
 
 const buildtag = () => {
@@ -1881,7 +1923,7 @@ const headerBreakdown = (id, field) => {
 }
 
 module.exports = buildtag;
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 'use strict'
 
 const address_JSON = (field) => {
@@ -1924,7 +1966,7 @@ const address_JSON = (field) => {
 }
 
 module.exports = address_JSON;
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict'
 
 const checkbox_array_JSON = (field) => {
@@ -1966,7 +2008,7 @@ const checkbox_array_JSON = (field) => {
 }
 
 module.exports = checkbox_array_JSON;
-},{}],30:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict'
 
 const date_JSON = (field) => {
@@ -1995,7 +2037,7 @@ const date_JSON = (field) => {
 }
 
 module.exports = date_JSON;
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict'
 
 const email_JSON = (field) => {
@@ -2031,7 +2073,7 @@ const email_JSON = (field) => {
 }
 
 module.exports = email_JSON;
-},{}],32:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 'use strict'
 
 const errorSummary_JSON = (field) => {
@@ -2056,7 +2098,7 @@ const errorSummary_JSON = (field) => {
 }
 
 module.exports = errorSummary_JSON;
-},{}],33:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict'
 
 const fragment_JSON = (field) => {
@@ -2084,7 +2126,7 @@ const fragment_JSON = (field) => {
 }
 
 module.exports = fragment_JSON;
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 'use strict'
 
 const header_JSON = (field) => {
@@ -2095,7 +2137,7 @@ const header_JSON = (field) => {
 }
 
 module.exports = header_JSON;
-},{}],35:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict'
 
 const name_JSON = field => {
@@ -2168,7 +2210,7 @@ const name_JSON = field => {
 }
 
 module.exports = name_JSON;
-},{}],36:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 'use strict'
 
 const nino_JSON = (field) => {
@@ -2191,47 +2233,30 @@ let hint = field["text-hint"];
 }
 
 module.exports = nino_JSON;
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict'
 
 const paragraph_JSON = (field) => {
-  let tag = field.tag;
-  let paragraph = field.paragraph;
-  let paraSplit = paragraph.split("\n");
-  let json = "";
+    let tag = field.tag;
+    let paragraph = field.paragraph;
+    let paraSplit = paragraph.split("\n");
+    let json = "";
 
-  let lineCnt = 1;
+    let lineCnt = 1;
 
-  paraSplit.forEach(line => {
-    line = line.trim();
-    if (line.substring(0, 1) === "<") {
-      json += parseLine(line, tag)
-    } else if (line.length > 0 && line.substr(0,1) != '<') {
-      json += `"${tag}.line${lineCnt}":"${line}",\n`
-      lineCnt++;
-    }
-  });
+    paraSplit.forEach(line => {
+        line = line.trim();
+        json += `"${tag}.line${lineCnt}":"${line}",\n`
+        lineCnt++;
+    });
 
-  json += `\n\n`;
+    json += `\n\n`;
 
-  return json;
-}
-
-const parseLine = (line, tag) => {
- if (line.substring(0,4) === `<=li` || line.substring(0,3) === `<=h`){
-    let start = line.indexOf(`>`) + 1;
-    let end = line.indexOf('<', start);
-    let midLine = line.substring(start, end).split("=");
-    line = `"${tag}.${midLine[0]}": "${midLine[1]}",\n`
- } else {
-   line = "";
- }
-
-  return line;
+    return json;
 }
 
 module.exports = paragraph_JSON;
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict'
 
 const phone_JSON = field => {
@@ -2256,7 +2281,7 @@ let hint = field["text-hint"];
 }
 
 module.exports = phone_JSON;
-},{}],39:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict'
 
 const radioGroup_JSON = (field) => {
@@ -2307,7 +2332,7 @@ const buildValidation = header => {
 }
 
 module.exports = radioGroup_JSON;
-},{}],40:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict'
 
 const textInput_JSON = (field) => {
@@ -2332,7 +2357,7 @@ let hint = field["text-hint"];
 }
 
 module.exports = textInput_JSON;
-},{}],41:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 'use strict'
 const { buildOptions } = require("./page_utilities");
 
@@ -2352,7 +2377,7 @@ const buildAddressObject = (pageName, field) => {
 }
 
 module.exports = buildAddressObject;
-},{"./page_utilities":53}],42:[function(require,module,exports){
+},{"./page_utilities":55}],44:[function(require,module,exports){
 'use strict'
 
 //  <div class="panel panel-border-narrow js-hidden" id="third-party-name" blanked-by="f-radio-areYouTheCarer-Yes">
@@ -2365,7 +2390,7 @@ const buildBeginHiddenObject = (pageName, field) => {
 }
 
 module.exports = buildBeginHiddenObject;
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict"
 
 const buildcheckboxArrayObject = (field) => {
@@ -2382,7 +2407,7 @@ const buildcheckboxArrayObject = (field) => {
 }
 
 module.exports = buildcheckboxArrayObject;
-},{}],44:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 'use strict'
 
 const { buildOptions } = require("./page_utilities");
@@ -2408,7 +2433,7 @@ const buildDateObject = (pageName, field) => {
 
 
 module.exports = buildDateObject;
-},{"./page_utilities":53}],45:[function(require,module,exports){
+},{"./page_utilities":55}],47:[function(require,module,exports){
 'use strict'
 
 const buildElseifObject = (pageName, field) => {
@@ -2418,7 +2443,7 @@ const buildElseifObject = (pageName, field) => {
 }
 
 module.exports = buildElseifObject;
-},{}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict'
 
 const { buildOptions } = require("./page_utilities");
@@ -2446,7 +2471,7 @@ const buildEmailObject = (pageName, field) => {
 }
 
 module.exports = buildEmailObject;
-},{"./page_utilities":53}],47:[function(require,module,exports){
+},{"./page_utilities":55}],49:[function(require,module,exports){
 'use strict'
 
 const buildErrorSummaryObject = (pageName, field) => {
@@ -2471,7 +2496,7 @@ const buildErrorSummaryObject = (pageName, field) => {
 }
 
   module.exports = buildErrorSummaryObject
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 'use strict'
 
 const parseFragment = (pageName, field) => {
@@ -2496,7 +2521,7 @@ const parseFragment = (pageName, field) => {
 }
 
 module.exports = parseFragment;
-},{}],49:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 'use strict'
 
 const buildHeaderObject = (pageName, field) => {
@@ -2512,7 +2537,7 @@ console.log(field)
 }
 
 module.exports = buildHeaderObject;
-},{}],50:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 'use strict'
 
 const buildIfObject = (pageName, field) => {
@@ -2522,7 +2547,7 @@ const buildIfObject = (pageName, field) => {
 }
 
 module.exports = buildIfObject;
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 'use strict'
 
 const { buildOptions } = require("./page_utilities");
@@ -2569,7 +2594,7 @@ const buildNameObject = (pageName, field) => {
 }
 
 module.exports = buildNameObject;
-},{"./page_utilities":53}],52:[function(require,module,exports){
+},{"./page_utilities":55}],54:[function(require,module,exports){
 'use strict'
 
 
@@ -2602,7 +2627,7 @@ const buildOptions = (pageName, tag) => {
 }
 
 module.exports = buildNinoObject;
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 'use  strict'
 
 const buildOptions = (pageName, tag, field, maxlength = 0, inline = false, trim = false) => {
@@ -2645,59 +2670,30 @@ const buildOptions = (pageName, tag, field, maxlength = 0, inline = false, trim 
 }
 
 module.exports = { buildOptions };
-},{}],54:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 'use strict'
 
 const buildParagraphObject = (pageName, field) => {
-  let tag = field.tag;
-  let paragraph = field.paragraph;
-  let paraSplit = paragraph.split("\n");
-  let paragraphObject = `<p>\n`;
+    let tag = field.tag;
+    let paragraph = field.paragraph;
+    let paraSplit = paragraph.split("\n");
+    let paragraphObject = `<p>\n`;
 
-  let lineCnt = 1;
+    let lineCnt = 1;
 
-  paraSplit.forEach(line => {
-    line = line.trim();
-    if (line.substring(0, 2) === "<=" || line.substring(line.length - 2) === "=>") {
-      paragraphObject += parseLine(line, pageName)
-    } else if (line.length > 0) {
-      paragraphObject += `{{ t('${pageName}:${tag}.line${lineCnt}') }}\n`
-      lineCnt++;
-    }
-  })
+    paraSplit.forEach(line => {
+        line = line.trim();
+        paragraphObject += `{{ t('${pageName}:${tag}.line${lineCnt}') }}\n`
+        lineCnt++;
+    })
 
-  paragraphObject += `</p>,\n\n`
+    paragraphObject += `</p>,\n\n`
 
-  return paragraphObject;
-}
-
-const parseLine = (line, pageName) => {
-
-  if (line.substring(0, 4) !== `<=ul` && line !== `<ul=>`) {
-    let start = line.indexOf(`>`) + 1;
-    let end = line.indexOf('<', start);
-    let midLine = line.substring(start, end).split("=");
-    line = line.replace(midLine[1], "").trim();
-
-    start = line.indexOf(`>`) + 1;
-    end = line.indexOf('=', start) + 1;
-    midLine = line.substring(start, end);
-    let newLine = `{{ t("${pageName}:${midLine.substring(0, midLine.length - 1).trim()}") }}`
-    line = line.replace(midLine, newLine).trim();
-  }
-
-  line = line.replace(`<=h3`, `<h3 class="heading-medium"`);
-  line = line.replace('<=ul', `<ul class="list-bullet"`);
-  line = line.replace(`<=li`, `<li`);
-  line = line.replace(`ul=>`, `/ul>`);
-  line = line.replace(`h3=>`, `/h3>`);
-  line = line.replace(`li=>`, `/li>`);
-
-  return line + "\n";
+    return paragraphObject;
 }
 
 module.exports = buildParagraphObject;
-},{}],55:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict'
 
 const { buildOptions } = require("./page_utilities");
@@ -2715,7 +2711,7 @@ const buildPhoneObject = (pageName, field) => {
 }
 
 module.exports = buildPhoneObject;
-},{"./page_utilities":53}],56:[function(require,module,exports){
+},{"./page_utilities":55}],58:[function(require,module,exports){
 'use strict'
 
 const { buildOptions } = require("./page_utilities");
@@ -2758,7 +2754,7 @@ const buildRadioGroupObject = (pageName, field) => {
 }
 
 module.exports = buildRadioGroupObject;
-},{"./page_utilities":53}],57:[function(require,module,exports){
+},{"./page_utilities":55}],59:[function(require,module,exports){
 'use strict'
 
 const buildTextInputObject = (pageName, field) => {
@@ -2778,7 +2774,7 @@ const buildTextInputObject = (pageName, field) => {
 }
 
 module.exports = buildTextInputObject;
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict'
 
 const address_JSON = require("./json_builders/address_JSON");
@@ -2796,8 +2792,10 @@ const radioGroup_JSON = require("./json_builders/radioGroup_JSON");
 const checkboxArray_JSON = require("./json_builders/checkboxArray_JSON");
 
 const showJSON = (casa, divide) => {
-  console.log(divide)
+    console.log(divide)
     $('.field-build').hide();
+    $(`#show-all`).hide();
+    $(`#show-all`).hide();
     $('.json-build').show();
     $('.page-details').hide();
     $('.page-neutral').show();
@@ -2811,7 +2809,7 @@ const showJSON = (casa, divide) => {
 const buildJSON = (casa, divide) => {
     let header = casa['page-header'];
     let json = `{\n`;
-    json += `"pageHeader": "${header}",`
+    json += `"pageHeader": "${header}",\n`
     json += buildMessages(casa.fields, divide);
     json = indentJSON(json.split('\n')).trim();
 
@@ -2871,9 +2869,9 @@ const buildMessages = (fields, divide) => {
                 json += checkboxArray_JSON(field);
                 break;
         }
-        if (divide){
-        json += `\n===========================================================================================\n\n`;
-      }
+        if (divide) {
+            json += `\n===========================================================================================\n\n`;
+        }
     })
     return json;
 }
@@ -2910,11 +2908,12 @@ const indentJSON = data => {
 }
 
 module.exports = { showJSON, buildJSON };
-},{"./json_builders/address_JSON":28,"./json_builders/checkboxArray_JSON":29,"./json_builders/date_JSON":30,"./json_builders/email_JSON":31,"./json_builders/errorSummary_JSON":32,"./json_builders/fragment_JSON":33,"./json_builders/header_JSON":34,"./json_builders/name_JSON":35,"./json_builders/nino_JSON":36,"./json_builders/paragraph_JSON":37,"./json_builders/phone_JSON":38,"./json_builders/radioGroup_JSON":39,"./json_builders/textInput_JSON":40}],59:[function(require,module,exports){
+},{"./json_builders/address_JSON":30,"./json_builders/checkboxArray_JSON":31,"./json_builders/date_JSON":32,"./json_builders/email_JSON":33,"./json_builders/errorSummary_JSON":34,"./json_builders/fragment_JSON":35,"./json_builders/header_JSON":36,"./json_builders/name_JSON":37,"./json_builders/nino_JSON":38,"./json_builders/paragraph_JSON":39,"./json_builders/phone_JSON":40,"./json_builders/radioGroup_JSON":41,"./json_builders/textInput_JSON":42}],61:[function(require,module,exports){
 'use strict'
 
 const showJavaScript = (casa) => {
     $(".field-build").hide();
+    $(`#show-all`).hide();
     $(".page-build").show();
     $(".page-details").hide();
     $(".page-neutral").show();
@@ -2961,7 +2960,7 @@ const buildJavaScript = (casa) => {
 }
 
 module.exports = { showJavaScript, buildJavaScript };
-},{}],60:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict'
 
 const buildIfObject = require("./page_builders/if_page.js");
@@ -2983,6 +2982,7 @@ const parseFragment = require("./page_builders/fragment_page.js");
 
 const showPage = (casa, topPart, divide) => {
     $(`.field-build`).hide();
+    $(`#show-all`).hide();
     $(`.page-build`).show();
     $(`.page-details`).hide();
     $(`.page-neutral`).show();
@@ -2994,27 +2994,31 @@ const showPage = (casa, topPart, divide) => {
 }
 
 const buildPage = (casa, topPart, divide) => {
+
         let pageName = `${casa.folder}-${casa[`page-name`]}`;
   let page = ``;
 
+    let firstField = casa.fields[0];
 
-  let firstField = casa.fields[0];
+    if (firstField){
 
-  if (firstField["field-name"] === `top-part`){
-    page += `${firstField.top}\n`;
-  } else {
-    topPart.forEach(item => {
-      page += `${item}\n`;
-    })
+    if (firstField["field-name"] === `top-part`) {
+      page += `${firstField.top}\n`;
+    } else {
+      topPart.forEach(item => {
+        page += `${item}\n`;
+      })
+    }
+
+    page += `{% set pageName = "${pageName}" %}\n\n`
+    page += `{% block journey_form %}\n`
+    page += `{{ super() }}\n\n`
+    if (casa.fields) {
+      page += buildFields(casa.fields, pageName, divide)
+    }
+    page = indentPage(page.split('\n')).trim();
+
   }
-
-  page += `{% set pageName = "${pageName}" %}\n\n`
-  page += `{% block journey_form %}\n`
-  page += `{{ super() }}\n\n`
-  if (casa.fields) {
-    page += buildFields(casa.fields, pageName, divide)
-  }
-  page = indentPage(page.split('\n')).trim();
   return page;
 }
 
@@ -3054,7 +3058,6 @@ const buildFields = (fields, pageName, divide) => {
         break;
       case `if`:
         fieldData += buildIfObject(pageName, field);
-        console.log('yeah!!')
         break;
       case `elseif`:
         fieldData += buildElseifObject(pageName, field);
@@ -3081,9 +3084,9 @@ const buildFields = (fields, pageName, divide) => {
         fieldData += parseFragment(pageName, field);
         break;
     }
-      if (divide){
-        fieldData += `\n===========================================================================================\n\n`;
-      }
+    if (divide) {
+      fieldData += `\n===========================================================================================\n\n`;
+    }
   });
 
   fieldData += `{% endblock %}`
@@ -3145,6 +3148,8 @@ const indentPage = data => {
       ind++;
     } else if (line.includes(`{{ form`)) {
       ind++;
+    } else if (line.includes(`{{ address`)) {
+      ind++;
     } else if (line.substring(0, 2) === `<p`) {
       ind++;
     } else if (line.substring(0, 3) === `<ul`) {
@@ -3158,7 +3163,7 @@ const indentPage = data => {
 }
 
 module.exports = { showPage, buildPage };
-},{"./page_builders/address_page.js":41,"./page_builders/begin_hidden_page.js":42,"./page_builders/checkbox_array_page.js":43,"./page_builders/date_page.js":44,"./page_builders/elseif_page.js":45,"./page_builders/email_page.js":46,"./page_builders/error_summary_page.js":47,"./page_builders/fragment_page.js":48,"./page_builders/header_page.js":49,"./page_builders/if_page.js":50,"./page_builders/name_page.js":51,"./page_builders/nino_page.js":52,"./page_builders/paragraph_page.js":54,"./page_builders/phone_page.js":55,"./page_builders/radio_group_page.js":56,"./page_builders/text_input_page.js":57}],61:[function(require,module,exports){
+},{"./page_builders/address_page.js":43,"./page_builders/begin_hidden_page.js":44,"./page_builders/checkbox_array_page.js":45,"./page_builders/date_page.js":46,"./page_builders/elseif_page.js":47,"./page_builders/email_page.js":48,"./page_builders/error_summary_page.js":49,"./page_builders/fragment_page.js":50,"./page_builders/header_page.js":51,"./page_builders/if_page.js":52,"./page_builders/name_page.js":53,"./page_builders/nino_page.js":54,"./page_builders/paragraph_page.js":56,"./page_builders/phone_page.js":57,"./page_builders/radio_group_page.js":58,"./page_builders/text_input_page.js":59}],63:[function(require,module,exports){
 'use strict'
 
 const address_validators = require("./validation_builders/address_validators");
@@ -3174,6 +3179,7 @@ const checkboxArray_validators = require("./validation_builders/checkboxArray_va
 
 const showValidators = (casa, divide) => {
     $(".field-build").hide();
+    $(`#show-all`).hide();
     $(".page-build").show();
     $(".page-details").hide();
     $(".page-neutral").show();
@@ -3257,7 +3263,7 @@ const sf = Validation.SimpleField;\n`
 }
 
 module.exports = { showValidators, buildValidators };
-},{"./validation_builders/address_validators":62,"./validation_builders/checkboxArray_validators":63,"./validation_builders/date_validators":64,"./validation_builders/email_validators":65,"./validation_builders/name_validators":66,"./validation_builders/nino_validators":67,"./validation_builders/phone_validators":68,"./validation_builders/radioGroup_validators":69,"./validation_builders/textInput_validators":70}],62:[function(require,module,exports){
+},{"./validation_builders/address_validators":64,"./validation_builders/checkboxArray_validators":65,"./validation_builders/date_validators":66,"./validation_builders/email_validators":67,"./validation_builders/name_validators":68,"./validation_builders/nino_validators":69,"./validation_builders/phone_validators":70,"./validation_builders/radioGroup_validators":71,"./validation_builders/textInput_validators":72}],64:[function(require,module,exports){
 'use strict'
 
 const address_validators = (pageName, tag) => {
@@ -3300,7 +3306,7 @@ const address_validators = (pageName, tag) => {
 }
 
 module.exports = address_validators;
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict'
 
 const checkboxArray_validators = (pageName, field) => {
@@ -3332,7 +3338,7 @@ const checkboxArray_validators = (pageName, field) => {
 }
 
 module.exports = checkboxArray_validators;
-},{}],64:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 'use strict'
 
 const date_validators = (pageName, tag) => {
@@ -3367,7 +3373,7 @@ const date_validators = (pageName, tag) => {
 }
 
 module.exports = date_validators;
-},{}],65:[function(require,module,exports){
+},{}],67:[function(require,module,exports){
 'use strict'
 
 const email_validators = (pageName, tag) => {
@@ -3418,7 +3424,7 @@ const email_validators = (pageName, tag) => {
 }
 
 module.exports = email_validators;
-},{}],66:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 'use strict'
 
 const name_validators = (pageName, tag) => {
@@ -3545,7 +3551,7 @@ const name_validators = (pageName, tag) => {
 }
 
 module.exports = name_validators;
-},{}],67:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 'use strict'
 
 const nino_validators = (pageName, tag) => {
@@ -3585,7 +3591,7 @@ const nino_validators = (pageName, tag) => {
 }
 
 module.exports = nino_validators;
-},{}],68:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 'use strict'
 
 const phone_validators = (pageName, tag) => {
@@ -3612,7 +3618,7 @@ const phone_validators = (pageName, tag) => {
 }
 
 module.exports = phone_validators;
-},{}],69:[function(require,module,exports){
+},{}],71:[function(require,module,exports){
 'use strict'
 
 const radioGroup_validators = (pageName, field) => {
@@ -3653,7 +3659,7 @@ const radioGroup_validators = (pageName, field) => {
 }
 
 module.exports = radioGroup_validators;
-},{}],70:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 'use strict'
 
 const textInput_validators = (pageName, field) => {
@@ -3688,7 +3694,7 @@ const textInput_validators = (pageName, field) => {
 }
 
 module.exports = textInput_validators;
-},{}],71:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 (function (process){
 /* Copyright (c) 2013 Rod Vagg, MIT License */
 
@@ -3772,7 +3778,7 @@ AbstractChainedBatch.prototype.write = function (options, callback) {
 
 module.exports = AbstractChainedBatch
 }).call(this,require('_process'))
-},{"_process":173}],72:[function(require,module,exports){
+},{"_process":175}],74:[function(require,module,exports){
 (function (process){
 /* Copyright (c) 2013 Rod Vagg, MIT License */
 
@@ -3825,7 +3831,7 @@ AbstractIterator.prototype.end = function (callback) {
 module.exports = AbstractIterator
 
 }).call(this,require('_process'))
-},{"_process":173}],73:[function(require,module,exports){
+},{"_process":175}],75:[function(require,module,exports){
 (function (Buffer,process){
 /* Copyright (c) 2013 Rod Vagg, MIT License */
 
@@ -4085,7 +4091,7 @@ module.exports.AbstractIterator     = AbstractIterator
 module.exports.AbstractChainedBatch = AbstractChainedBatch
 
 }).call(this,{"isBuffer":require("../is-buffer/index.js")},require('_process'))
-},{"../is-buffer/index.js":111,"./abstract-chained-batch":71,"./abstract-iterator":72,"_process":173,"xtend":74}],74:[function(require,module,exports){
+},{"../is-buffer/index.js":113,"./abstract-chained-batch":73,"./abstract-iterator":74,"_process":175,"xtend":76}],76:[function(require,module,exports){
 module.exports = extend
 
 function extend() {
@@ -4104,7 +4110,7 @@ function extend() {
     return target
 }
 
-},{}],75:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -4258,7 +4264,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],76:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 (function (Buffer){
 var DuplexStream = require('readable-stream').Duplex
   , util         = require('util')
@@ -4475,12 +4481,12 @@ BufferList.prototype.destroy = function () {
 module.exports = BufferList
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":88,"readable-stream":83,"util":198}],77:[function(require,module,exports){
+},{"buffer":90,"readable-stream":85,"util":200}],79:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],78:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -4573,7 +4579,7 @@ function forEach (xs, f) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_readable":80,"./_stream_writable":82,"_process":173,"core-util-is":91,"inherits":110}],79:[function(require,module,exports){
+},{"./_stream_readable":82,"./_stream_writable":84,"_process":175,"core-util-is":93,"inherits":112}],81:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4621,7 +4627,7 @@ PassThrough.prototype._transform = function(chunk, encoding, cb) {
   cb(null, chunk);
 };
 
-},{"./_stream_transform":81,"core-util-is":91,"inherits":110}],80:[function(require,module,exports){
+},{"./_stream_transform":83,"core-util-is":93,"inherits":112}],82:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -5607,7 +5613,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"_process":173,"buffer":88,"core-util-is":91,"events":95,"inherits":110,"isarray":77,"stream":190,"string_decoder/":84}],81:[function(require,module,exports){
+},{"_process":175,"buffer":90,"core-util-is":93,"events":97,"inherits":112,"isarray":79,"stream":192,"string_decoder/":86}],83:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5819,7 +5825,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":78,"core-util-is":91,"inherits":110}],82:[function(require,module,exports){
+},{"./_stream_duplex":80,"core-util-is":93,"inherits":112}],84:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -6209,7 +6215,7 @@ function endWritable(stream, state, cb) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":78,"_process":173,"buffer":88,"core-util-is":91,"inherits":110,"stream":190}],83:[function(require,module,exports){
+},{"./_stream_duplex":80,"_process":175,"buffer":90,"core-util-is":93,"inherits":112,"stream":192}],85:[function(require,module,exports){
 (function (process){
 var Stream = require('stream'); // hack to fix a circular dependency issue when used with browserify
 exports = module.exports = require('./lib/_stream_readable.js');
@@ -6224,7 +6230,7 @@ if (!process.browser && process.env.READABLE_STREAM === 'disable') {
 }
 
 }).call(this,require('_process'))
-},{"./lib/_stream_duplex.js":78,"./lib/_stream_passthrough.js":79,"./lib/_stream_readable.js":80,"./lib/_stream_transform.js":81,"./lib/_stream_writable.js":82,"_process":173,"stream":190}],84:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":80,"./lib/_stream_passthrough.js":81,"./lib/_stream_readable.js":82,"./lib/_stream_transform.js":83,"./lib/_stream_writable.js":84,"_process":175,"stream":192}],86:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -6447,16 +6453,16 @@ function base64DetectIncompleteChar(buffer) {
   this.charLength = this.charReceived ? 3 : 0;
 }
 
-},{"buffer":88}],85:[function(require,module,exports){
+},{"buffer":90}],87:[function(require,module,exports){
 
-},{}],86:[function(require,module,exports){
+},{}],88:[function(require,module,exports){
 var leveljs = require('level-js');
 var levelup = require('levelup');
 var fs = require('level-filesystem');
 
 var db = levelup('level-filesystem', {db:leveljs});
 module.exports = fs(db);
-},{"level-filesystem":126,"level-js":134,"levelup":151}],87:[function(require,module,exports){
+},{"level-filesystem":128,"level-js":136,"levelup":153}],89:[function(require,module,exports){
 (function (Buffer){
 var toString = Object.prototype.toString
 
@@ -6529,7 +6535,7 @@ function bufferFrom (value, encodingOrOffset, length) {
 module.exports = bufferFrom
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":88}],88:[function(require,module,exports){
+},{"buffer":90}],90:[function(require,module,exports){
 (function (Buffer){
 /*!
  * The buffer module from node.js, for the browser.
@@ -8332,7 +8338,7 @@ var hexSliceLookupTable = (function () {
 })()
 
 }).call(this,require("buffer").Buffer)
-},{"base64-js":75,"buffer":88,"ieee754":109}],89:[function(require,module,exports){
+},{"base64-js":77,"buffer":90,"ieee754":111}],91:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -8480,7 +8486,7 @@ clone.clonePrototype = function(parent) {
 };
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":88}],90:[function(require,module,exports){
+},{"buffer":90}],92:[function(require,module,exports){
 (function (Buffer){
 var Writable = require('readable-stream').Writable
 var inherits = require('inherits')
@@ -8628,7 +8634,7 @@ function u8Concat (parts) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":88,"buffer-from":87,"inherits":110,"readable-stream":187,"typedarray":194}],91:[function(require,module,exports){
+},{"buffer":90,"buffer-from":89,"inherits":112,"readable-stream":189,"typedarray":196}],93:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -8739,7 +8745,7 @@ function objectToString(o) {
 }
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
-},{"../../is-buffer/index.js":111}],92:[function(require,module,exports){
+},{"../../is-buffer/index.js":113}],94:[function(require,module,exports){
 (function (Buffer,process){
 var util              = require('util')
   , AbstractLevelDOWN = require('abstract-leveldown').AbstractLevelDOWN
@@ -8790,7 +8796,7 @@ DeferredLevelDOWN.prototype._iterator = function () {
 module.exports = DeferredLevelDOWN
 
 }).call(this,{"isBuffer":require("../is-buffer/index.js")},require('_process'))
-},{"../is-buffer/index.js":111,"_process":173,"abstract-leveldown":73,"util":198}],93:[function(require,module,exports){
+},{"../is-buffer/index.js":113,"_process":175,"abstract-leveldown":75,"util":200}],95:[function(require,module,exports){
 var prr = require('prr')
 
 function init (type, message, cause) {
@@ -8849,7 +8855,7 @@ module.exports = function (errno) {
   }
 }
 
-},{"prr":174}],94:[function(require,module,exports){
+},{"prr":176}],96:[function(require,module,exports){
 var all = module.exports.all = [
   {
     errno: -2,
@@ -9164,7 +9170,7 @@ all.forEach(function (error) {
 module.exports.custom = require('./custom')(module.exports)
 module.exports.create = module.exports.custom.createError
 
-},{"./custom":93}],95:[function(require,module,exports){
+},{"./custom":95}],97:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -9689,7 +9695,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],96:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
@@ -9713,7 +9719,7 @@ module.exports = function forEach (obj, fn, ctx) {
 };
 
 
-},{}],97:[function(require,module,exports){
+},{}],99:[function(require,module,exports){
 (function (process,Buffer){
 var Writable = require('readable-stream/writable');
 var Readable = require('readable-stream/readable');
@@ -9875,29 +9881,29 @@ exports.duplex = function(opts, initWritable, initReadable) {
 	return dupl;
 };
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":173,"buffer":88,"readable-stream/duplex":99,"readable-stream/readable":105,"readable-stream/writable":106}],98:[function(require,module,exports){
-arguments[4][77][0].apply(exports,arguments)
-},{"dup":77}],99:[function(require,module,exports){
+},{"_process":175,"buffer":90,"readable-stream/duplex":101,"readable-stream/readable":107,"readable-stream/writable":108}],100:[function(require,module,exports){
+arguments[4][79][0].apply(exports,arguments)
+},{"dup":79}],101:[function(require,module,exports){
 module.exports = require("./lib/_stream_duplex.js")
 
-},{"./lib/_stream_duplex.js":100}],100:[function(require,module,exports){
-arguments[4][78][0].apply(exports,arguments)
-},{"./_stream_readable":102,"./_stream_writable":104,"_process":173,"core-util-is":91,"dup":78,"inherits":110}],101:[function(require,module,exports){
-arguments[4][79][0].apply(exports,arguments)
-},{"./_stream_transform":103,"core-util-is":91,"dup":79,"inherits":110}],102:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":102}],102:[function(require,module,exports){
 arguments[4][80][0].apply(exports,arguments)
-},{"_process":173,"buffer":88,"core-util-is":91,"dup":80,"events":95,"inherits":110,"isarray":98,"stream":190,"string_decoder/":107}],103:[function(require,module,exports){
+},{"./_stream_readable":104,"./_stream_writable":106,"_process":175,"core-util-is":93,"dup":80,"inherits":112}],103:[function(require,module,exports){
 arguments[4][81][0].apply(exports,arguments)
-},{"./_stream_duplex":100,"core-util-is":91,"dup":81,"inherits":110}],104:[function(require,module,exports){
+},{"./_stream_transform":105,"core-util-is":93,"dup":81,"inherits":112}],104:[function(require,module,exports){
 arguments[4][82][0].apply(exports,arguments)
-},{"./_stream_duplex":100,"_process":173,"buffer":88,"core-util-is":91,"dup":82,"inherits":110,"stream":190}],105:[function(require,module,exports){
+},{"_process":175,"buffer":90,"core-util-is":93,"dup":82,"events":97,"inherits":112,"isarray":100,"stream":192,"string_decoder/":109}],105:[function(require,module,exports){
 arguments[4][83][0].apply(exports,arguments)
-},{"./lib/_stream_duplex.js":100,"./lib/_stream_passthrough.js":101,"./lib/_stream_readable.js":102,"./lib/_stream_transform.js":103,"./lib/_stream_writable.js":104,"_process":173,"dup":83,"stream":190}],106:[function(require,module,exports){
+},{"./_stream_duplex":102,"core-util-is":93,"dup":83,"inherits":112}],106:[function(require,module,exports){
+arguments[4][84][0].apply(exports,arguments)
+},{"./_stream_duplex":102,"_process":175,"buffer":90,"core-util-is":93,"dup":84,"inherits":112,"stream":192}],107:[function(require,module,exports){
+arguments[4][85][0].apply(exports,arguments)
+},{"./lib/_stream_duplex.js":102,"./lib/_stream_passthrough.js":103,"./lib/_stream_readable.js":104,"./lib/_stream_transform.js":105,"./lib/_stream_writable.js":106,"_process":175,"dup":85,"stream":192}],108:[function(require,module,exports){
 module.exports = require("./lib/_stream_writable.js")
 
-},{"./lib/_stream_writable.js":104}],107:[function(require,module,exports){
-arguments[4][84][0].apply(exports,arguments)
-},{"buffer":88,"dup":84}],108:[function(require,module,exports){
+},{"./lib/_stream_writable.js":106}],109:[function(require,module,exports){
+arguments[4][86][0].apply(exports,arguments)
+},{"buffer":90,"dup":86}],110:[function(require,module,exports){
 /*global window:false, self:false, define:false, module:false */
 
 /**
@@ -11304,7 +11310,7 @@ arguments[4][84][0].apply(exports,arguments)
 
 }, this);
 
-},{}],109:[function(require,module,exports){
+},{}],111:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -11390,7 +11396,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],110:[function(require,module,exports){
+},{}],112:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -11419,7 +11425,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],111:[function(require,module,exports){
+},{}],113:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -11442,7 +11448,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],112:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 
 /**!
  * is
@@ -12146,14 +12152,14 @@ is.string = function (value) {
 };
 
 
-},{}],113:[function(require,module,exports){
+},{}],115:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],114:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 var Buffer = require('buffer').Buffer;
 
 module.exports = isBuffer;
@@ -12163,7 +12169,7 @@ function isBuffer (o) {
     || /\[object (.+Array|Array.+)\]/.test(Object.prototype.toString.call(o));
 }
 
-},{"buffer":88}],115:[function(require,module,exports){
+},{"buffer":90}],117:[function(require,module,exports){
 (function (process,Buffer){
 var Writable = require('readable-stream/writable');
 var Readable = require('readable-stream/readable');
@@ -12558,13 +12564,13 @@ module.exports = function(db, opts) {
 	return blobs;
 };
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":173,"buffer":88,"level-peek":142,"once":170,"readable-stream/readable":122,"readable-stream/writable":123,"util":198}],116:[function(require,module,exports){
-arguments[4][77][0].apply(exports,arguments)
-},{"dup":77}],117:[function(require,module,exports){
-arguments[4][78][0].apply(exports,arguments)
-},{"./_stream_readable":119,"./_stream_writable":121,"_process":173,"core-util-is":91,"dup":78,"inherits":110}],118:[function(require,module,exports){
+},{"_process":175,"buffer":90,"level-peek":144,"once":172,"readable-stream/readable":124,"readable-stream/writable":125,"util":200}],118:[function(require,module,exports){
 arguments[4][79][0].apply(exports,arguments)
-},{"./_stream_transform":120,"core-util-is":91,"dup":79,"inherits":110}],119:[function(require,module,exports){
+},{"dup":79}],119:[function(require,module,exports){
+arguments[4][80][0].apply(exports,arguments)
+},{"./_stream_readable":121,"./_stream_writable":123,"_process":175,"core-util-is":93,"dup":80,"inherits":112}],120:[function(require,module,exports){
+arguments[4][81][0].apply(exports,arguments)
+},{"./_stream_transform":122,"core-util-is":93,"dup":81,"inherits":112}],121:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -13519,7 +13525,7 @@ function indexOf (xs, x) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":117,"_process":173,"buffer":88,"core-util-is":91,"events":95,"inherits":110,"isarray":116,"stream":190,"string_decoder/":124,"util":85}],120:[function(require,module,exports){
+},{"./_stream_duplex":119,"_process":175,"buffer":90,"core-util-is":93,"events":97,"inherits":112,"isarray":118,"stream":192,"string_decoder/":126,"util":87}],122:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -13730,7 +13736,7 @@ function done(stream, er) {
   return stream.push(null);
 }
 
-},{"./_stream_duplex":117,"core-util-is":91,"inherits":110}],121:[function(require,module,exports){
+},{"./_stream_duplex":119,"core-util-is":93,"inherits":112}],123:[function(require,module,exports){
 (function (process){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -14211,7 +14217,7 @@ function endWritable(stream, state, cb) {
 }
 
 }).call(this,require('_process'))
-},{"./_stream_duplex":117,"_process":173,"buffer":88,"core-util-is":91,"inherits":110,"stream":190}],122:[function(require,module,exports){
+},{"./_stream_duplex":119,"_process":175,"buffer":90,"core-util-is":93,"inherits":112,"stream":192}],124:[function(require,module,exports){
 (function (process){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = require('stream');
@@ -14225,11 +14231,11 @@ if (!process.browser && process.env.READABLE_STREAM === 'disable') {
 }
 
 }).call(this,require('_process'))
-},{"./lib/_stream_duplex.js":117,"./lib/_stream_passthrough.js":118,"./lib/_stream_readable.js":119,"./lib/_stream_transform.js":120,"./lib/_stream_writable.js":121,"_process":173,"stream":190}],123:[function(require,module,exports){
-arguments[4][106][0].apply(exports,arguments)
-},{"./lib/_stream_writable.js":121,"dup":106}],124:[function(require,module,exports){
-arguments[4][84][0].apply(exports,arguments)
-},{"buffer":88,"dup":84}],125:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":119,"./lib/_stream_passthrough.js":120,"./lib/_stream_readable.js":121,"./lib/_stream_transform.js":122,"./lib/_stream_writable.js":123,"_process":175,"stream":192}],125:[function(require,module,exports){
+arguments[4][108][0].apply(exports,arguments)
+},{"./lib/_stream_writable.js":123,"dup":108}],126:[function(require,module,exports){
+arguments[4][86][0].apply(exports,arguments)
+},{"buffer":90,"dup":86}],127:[function(require,module,exports){
 var errno = require('errno');
 
 Object.keys(errno.code).forEach(function(code) {
@@ -14243,7 +14249,7 @@ Object.keys(errno.code).forEach(function(code) {
 		return err;
 	};
 });
-},{"errno":94}],126:[function(require,module,exports){
+},{"errno":96}],128:[function(require,module,exports){
 (function (process,Buffer){
 var fwd = require('fwd-stream');
 var sublevel = require('level-sublevel');
@@ -14844,7 +14850,7 @@ module.exports = function(db, opts) {
 };
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"./errno":125,"./paths":129,"./watchers":131,"_process":173,"buffer":88,"fwd-stream":97,"level-blobs":115,"level-peek":142,"level-sublevel":144,"octal":169,"once":170}],127:[function(require,module,exports){
+},{"./errno":127,"./paths":131,"./watchers":133,"_process":175,"buffer":90,"fwd-stream":99,"level-blobs":117,"level-peek":144,"level-sublevel":146,"octal":171,"once":172}],129:[function(require,module,exports){
 module.exports = hasKeys
 
 function hasKeys(source) {
@@ -14853,7 +14859,7 @@ function hasKeys(source) {
         typeof source === "function")
 }
 
-},{}],128:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 var hasKeys = require("./has-keys")
 
 module.exports = extend
@@ -14878,7 +14884,7 @@ function extend() {
     return target
 }
 
-},{"./has-keys":127}],129:[function(require,module,exports){
+},{"./has-keys":129}],131:[function(require,module,exports){
 (function (process){
 var path = require('path');
 var once = require('once');
@@ -14998,7 +15004,7 @@ module.exports = function(db) {
 };
 
 }).call(this,require('_process'))
-},{"./errno":125,"./stat":130,"_process":173,"concat-stream":90,"octal":169,"once":170,"path":171,"xtend":128}],130:[function(require,module,exports){
+},{"./errno":127,"./stat":132,"_process":175,"concat-stream":92,"octal":171,"once":172,"path":173,"xtend":130}],132:[function(require,module,exports){
 var toDate = function(date) {
 	if (!date) return new Date();
 	if (typeof date === 'string') return new Date(date);
@@ -15050,7 +15056,7 @@ Stat.prototype.isSocket = function() {
 module.exports = function(opts) {
 	return new Stat(opts);
 };
-},{}],131:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 var events = require('events');
 
 module.exports = function() {
@@ -15103,7 +15109,7 @@ module.exports = function() {
 
 	return that;
 };
-},{"events":95}],132:[function(require,module,exports){
+},{"events":97}],134:[function(require,module,exports){
 
 module.exports = 
 function fixRange(opts) {
@@ -15123,7 +15129,7 @@ function fixRange(opts) {
 }
 
 
-},{}],133:[function(require,module,exports){
+},{}],135:[function(require,module,exports){
 var ranges = require('string-range')
 
 module.exports = function (db) {
@@ -15293,7 +15299,7 @@ module.exports = function (db) {
   }
 }
 
-},{"string-range":191}],134:[function(require,module,exports){
+},{"string-range":193}],136:[function(require,module,exports){
 (function (Buffer){
 module.exports = Level
 
@@ -15471,7 +15477,7 @@ var checkKeyValue = Level.prototype._checkKeyValue = function (obj, type) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./iterator":135,"abstract-leveldown":73,"buffer":88,"idb-wrapper":108,"isbuffer":114,"typedarray-to-buffer":193,"util":198,"xtend":141}],135:[function(require,module,exports){
+},{"./iterator":137,"abstract-leveldown":75,"buffer":90,"idb-wrapper":110,"isbuffer":116,"typedarray-to-buffer":195,"util":200,"xtend":143}],137:[function(require,module,exports){
 var util = require('util')
 var AbstractIterator  = require('abstract-leveldown').AbstractIterator
 var ltgt = require('ltgt')
@@ -15545,7 +15551,7 @@ Iterator.prototype._next = function (callback) {
   this.callback = callback
 }
 
-},{"abstract-leveldown":73,"ltgt":166,"util":198}],136:[function(require,module,exports){
+},{"abstract-leveldown":75,"ltgt":168,"util":200}],138:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toString = Object.prototype.toString;
 
@@ -15587,11 +15593,11 @@ module.exports = function forEach(obj, fn) {
 };
 
 
-},{}],137:[function(require,module,exports){
+},{}],139:[function(require,module,exports){
 module.exports = Object.keys || require('./shim');
 
 
-},{"./shim":139}],138:[function(require,module,exports){
+},{"./shim":141}],140:[function(require,module,exports){
 var toString = Object.prototype.toString;
 
 module.exports = function isArguments(value) {
@@ -15609,7 +15615,7 @@ module.exports = function isArguments(value) {
 };
 
 
-},{}],139:[function(require,module,exports){
+},{}],141:[function(require,module,exports){
 (function () {
 	"use strict";
 
@@ -15673,9 +15679,9 @@ module.exports = function isArguments(value) {
 }());
 
 
-},{"./foreach":136,"./isArguments":138}],140:[function(require,module,exports){
-arguments[4][127][0].apply(exports,arguments)
-},{"dup":127}],141:[function(require,module,exports){
+},{"./foreach":138,"./isArguments":140}],142:[function(require,module,exports){
+arguments[4][129][0].apply(exports,arguments)
+},{"dup":129}],143:[function(require,module,exports){
 var Keys = require("object-keys")
 var hasKeys = require("./has-keys")
 
@@ -15702,7 +15708,7 @@ function extend() {
     return target
 }
 
-},{"./has-keys":140,"object-keys":137}],142:[function(require,module,exports){
+},{"./has-keys":142,"object-keys":139}],144:[function(require,module,exports){
 var fixRange = require('level-fix-range')
 //get the first/last record in a range
 
@@ -15779,7 +15785,7 @@ function last (db, opts, cb) {
 }
 
 
-},{"level-fix-range":132}],143:[function(require,module,exports){
+},{"level-fix-range":134}],145:[function(require,module,exports){
 function addOperation (type, key, value, options) {
   var operation = {
     type: type,
@@ -15819,7 +15825,7 @@ B.write = function (cb) {
 
 module.exports = Batch
 
-},{}],144:[function(require,module,exports){
+},{}],146:[function(require,module,exports){
 (function (process){
 var EventEmitter = require('events').EventEmitter
 var next         = process.nextTick
@@ -15913,7 +15919,7 @@ module.exports   = function (_db, options) {
 
 
 }).call(this,require('_process'))
-},{"./batch":143,"./sub":148,"_process":173,"events":95,"level-fix-range":145,"level-hooks":133}],145:[function(require,module,exports){
+},{"./batch":145,"./sub":150,"_process":175,"events":97,"level-fix-range":147,"level-hooks":135}],147:[function(require,module,exports){
 var clone = require('clone')
 
 module.exports = 
@@ -15939,11 +15945,11 @@ function fixRange(opts) {
   return opts
 }
 
-},{"clone":89}],146:[function(require,module,exports){
-arguments[4][127][0].apply(exports,arguments)
-},{"dup":127}],147:[function(require,module,exports){
-arguments[4][141][0].apply(exports,arguments)
-},{"./has-keys":146,"dup":141,"object-keys":167}],148:[function(require,module,exports){
+},{"clone":91}],148:[function(require,module,exports){
+arguments[4][129][0].apply(exports,arguments)
+},{"dup":129}],149:[function(require,module,exports){
+arguments[4][143][0].apply(exports,arguments)
+},{"./has-keys":148,"dup":143,"object-keys":169}],150:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter
 var inherits     = require('util').inherits
 var ranges       = require('string-range')
@@ -16222,7 +16228,7 @@ SDB.post = function (range, hook) {
 var exports = module.exports = SubDB
 
 
-},{"./batch":143,"events":95,"level-fix-range":145,"string-range":191,"util":198,"xtend":147}],149:[function(require,module,exports){
+},{"./batch":145,"events":97,"level-fix-range":147,"string-range":193,"util":200,"xtend":149}],151:[function(require,module,exports){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT License
@@ -16302,7 +16308,7 @@ Batch.prototype.write = function (callback) {
 
 module.exports = Batch
 
-},{"./errors":150,"./util":153}],150:[function(require,module,exports){
+},{"./errors":152,"./util":155}],152:[function(require,module,exports){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT License
@@ -16326,7 +16332,7 @@ module.exports = {
   , EncodingError       : createError('EncodingError', LevelUPError)
 }
 
-},{"errno":94}],151:[function(require,module,exports){
+},{"errno":96}],153:[function(require,module,exports){
 (function (process){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
@@ -16765,7 +16771,7 @@ module.exports.destroy = utilStatic('destroy')
 module.exports.repair  = utilStatic('repair')
 
 }).call(this,require('_process'))
-},{"./batch":149,"./errors":150,"./read-stream":152,"./util":153,"./write-stream":154,"_process":173,"deferred-leveldown":92,"events":95,"prr":156,"util":198,"xtend":164}],152:[function(require,module,exports){
+},{"./batch":151,"./errors":152,"./read-stream":154,"./util":155,"./write-stream":156,"_process":175,"deferred-leveldown":94,"events":97,"prr":158,"util":200,"xtend":166}],154:[function(require,module,exports){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
  * MIT License <https://github.com/rvagg/node-levelup/blob/master/LICENSE.md>
@@ -16893,7 +16899,7 @@ ReadStream.prototype.toString = function () {
 
 module.exports = ReadStream
 
-},{"./errors":150,"./util":153,"readable-stream":162,"util":198,"xtend":164}],153:[function(require,module,exports){
+},{"./errors":152,"./util":155,"readable-stream":164,"util":200,"xtend":166}],155:[function(require,module,exports){
 (function (process,Buffer){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
@@ -17079,7 +17085,7 @@ module.exports = {
 }
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"../package.json":165,"./errors":150,"_process":173,"buffer":88,"leveldown":85,"leveldown/package":85,"semver":85,"xtend":164}],154:[function(require,module,exports){
+},{"../package.json":167,"./errors":152,"_process":175,"buffer":90,"leveldown":87,"leveldown/package":87,"semver":87,"xtend":166}],156:[function(require,module,exports){
 (function (process,global){
 /* Copyright (c) 2012-2014 LevelUP contributors
  * See list at <https://github.com/rvagg/node-levelup#contributing>
@@ -17261,9 +17267,9 @@ WriteStream.prototype.toString = function () {
 module.exports = WriteStream
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./util":153,"_process":173,"bl":76,"stream":190,"util":198,"xtend":164}],155:[function(require,module,exports){
-arguments[4][77][0].apply(exports,arguments)
-},{"dup":77}],156:[function(require,module,exports){
+},{"./util":155,"_process":175,"bl":78,"stream":192,"util":200,"xtend":166}],157:[function(require,module,exports){
+arguments[4][79][0].apply(exports,arguments)
+},{"dup":79}],158:[function(require,module,exports){
 /*!
   * prr
   * (c) 2013 Rod Vagg <rod@vagg.org>
@@ -17327,32 +17333,25 @@ arguments[4][77][0].apply(exports,arguments)
 
   return prr
 })
-},{}],157:[function(require,module,exports){
-arguments[4][78][0].apply(exports,arguments)
-},{"./_stream_readable":159,"./_stream_writable":161,"_process":173,"core-util-is":91,"dup":78,"inherits":110}],158:[function(require,module,exports){
-arguments[4][79][0].apply(exports,arguments)
-},{"./_stream_transform":160,"core-util-is":91,"dup":79,"inherits":110}],159:[function(require,module,exports){
+},{}],159:[function(require,module,exports){
 arguments[4][80][0].apply(exports,arguments)
-},{"_process":173,"buffer":88,"core-util-is":91,"dup":80,"events":95,"inherits":110,"isarray":155,"stream":190,"string_decoder/":163}],160:[function(require,module,exports){
+},{"./_stream_readable":161,"./_stream_writable":163,"_process":175,"core-util-is":93,"dup":80,"inherits":112}],160:[function(require,module,exports){
 arguments[4][81][0].apply(exports,arguments)
-},{"./_stream_duplex":157,"core-util-is":91,"dup":81,"inherits":110}],161:[function(require,module,exports){
+},{"./_stream_transform":162,"core-util-is":93,"dup":81,"inherits":112}],161:[function(require,module,exports){
 arguments[4][82][0].apply(exports,arguments)
-},{"./_stream_duplex":157,"_process":173,"buffer":88,"core-util-is":91,"dup":82,"inherits":110,"stream":190}],162:[function(require,module,exports){
+},{"_process":175,"buffer":90,"core-util-is":93,"dup":82,"events":97,"inherits":112,"isarray":157,"stream":192,"string_decoder/":165}],162:[function(require,module,exports){
 arguments[4][83][0].apply(exports,arguments)
-},{"./lib/_stream_duplex.js":157,"./lib/_stream_passthrough.js":158,"./lib/_stream_readable.js":159,"./lib/_stream_transform.js":160,"./lib/_stream_writable.js":161,"_process":173,"dup":83,"stream":190}],163:[function(require,module,exports){
+},{"./_stream_duplex":159,"core-util-is":93,"dup":83,"inherits":112}],163:[function(require,module,exports){
 arguments[4][84][0].apply(exports,arguments)
-},{"buffer":88,"dup":84}],164:[function(require,module,exports){
-arguments[4][74][0].apply(exports,arguments)
-},{"dup":74}],165:[function(require,module,exports){
+},{"./_stream_duplex":159,"_process":175,"buffer":90,"core-util-is":93,"dup":84,"inherits":112,"stream":192}],164:[function(require,module,exports){
+arguments[4][85][0].apply(exports,arguments)
+},{"./lib/_stream_duplex.js":159,"./lib/_stream_passthrough.js":160,"./lib/_stream_readable.js":161,"./lib/_stream_transform.js":162,"./lib/_stream_writable.js":163,"_process":175,"dup":85,"stream":192}],165:[function(require,module,exports){
+arguments[4][86][0].apply(exports,arguments)
+},{"buffer":90,"dup":86}],166:[function(require,module,exports){
+arguments[4][76][0].apply(exports,arguments)
+},{"dup":76}],167:[function(require,module,exports){
 module.exports={
-  "_args": [
-    [
-      "levelup@0.18.6",
-      "C:\\Users\\pc\\node_projects\\casablanca"
-    ]
-  ],
-  "_development": true,
-  "_from": "levelup@0.18.6",
+  "_from": "levelup@^0.18.2",
   "_id": "levelup@0.18.6",
   "_inBundle": false,
   "_integrity": "sha1-5qAcsIlhbI7MApHCqb0/DETj5es=",
@@ -17362,21 +17361,22 @@ module.exports={
     "inherits": "2.0.4"
   },
   "_requested": {
-    "type": "version",
+    "type": "range",
     "registry": true,
-    "raw": "levelup@0.18.6",
+    "raw": "levelup@^0.18.2",
     "name": "levelup",
     "escapedName": "levelup",
-    "rawSpec": "0.18.6",
+    "rawSpec": "^0.18.2",
     "saveSpec": null,
-    "fetchSpec": "0.18.6"
+    "fetchSpec": "^0.18.2"
   },
   "_requiredBy": [
     "/browserify-fs"
   ],
   "_resolved": "https://nexus.mgmt.health-dev.dwpcloud.uk/repository/npm-internal/levelup/-/levelup-0.18.6.tgz",
-  "_spec": "0.18.6",
-  "_where": "C:\\Users\\pc\\node_projects\\casablanca",
+  "_shasum": "e6a01cb089616c8ecc0291c2a9bd3f0c44e3e5eb",
+  "_spec": "levelup@^0.18.2",
+  "_where": "/Users/patrick.whittaker/myProjects/casablanca/node_modules/browserify-fs",
   "browser": {
     "leveldown": false,
     "leveldown/package": false,
@@ -17385,6 +17385,7 @@ module.exports={
   "bugs": {
     "url": "https://github.com/rvagg/node-levelup/issues"
   },
+  "bundleDependencies": false,
   "contributors": [
     {
       "name": "Rod Vagg",
@@ -17461,6 +17462,7 @@ module.exports={
     "semver": "~2.3.1",
     "xtend": "~3.0.0"
   },
+  "deprecated": false,
   "description": "Fast & simple storage - a Node.js-style LevelDB wrapper",
   "devDependencies": {
     "async": "*",
@@ -17505,7 +17507,7 @@ module.exports={
   "version": "0.18.6"
 }
 
-},{}],166:[function(require,module,exports){
+},{}],168:[function(require,module,exports){
 (function (Buffer){
 
 exports.compare = function (a, b) {
@@ -17674,9 +17676,9 @@ exports.filter = function (range, compare) {
 
 
 }).call(this,{"isBuffer":require("../is-buffer/index.js")})
-},{"../is-buffer/index.js":111}],167:[function(require,module,exports){
-arguments[4][137][0].apply(exports,arguments)
-},{"./shim":168,"dup":137}],168:[function(require,module,exports){
+},{"../is-buffer/index.js":113}],169:[function(require,module,exports){
+arguments[4][139][0].apply(exports,arguments)
+},{"./shim":170,"dup":139}],170:[function(require,module,exports){
 (function () {
 	"use strict";
 
@@ -17722,12 +17724,12 @@ arguments[4][137][0].apply(exports,arguments)
 }());
 
 
-},{"foreach":96,"is":112}],169:[function(require,module,exports){
+},{"foreach":98,"is":114}],171:[function(require,module,exports){
 module.exports = function (num, base) {
   return parseInt(num.toString(), base || 8)
 }
 
-},{}],170:[function(require,module,exports){
+},{}],172:[function(require,module,exports){
 var wrappy = require('wrappy')
 module.exports = wrappy(once)
 module.exports.strict = wrappy(onceStrict)
@@ -17771,7 +17773,7 @@ function onceStrict (fn) {
   return f
 }
 
-},{"wrappy":199}],171:[function(require,module,exports){
+},{"wrappy":201}],173:[function(require,module,exports){
 (function (process){
 // .dirname, .basename, and .extname methods are extracted from Node.js v8.11.1,
 // backported and transplited with Babel, with backwards-compat fixes
@@ -18077,7 +18079,7 @@ var substr = 'ab'.substr(-1) === 'b'
 ;
 
 }).call(this,require('_process'))
-},{"_process":173}],172:[function(require,module,exports){
+},{"_process":175}],174:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -18126,7 +18128,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 
 
 }).call(this,require('_process'))
-},{"_process":173}],173:[function(require,module,exports){
+},{"_process":175}],175:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -18312,12 +18314,12 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],174:[function(require,module,exports){
-arguments[4][156][0].apply(exports,arguments)
-},{"dup":156}],175:[function(require,module,exports){
+},{}],176:[function(require,module,exports){
+arguments[4][158][0].apply(exports,arguments)
+},{"dup":158}],177:[function(require,module,exports){
 module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":176}],176:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":178}],178:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -18449,7 +18451,7 @@ Duplex.prototype._destroy = function (err, cb) {
 
   pna.nextTick(cb, err);
 };
-},{"./_stream_readable":178,"./_stream_writable":180,"core-util-is":91,"inherits":110,"process-nextick-args":172}],177:[function(require,module,exports){
+},{"./_stream_readable":180,"./_stream_writable":182,"core-util-is":93,"inherits":112,"process-nextick-args":174}],179:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -18497,7 +18499,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":179,"core-util-is":91,"inherits":110}],178:[function(require,module,exports){
+},{"./_stream_transform":181,"core-util-is":93,"inherits":112}],180:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -19519,7 +19521,7 @@ function indexOf(xs, x) {
   return -1;
 }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./_stream_duplex":176,"./internal/streams/BufferList":181,"./internal/streams/destroy":182,"./internal/streams/stream":183,"_process":173,"core-util-is":91,"events":95,"inherits":110,"isarray":113,"process-nextick-args":172,"safe-buffer":184,"string_decoder/":185,"util":85}],179:[function(require,module,exports){
+},{"./_stream_duplex":178,"./internal/streams/BufferList":183,"./internal/streams/destroy":184,"./internal/streams/stream":185,"_process":175,"core-util-is":93,"events":97,"inherits":112,"isarray":115,"process-nextick-args":174,"safe-buffer":186,"string_decoder/":187,"util":87}],181:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -19734,7 +19736,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":176,"core-util-is":91,"inherits":110}],180:[function(require,module,exports){
+},{"./_stream_duplex":178,"core-util-is":93,"inherits":112}],182:[function(require,module,exports){
 (function (process,global,setImmediate){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -20424,7 +20426,7 @@ Writable.prototype._destroy = function (err, cb) {
   cb(err);
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("timers").setImmediate)
-},{"./_stream_duplex":176,"./internal/streams/destroy":182,"./internal/streams/stream":183,"_process":173,"core-util-is":91,"inherits":110,"process-nextick-args":172,"safe-buffer":184,"timers":192,"util-deprecate":195}],181:[function(require,module,exports){
+},{"./_stream_duplex":178,"./internal/streams/destroy":184,"./internal/streams/stream":185,"_process":175,"core-util-is":93,"inherits":112,"process-nextick-args":174,"safe-buffer":186,"timers":194,"util-deprecate":197}],183:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -20504,7 +20506,7 @@ if (util && util.inspect && util.inspect.custom) {
     return this.constructor.name + ' ' + obj;
   };
 }
-},{"safe-buffer":184,"util":85}],182:[function(require,module,exports){
+},{"safe-buffer":186,"util":87}],184:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -20579,10 +20581,10 @@ module.exports = {
   destroy: destroy,
   undestroy: undestroy
 };
-},{"process-nextick-args":172}],183:[function(require,module,exports){
+},{"process-nextick-args":174}],185:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
 
-},{"events":95}],184:[function(require,module,exports){
+},{"events":97}],186:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -20646,7 +20648,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":88}],185:[function(require,module,exports){
+},{"buffer":90}],187:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20943,10 +20945,10 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":184}],186:[function(require,module,exports){
+},{"safe-buffer":186}],188:[function(require,module,exports){
 module.exports = require('./readable').PassThrough
 
-},{"./readable":187}],187:[function(require,module,exports){
+},{"./readable":189}],189:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = exports;
 exports.Readable = exports;
@@ -20955,13 +20957,13 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":176,"./lib/_stream_passthrough.js":177,"./lib/_stream_readable.js":178,"./lib/_stream_transform.js":179,"./lib/_stream_writable.js":180}],188:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":178,"./lib/_stream_passthrough.js":179,"./lib/_stream_readable.js":180,"./lib/_stream_transform.js":181,"./lib/_stream_writable.js":182}],190:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
-},{"./readable":187}],189:[function(require,module,exports){
+},{"./readable":189}],191:[function(require,module,exports){
 module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_writable.js":180}],190:[function(require,module,exports){
+},{"./lib/_stream_writable.js":182}],192:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -21090,7 +21092,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":95,"inherits":110,"readable-stream/duplex.js":175,"readable-stream/passthrough.js":186,"readable-stream/readable.js":187,"readable-stream/transform.js":188,"readable-stream/writable.js":189}],191:[function(require,module,exports){
+},{"events":97,"inherits":112,"readable-stream/duplex.js":177,"readable-stream/passthrough.js":188,"readable-stream/readable.js":189,"readable-stream/transform.js":190,"readable-stream/writable.js":191}],193:[function(require,module,exports){
 
 //force to a valid range
 var range = exports.range = function (obj) {
@@ -21164,7 +21166,7 @@ var satifies = exports.satisfies = function (key, range) {
 
 
 
-},{}],192:[function(require,module,exports){
+},{}],194:[function(require,module,exports){
 (function (setImmediate,clearImmediate){
 var nextTick = require('process/browser.js').nextTick;
 var apply = Function.prototype.apply;
@@ -21243,7 +21245,7 @@ exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate :
   delete immediateIds[id];
 };
 }).call(this,require("timers").setImmediate,require("timers").clearImmediate)
-},{"process/browser.js":173,"timers":192}],193:[function(require,module,exports){
+},{"process/browser.js":175,"timers":194}],195:[function(require,module,exports){
 (function (Buffer){
 /**
  * Convert a typed array to a Buffer without a copy
@@ -21266,7 +21268,7 @@ module.exports = function (arr) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":88}],194:[function(require,module,exports){
+},{"buffer":90}],196:[function(require,module,exports){
 var undefined = (void 0); // Paranoia
 
 // Beyond this value, index getters/setters (i.e. array[0], array[1]) are so slow to
@@ -21898,7 +21900,7 @@ function packF32(v) { return packIEEE754(v, 8, 23); }
 
 }());
 
-},{}],195:[function(require,module,exports){
+},{}],197:[function(require,module,exports){
 (function (global){
 
 /**
@@ -21969,7 +21971,7 @@ function config (name) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],196:[function(require,module,exports){
+},{}],198:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -21994,14 +21996,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],197:[function(require,module,exports){
+},{}],199:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],198:[function(require,module,exports){
+},{}],200:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -22591,7 +22593,7 @@ function hasOwnProperty(obj, prop) {
 }
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":197,"_process":173,"inherits":196}],199:[function(require,module,exports){
+},{"./support/isBuffer":199,"_process":175,"inherits":198}],201:[function(require,module,exports){
 // Returns a wrapper function that returns a wrapped callback
 // The wrapper function should do some stuff, and return a
 // presumably different callback function.
