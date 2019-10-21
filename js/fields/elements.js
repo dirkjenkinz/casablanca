@@ -1,21 +1,19 @@
 const addElement = (element, prefix) => {
-    let elementRow = `
-  <div class="row element-row"  id="${prefix}-element">
-      <div class = "col-md-3">
-          <button class="btn-sm btn-danger delete-btn" id="${prefix}-delete-btn">Delete</button>
-      </div>
-      <div class = "col">
-          <button class="btn-sm btn-dark btn-block btn-select selected" id="${prefix}-element-btn">${element}</button>
-      </div>`
+    let elementRow = `<div class="row element-row"  id="${prefix}-element">`
+    elementRow += `<div class="col-md-3">`
+    elementRow += ` <button class="btn-sm btn-danger delete-btn" id="${prefix}-delete-btn">Delete</button>`
+    elementRow += `</div>`
+    elementRow += `<div class="col">`
+    elementRow += `<button class="btn-sm btn-dark btn-block btn-select selected" id="${prefix}-element-btn">${element}</button>`
+    elementRow += `</div>`
 
     if (element !== `Top Part`) {
-        elementRow += `
-      <div class = "col-md-1">
-          <img id="${prefix}-up-arrow" src="../../images/arrow.png" class="arrow" height="25px">
-      </div>
-      <div class = "col-md-1">
-          <img id="${prefix}-down-arrow" src="../../images/arrow.png" class="arrow" height="25px" style="transform:rotate(180deg);">
-      </div>`
+        elementRow += `<div class="col-md-1">`
+        elementRow += `<img id="${prefix}-up-arrow" src="../../images/arrow.png" class="arrow" height="25px">`
+        elementRow += `</div>`
+        elementRow += `<div class="col-md-1">`
+        elementRow += `<img id="${prefix}-down-arrow" src="../../images/arrow.png" class="arrow" height="25px" style="transform:rotate(180deg);">`
+        elementRow += `</div>`
     }
 
     elementRow += `</div>`

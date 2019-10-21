@@ -35,9 +35,9 @@ const buildPage = (casa, topPart, divide) => {
         let pageName = `${casa.folder}-${casa[`page-name`]}`;
   let page = ``;
 
-    let firstField = casa.fields[0];
+  let firstField = casa.fields[0];
 
-    if (firstField){
+  if (firstField) {
 
     if (firstField["field-name"] === `top-part`) {
       page += `${firstField.top}\n`;
@@ -115,14 +115,14 @@ const buildFields = (fields, pageName, divide) => {
         fieldData += buildRadioGroupObject(pageName, field);
         break;
       case `checkbox-array`:
-        fieldData += buildCheckboxArrayObject(field);
+        fieldData += buildCheckboxArrayObject(pageName, field);
         break;
       case `fragment`:
         fieldData += parseFragment(pageName, field);
         break;
     }
     if (divide) {
-      fieldData += `\n===========================================================================================\n\n`;
+      fieldData += `\n[]=======================================================================================[]\n\n`;
     }
   });
 
@@ -163,6 +163,8 @@ const indentPage = data => {
       ind--;
     } else if (line.substring(0, 6) === `</div>`) {
       ind--;
+    } else if (line.includes("| replace")) {
+      ind++;
     }
 
     if (ind < 0) ind = 0;
@@ -193,6 +195,8 @@ const indentPage = data => {
       ind++;
     } else if (line.substring(0, 4) === `<div`) {
       ind++;
+    } else if (line.includes("| replace")) {
+      ind--;
     }
   })
 

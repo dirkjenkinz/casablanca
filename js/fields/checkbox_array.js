@@ -1,39 +1,12 @@
-"use strict"
+let checkbox_array_boxCount = 0;
 
-const { getCode } = require("../codes");
-const { addElement, showSelectedElement } = require("./elements.js");
-const { buildInputRow, buildTopOfField } = require("./partials");
-const BTN = "box btn-primary btn-sm btn-block";
-let checkbox_array_boxCount;
-
-
-const buildCheckboxArray = () => {
-    checkbox_array_boxCount = 0;
-    let fieldID = getCode();
-    let prefix = `${fieldID}-checkbox-array`;
-    let checkbox_array = buildTopOfField(prefix, "Checkbox Array", "checkbox-array")
-    checkbox_array += `<hr><div class="row">
-                      <div class="col-md-1"></div>
-                      <div class="col">
-                        <button class="${BTN} btn-cb-add" id="${prefix}-cb-add-1">Add a checkbox</button>
-                      </div>
-                      <div class="col-md-1"></div>
-                    </div><br>`
-    checkbox_array += `<div id="${prefix}-checkbox-area"></div>`
-    checkbox_array += `</div></div></div>`
-    $(`.field-build`).append(checkbox_array);
-    $(`#${prefix}-replacements`).hide();
-    $(`#elements`).append(addElement("Check Boxes", prefix));
-    showSelectedElement();
-    return checkbox_array;
-}
-
-const checkbox_array_addCheckbox = (id) => {
+const checkbox_array_addCheckbox = (id, boxCount = checkbox_array_boxCount) => {
     checkbox_array_boxCount++;
     let prefix = id.substring(0, 17);
-    let newBox = `<div class = "checkbox-array-group" id="${prefix}-cbgroup-${checkbox_array_boxCount}">`;
-    newBox += buildCheckbox(`${prefix}-cb-text-${checkbox_array_boxCount}`, `${prefix}-cb-del-${checkbox_array_boxCount}`);
-    newBox += buildInputRow("Box Value", `${prefix}-cb-value-${checkbox_array_boxCount}`, "", "", 20);
+    let newBox = `<div class = "checkbox-array-group" id="${prefix}-cbgroup-${boxCount}">`;
+    newBox += buildCheckbox(`${prefix}-cb-text-${boxCount}`, `${prefix}-cb-del-${boxCount}`);
+    newBox += buildInputRow(`${prefix}-cb-value-${boxCount}`);
+
     $(`#${prefix}-checkbox-area`).append(newBox);
     return newBox;
 }
@@ -44,16 +17,33 @@ const checkbox_array_deleteCheckbox = (id) => {
 }
 
 const buildCheckbox = (name, btnID) => {
-    let row = `<div class="row" id="${name}"><div class="col-md-2 right-justify">`;
-    row += `Box Text</div><div class="col"><input type="text" id="${name}-value" `;
-    row += `size="60"></div>
-              <div class="col-md-2">
-                <box class="box btn-primary btn-sm btn-block delete-btn" id="${btnID}">  
-                  Delete
-                </box>
-              </div>
-              <div  class="col-md-1"></div>
-            </div>`
+    let row = `<div class="row" id="${name}">`
+    row += `     <div class="col-md-2 right-justify">`;
+    row += `       Box Text </div>`
+    row += `     <div class="col">`
+    row += `        <input type="text" id="${name}-value" size="60">`;
+    row += `     </div>`
+    row += `     <div class="col-md-2">`
+    row += `       <button class="button btn-danger btn-sm btn-block delete-btn" id="${btnID}">`
+    row += `         Delete`
+    row += `       </button>`
+    row += `     </div>`
+    row += `     <div class="col-md-1"></div>`
+    row += `   </div>`
+    return row
+}
+
+const buildInputRow = name => {
+    let row = `<div class="row btn-value" id="${name}">`
+    row += `<div class="col-md-2 right-justify">`;
+    row += `Box Value</div><div class="col"><input type="text" id="${name}-value" size="20">`;
+    row += `</div>`
+    row += `<div class="col-md-2 right-justify">`;
+    name = name.replace(`value`, `trigger`);
+    row += `Target:</div><div class="col"><input type="text" id="${name}" size="40">`;
+    row += `</div>`
+    row += `<div class="col"></div>`
+    row += `</div>`
     return row
 }
 
@@ -70,4 +60,4 @@ $(
     })
 )
 
-module.exports = { buildCheckboxArray, checkbox_array_addCheckbox }
+module.exports = { checkbox_array_addCheckbox }

@@ -1,23 +1,21 @@
 'use strict'
 
-const { buildOptions } = require("./page_utilities");
+const { buildOptions, buildHeader } = require("./page_utilities");
 
 const buildEmailObject = (pageName, field) => {
     let tag = field.tag;
-    let options = buildOptions(pageName, tag, field, 0, false, true)
-
     let emailObject = `{{ form.text(\n`;
     emailObject += `formData.${tag},\n`;
     emailObject += `'tagAddress',\n`;
-    emailObject += `t("${pageName}:${tag}.emailAddress.label"),\n`;
-    emailObject += options;
+    emailObject += buildHeader(pageName, tag, field);
+    emailObject += buildOptions(pageName, tag, field);
     emailObject += `errors=formErrors)\n`;
     emailObject += `}}\n\n`
     emailObject += `{{ form.text(\n`;
     emailObject += `formData.${tag},\n`;
     emailObject += `"${tag}",\n`
     emailObject += `t("${pageName}:${tag}.confirmEmailAddress.label"),\n`;
-    emailObject += options;
+    emailObject += buildOptions(pageName, tag, field);
     emailObject += `errors=formErrors)\n`;
     emailObject += `}}\n\n`
 

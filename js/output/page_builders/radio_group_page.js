@@ -1,23 +1,21 @@
 'use strict'
 
-const { buildOptions } = require("./page_utilities");
+const { buildOptions, buildHeader } = require("./page_utilities");
 
 const buildRadioGroupObject = (pageName, field) => {
     let tag = field.tag;
-    let buttons = field[`buttons`];
+    let buttons = field.buttons;
     let inline = field.inline;
     let radioGroupObject;
-    let options = buildOptions(pageName, tag, field, 0, inline, false);
 
     radioGroupObject = `{% call form.radioGroup(\n`;
     radioGroupObject += `formData.${tag},\n`;
     radioGroupObject += `"${tag}",\n`;
-    radioGroupObject += `t("${pageName}:${tag}.label"),\n`;
-    radioGroupObject += options;
+    radioGroupObject += buildHeader(pageName, tag, field);
+    radioGroupObject += buildOptions(pageName, tag, field, 0, inline, false);
     radioGroupObject += `errors=formErrors\n`;
     radioGroupObject += `%}\n\n`
 
-    const err = "errors=formErrors"
     for (let i = 0; i < buttons.length; i++) {
         let options = "";
         if (buttons[i][2]) {

@@ -1,16 +1,39 @@
-"use strict"
+'use strict'
 
-const buildcheckboxArrayObject = (field) => {
-  let tag = field.tag;
+const { buildOptions, buildHeader } = require("./page_utilities");
 
-  let checkboxArrayObject = `{{ form.checkboxArray(formData.${tag},\n`
-  checkboxArrayObject += `"${tag}",\n`;
-  checkboxArrayObject += `t("${tag}.label"),\n`;
-  checkboxArrayObject += `"${tag}",\n`
-  checkboxArrayObject += `errors=formErrors)\n`;
-  checkboxArrayObject += `}},\n\n`
+const buildCheckboxArrayObject = (pageName, field) => {
+    let tag = field.tag;
+    let boxes = field.boxes;
 
-  return checkboxArrayObject;
+    let checkboxArrayObject = `{% call form.checkboxArrayGroup(\n`
+    checkboxArrayObject += `formData.${tag},\n`
+    checkboxArrayObject += `"${tag}",\n`;
+    checkboxArrayObject += buildHeader(pageName, tag, field);
+    checkboxArrayObject += buildOptions(pageName, tag, field);
+    checkboxArrayObject += `errors=formErrors)\n`;
+    checkboxArrayObject += `%},\n\n`
+
+    for (let i = 0; i < boxes.length; i++) {
+        let options = "";
+        if (boxes[i][2]) {
+            options = `options = {\n`;
+            options += `targetPanel: "${boxes[i][2]}"\n`;
+            options += `},\n`;
+        }
+        checkboxArrayObject += `{{ form.checkboxArray(\n`
+        checkboxArrayObject += `formData.${tag},\n`
+        checkboxArrayObject += `"${tag}",\n`
+        checkboxArrayObject += `t("${pageName}:${tag}.answers.${boxes[i][1]}"),\n`
+        checkboxArrayObject += `"${boxes[i][1]}",\n`;
+        checkboxArrayObject += `${options}`
+        checkboxArrayObject += `errors=formErrors)\n`
+        checkboxArrayObject += `}}\n\n`;
+    }
+
+    checkboxArrayObject += `{% endcall %},\n\n`
+
+    return checkboxArrayObject;
 }
 
-module.exports = buildcheckboxArrayObject;
+module.exports = buildCheckboxArrayObject;

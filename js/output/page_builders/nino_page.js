@@ -1,19 +1,16 @@
 'use strict'
-
+const { buildHeader } = require("./page_utilities");
 
 const buildNinoObject = (pageName, field) => {
     let tag = field.tag;
     let options = buildOptions(pageName, tag)
-
-
     let ninoObject = `{{ form.text(\n`;
     ninoObject += `formData.${tag},\n`;
     ninoObject += `"${tag}",\n`;
-    ninoObject += `t("${pageName}:${tag}.label"),\n`;
+    ninoObject += buildHeader(pageName, tag, field);
     ninoObject += options;
     ninoObject += `errors=formErrors, validationVariables = validationVariables)\n`
     ninoObject += `}},\n\n`
-
     return ninoObject;
 }
 
@@ -25,7 +22,6 @@ const buildOptions = (pageName, tag) => {
     options += `extraCss: [ "uppercase" ],\n`;
     options += `inputPostfixHtml: "<p><span class="form-hint">" + "t("${pageName}:${tag}.hint")" + "</span></p>"\n`;
     options += `},\n`
-
     return options;
 }
 

@@ -116,15 +116,19 @@ let checkboxArrayExtras = (field, inputs) => {
     let boxes = [];
     let text;
     let value;
+    let trigger;
     for (let i = 0; i < inputs.length; i++) {
         let id = inputs[i].id;
         if (id.includes("cb-text")) {
             text = $(`#${id}`).val();
         } else if (id.includes("cb-value")) {
             value = $(`#${id}`).val();
-            boxes.push([text, value])
+        } else if (id.includes("cb-trigger")) {
+            trigger = ($(`#${id}`).val());
+            boxes.push([text, value, trigger])
         }
     }
+    console.log(boxes)
     if (boxes) {
         field.boxes = boxes;
     }

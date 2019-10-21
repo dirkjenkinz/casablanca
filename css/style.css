@@ -268,11 +268,19 @@ hr {
 .replace-row {
     text-align: left;
     border: black 1px solid;
-    margin: 0 20px 0 20px;
+    margin: 0 10px 0 20px;
 }
 
-.rep-btn-add {
+.checkbox-row {
+    text-align: left;
+    margin: 0 10px 0 10px;
+    padding: 0;
+}
+
+.rep-btn-add,
+.cb-btn-add {
     margin: 10px 0 0 0;
+    border: white 1px solid;
 }
 
 .top-row {
@@ -285,6 +293,7 @@ hr {
 .dividers {
     background: lightgrey;
     border: black 3px solid;
+    font-size: 90%;
 }
 
 .field,
@@ -317,4 +326,8 @@ hr {
 
 .field-label {
     text-align: right;
+}
+
+#hooks {
+    font-size: 90%;
 }

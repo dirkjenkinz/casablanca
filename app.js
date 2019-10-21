@@ -1,27 +1,8 @@
 `use strict`
 
+const buildElement = require("./js/fields/build_element");
 const { save_file, file_list } = require("./js/input_output/file_handler")
 const { buildCodes, getCode } = require("./js/codes");
-const buildTopPart = require("./js/fields/top_part");
-const buildBeginHidden = require("./js/fields/begin_hidden");
-const buildEndHidden = require("./js/fields/end_hidden");
-const buildAddress = require("./js/fields/address");
-const buildFragment = require("./js/fields/fragment");
-const buildIf = require("./js/fields/if");
-const buildElse = require("./js/fields/else");
-const buildElseIf = require("./js/fields/elseif");
-const buildEndIf = require("./js/fields/endif");
-const buildHeader = require("./js/fields/header");
-const buildName = require("./js/fields/name");
-const buildNino = require("./js/fields/nino");
-const buildParagraph = require("./js/fields/paragraph");
-const buildErrorSummary = require("./js/fields/error_summary");
-const buildTextInput = require("./js/fields/text_input");
-const buildPhoneNumber = require("./js/fields/phone_number");
-const buildDate = require("./js/fields/date");
-const buildEmail = require("./js/fields/email");
-const { buildCheckboxArray } = require("./js/fields/checkbox_array");
-const { buildRadioGroup } = require("./js/fields/radio_group");
 const buildData = require("./js/output/build_data");
 const { showPage } = require("./js/output/show_page");
 const { showJSON } = require("./js/output/show_JSON");
@@ -41,68 +22,7 @@ $(
     buildCodes(),
     initView(),
     $(`.field-button`).click((e) => {
-        switch (e.target.id) {
-            case `top-part`:
-                buildTopPart();
-                break;
-            case `else`:
-                buildElse();
-                break;
-            case `if`:
-                buildIf();
-                break;
-            case `elseif`:
-                buildElseIf();
-                break;
-            case `endif`:
-                buildEndIf();
-                break;
-            case `begin-hidden`:
-                buildBeginHidden();
-                break;
-            case `end-hidden`:
-                buildEndHidden();
-                break;
-            case `radio-group`:
-                buildRadioGroup();
-                break;
-            case `date`:
-                buildDate();
-                break;
-            case `email`:
-                buildEmail();
-                break;
-            case `checkbox-array`:
-                buildCheckboxArray();
-                break;
-            case `phone`:
-                buildPhoneNumber();
-                break;
-            case `name`:
-                buildName();
-                break;
-            case `address`:
-                buildAddress();
-                break;
-            case `nino`:
-                buildNino();
-                break;
-            case `fragment`:
-                buildFragment();
-                break;
-            case `paragraph`:
-                buildParagraph();
-                break;
-            case `errorSummary`:
-                buildErrorSummary();
-                break;
-            case `textInput`:
-                buildTextInput();
-                break;
-            case `header`:
-                buildHeader();
-                break;
-        }
+        buildElement(e.target.id);
     }),
     $("#show-all").click(() => {
         showAll();

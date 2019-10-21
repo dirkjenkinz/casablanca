@@ -1,19 +1,17 @@
 'use strict'
 
-const buildTextInputObject = (pageName, field) => {
-  let tag = field.tag;
-  let textInputObject = `{{ form.text(\n`;
-  textInputObject += `formData.${tag},\n`;
-  textInputObject += `"${tag}",\n`;
-  textInputObject += `t("${pageName}:${tag}.label"),\n`;
-  textInputObject += `options = {\n`;
-  textInputObject += `maxlength: 60,\n`
-  textInputObject += `trim: true,`
-  textInputObject += `},\n`
-  textInputObject += `errors=formErrors, validationVariables = validationVariables)\n`
-  textInputObject += `}},\n\n`
+const { buildOptions, buildHeader } = require("./page_utilities");
 
-  return textInputObject;
+const buildTextInputObject = (pageName, field) => {
+    let tag = field.tag;
+    let textInputObject = `{{ form.text(\n`;
+    textInputObject += `formData.${tag},\n`;
+    textInputObject += `"${tag}",\n`;
+    textInputObject += buildHeader(pageName, tag, field);
+    textInputObject += buildOptions(pageName, tag, field, 60, false, true);
+    textInputObject += `errors=formErrors, validationVariables = validationVariables)\n`
+    textInputObject += `}},\n\n`
+    return textInputObject;
 }
 
 module.exports = buildTextInputObject;
