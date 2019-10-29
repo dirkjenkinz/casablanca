@@ -1,8 +1,7 @@
 "use strict"
 
-const BTN = "button btn-primary btn-sm btn-block";
-const buildData = require("../output/build_data");
-
+const BTN = `button btn-primary btn-sm btn-block`;
+const buildData = require(`../output/build_data`);
 
 const {
     populateAddress,
@@ -24,24 +23,29 @@ const {
     populatePhone,
     populateRadioGroup,
     populateTextInput,
+    populateTextArea,
+    populateBankDetails,
     populateTopPart
 } = require("./populate");
 
-const save_file = () => {
+const saveFile = () => {
     let casa = buildData();
-    console.log(casa)
+    console.log('SAVE:', casa);
     let item = `casa-${casa.folder}/${casa["page-name"]}`;
     localStorage.setItem(item, JSON.stringify(casa));
+    $(`#message-box`).text(`Screen saved: ${casa.folder}/${casa["page-name"]}.`);
 }
 
-const file_list = () => {
+const listFiles = () => {
     $("#file-display").show();
     $("#main-display").hide();
     $(`#list-of-files`).remove();
-    let items = `<div id="list-of-files"><br/><button class="button btn-sm btn-danger btn-block field-button" id="return-to-build">Return to Build</button><br/>`
-    items += `<div class="row"><h5>&nbsp;&nbsp;Saved Pages.</h5><br/>
-  Click on blue button to load...
-  <br/></div>`;
+    $(`#summary`).hide();
+    $(`#fields`).hide();
+    let items = `<div id="list-of-files"><br/><button class="button btn-sm btn-danger btn-block field-button" id="return-to-build">Return to Build</button>`
+    items += `<div class="row part-label">Saved Pages</div>`
+    items += `<div class="row part-label">Click on blue button to load.</div>`;
+    items += '<div class="files">'
 
     let fileList = [];
 
@@ -60,32 +64,38 @@ const file_list = () => {
         key = key.substring(5)
         items += `
         <div class="row load-btn-row">
-          <div class="col-md-2"><button class="${BTN} del-file-btn" id="del-file-${key_transformed}">Del&nbsp;&nbsp;&nbsp;&nbsp;</button></div>
+          <div class="col-md-3"><button class="${BTN} del-file-btn" id="del-file-${key_transformed}">Delete</button></div>
           <div class="col"><button class="${BTN} load-btn" id="${key_transformed}">${key}</button></div>
         </div>`
     }
-    items += `</div>`
+    items += `</div></div>`
     $("#file-display").append(items);
 }
 
-const load_casa = (id) => {
+const loadCasa = (id) => {
     let key = id.replace("_", "/")
     let casa = JSON.parse(localStorage.getItem(key));
+    console.log('LOAD:', casa)
     $("#file-display").hide();
     $("#main-display").show();
     $("#elements").empty();
-    build_display(casa);
-    let f = `Entity: ${$("#folder").val()}-${$("#page-name").val()}`;
+    buildDisplay(casa);
+    let f = `Current Screen: ${$("#folder").val()}-${$("#page-name").val()}`;
     $(`#folder-and-page`).text(f);
+    $(`#summary`).show();
+    $(`#fields`).show();
 }
 
-const build_display = (casa) => {
+const buildDisplay = (casa) => {
     let divide = true;
     $("#folder").val(casa.folder);
     $("#page-name").val(casa["page-name"]);
     $("#page-header").val(casa["page-header"]);
     $("#prevalidate").prop("checked", casa.prevalidate);
+    $("#pregather").prop("checked", casa.pregather);
     $("#postvalidate").prop("checked", casa.postvalidate);
+    $("#postrender").prop("checked", casa.postrender);
+    $("#preredirect").prop("checked", casa.preredirect);
     $(".field-build").empty();
     casa.fields.forEach(field => {
         switch (field["field-name"]) {
@@ -128,6 +138,12 @@ const build_display = (casa) => {
             case "text-input":
                 populateTextInput(field);
                 break;
+            case "text-area":
+                populateTextArea(field);
+                break;
+            case "bank-details":
+                populateBankDetails(field);
+                break;
             case "header":
                 populateHeader(field);
                 break;
@@ -153,21 +169,19 @@ const build_display = (casa) => {
     })
 }
 
-const delete_file = (id) => {
+const deleteFile = (id) => {
     let r = confirm("Are you sure you want to delete this file?");
     if (r == true) {
         id = id.substring(9);
         localStorage.removeItem(id.replace("_", "/"));
-        file_list();
+        listFiles();
     }
 }
 
-
-
 module.exports = {
-    save_file,
-    file_list,
-    delete_file,
-    load_casa,
-    build_display
+    saveFile,
+    listFiles,
+    deleteFile,
+    loadCasa,
+    buildDisplay
 }

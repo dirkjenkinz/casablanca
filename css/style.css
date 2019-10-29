@@ -8,6 +8,8 @@ hr {
 
 .btn-select {
     border: 2px white double;
+    padding: 0;
+    margin-right: 0;
 }
 
 #hooks {
@@ -39,9 +41,9 @@ hr {
 }
 
 .element-row {
-    margin-bottom: 10px;
     background: black;
-    padding: 0 10px 0 5px;
+    padding: 2px 15px 0 0px;
+    margin: 6px 1px 2px 0;
 }
 
 .page-data {
@@ -73,10 +75,11 @@ hr {
 
 .del-file-btn {
     background: red;
+    margin: 0;
 }
 
 .load-btn-row {
-    margin-top: 10px;
+    margin-top: 2px;
     background: black;
     color: white;
     border: red 2px double;
@@ -108,7 +111,9 @@ hr {
 
 #json-output,
 #page-output {
-    background: silver;
+    background: whitesmoke;
+    border: black outset 4px;
+    font-size: 80%;
 }
 
 .header {
@@ -122,48 +127,50 @@ hr {
 
 .page-details {
     margin: 20px 0 0 10px;
-    border: white 4px double;
     font-weight: bold;
     padding-bottom: 20px;
     border-radius: 3%;
+    border: red 4px outset;
+    background: grey;
 }
 
-#top-tab-content {
-    margin: 20px 0 0 0;
+#top-tab-content,
+#page-tab-content,
+#output-content,
+#fields-tab-content {
     background: black;
     color: white;
-    border: white 4px double;
-    font-size: 80%;
-    border-radius: 3%;
-    padding: 10px 20px 10px 30px;
-}
-
-#page-tab-content {
-    background: black;
-    color: white;
-    margin: 20px 0 0 0;
-    border: black 4px double;
+    border: red 4px double;
     font-weight: bold;
     border-radius: 3%;
     padding-left: 30px;
+    margin-left: 0;
 }
 
-#fields-tab-content,
 #fields {
     background: silver;
-    margin: 20px 0 0 0;
-    border: black 4px double;
+    border: red 4px double;
     font-weight: bold;
     border-radius: 3%;
+    padding-left: 30px;
+    margin: 20px 0 0 10px;
+}
+
+#fields,
+#summary,
+.page-details {
+    height: 800px;
+    overflow: scroll;
+    margin-left: 4px;
 }
 
 #summary {
     margin-top: 20px;
-    padding: 0 15px 0 10px;
-    border: black 4px double;
+    padding: 0 3px 0 3px;
+    border: black 3px double;
     font-weight: bold;
     border-radius: 3%;
-    background: silver;
+    background: rgb(6, 105, 6);
 }
 
 .field,
@@ -175,14 +182,17 @@ hr {
     border-radius: 3%;
 }
 
+#show-all {
+    margin: 10px 0 0 0;
+}
+
 .field-button {
     font-size: 80%;
     margin-bottom: 8px;
 }
 
 .field-type {
-    padding-top: 6px;
-    border: 4px red double;
+    border: 2px red double;
     background: black;
     color: white;
     text-align: center;
@@ -245,9 +255,10 @@ hr {
     border: 1px solid black;
     outline: none;
     cursor: pointer;
-    padding: 14px 16px;
+    padding: 4px 16px;
     transition: 0.3s;
     border-radius: 10%;
+    margin: 4px 2px;
 }
 
 .tab button:hover {
@@ -283,17 +294,25 @@ hr {
     border: white 1px solid;
 }
 
-.top-row {
+.top-row,
+.bottom-row {
     border: double red 2px;
     background: black;
     color: white;
     margin: 10px 10px -10px 10px;
 }
 
-.dividers {
-    background: lightgrey;
-    border: black 3px solid;
+#top-parts {
     font-size: 90%;
+}
+
+.dividers {
+    background: rgb(62, 104, 241);
+    font-size: 90%;
+    margin-right: 10px;
+    border: white 2px solid;
+    text-align: center;
+    padding-top: 6px;
 }
 
 .field,
@@ -303,11 +322,6 @@ hr {
 
 .btn-casa {
     font-weight: bold;
-}
-
-.fragment,
-.btn-fragment {
-    background: rgb(19, 238, 190)
 }
 
 .begin-hidden,
@@ -330,4 +344,88 @@ hr {
 
 #hooks {
     font-size: 90%;
+}
+
+#show-help {
+    margin-top: 10px;
+}
+
+.help-nav {
+    background: black;
+    color: white;
+    margin-top: 15px;
+}
+
+.help-facility {
+    padding-top: 8px;
+    border-radius: 5%;
+}
+
+.sidebar {
+    background: rgb(4, 245, 245);
+    border: solid black 4px;
+    padding: 20px 40px 20px 0px;
+    border-radius: 5%;
+    height: 700px;
+    overflow: scroll;
+}
+
+.sidebar button {
+    border: red solid 4px;
+}
+
+.help-build,
+.page-build,
+.javascript-build,
+.json-build,
+.validators-build {
+    border-radius: 5%;
+    padding: 30px 10px 0 10px;
+    margin-left: 400px;
+    border: black 4px solid;
+}
+
+.page-build {
+    height: 800px;
+    overflow: scroll;
+}
+
+.files {
+    height: 600px;
+    overflow: scroll;
+}
+
+.page-neutral {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    width: 100%;
+}
+
+.btn-help {
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.part-label {
+    background: black;
+    color: white;
+    border: white 2px inset;
+    margin: 8px 0 0 0px;
+    padding: 10px 0 10px 10px;
+    width: 100%;
+    text-align: center;
+}
+
+.field-build {
+    margin-top: 10px;
+}
+
+.shrink {
+    font-size: 80%;
+}
+
+.rep-btn-add {
+    margin-top: 0;
 }

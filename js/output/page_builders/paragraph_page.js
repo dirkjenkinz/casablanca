@@ -10,8 +10,15 @@ const buildParagraphObject = (pageName, field) => {
 
     paraSplit.forEach(line => {
         line = line.trim();
-        paragraphObject += `{{ t('${pageName}:${tag}.line${lineCnt}') }}\n`
-        lineCnt++;
+        if (line.substring(0, 2) === '<h' ||
+            line.substring(0, 3) === '<ul' ||
+            line.substring(0, 3) === '<li' ||
+            line.substring(0, 4) === '</ul') {
+            paragraphObject += `${line}\n`;
+        } else {
+            paragraphObject += `{{ t('${pageName}:${tag}.line${lineCnt}') }}\n`
+            lineCnt++;
+        }
     })
 
     paragraphObject += `</p>,\n\n`

@@ -1,6 +1,6 @@
 'use strict'
 
-const fs = require('browserify-fs');
+const { saveAs } = require("file-saver");
 
 const { buildPage } = require("../output/show_page.js");
 const { buildJavaScript } = require("../output/show_javascript.js");

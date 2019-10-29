@@ -28,7 +28,7 @@ const email_JSON = (field) => {
                 }
             }
           }
-      }`
+      },`
     return json.trim();
 }
 

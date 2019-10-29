@@ -13,7 +13,6 @@ const buildDateObject = (pageName, field) => {
     dateObject += `validationVariables = validationVariables\n`
     dateObject += `)\n`
     dateObject += `}},\n\n`
-
     return dateObject;
 }
 

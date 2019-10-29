@@ -10,8 +10,13 @@ const paragraph_JSON = (field) => {
 
     paraSplit.forEach(line => {
         line = line.trim();
-        json += `"${tag}.line${lineCnt}":"${line}",\n`
-        lineCnt++;
+        if (line.substring(0, 2) !== '<h' &&
+            line.substring(0, 3) !== '<ul' &&
+            line.substring(0, 3) !== '<li' &&
+            line.substring(0, 4) !== '</ul') {
+            json += `"${tag}.line${lineCnt}":"${line}",\n`
+            lineCnt++;
+        }
     });
 
     json += `\n\n`;

@@ -10,22 +10,23 @@ const nino_JSON = require("./json_builders/nino_JSON");
 const paragraph_JSON = require("./json_builders/paragraph_JSON");
 const errorSummary_JSON = require("./json_builders/errorSummary_JSON");
 const textInput_JSON = require("./json_builders/textInput_JSON");
+const bankDetails_JSON = require("./json_builders/bankDetails_JSON");
 const phone_JSON = require("./json_builders/phone_JSON");
 const radioGroup_JSON = require("./json_builders/radioGroup_JSON");
 const checkboxArray_JSON = require("./json_builders/checkboxArray_JSON");
 
 const showJSON = (casa, divide) => {
-    console.log(divide)
-    $('.field-build').hide();
+    $(".field-build").hide();
+    $(`#field-input-area`).hide();
     $(`#show-all`).hide();
-    $(`#show-all`).hide();
-    $('.json-build').show();
-    $('.page-details').hide();
-    $('.page-neutral').show();
-    $('#json-output').remove();
+    $(".page-build").show();
+    $(".page-details").hide();
+    $(".page-neutral").show();
+    $("#page-output").remove();
     $(`#summary`).hide();
     let json = buildJSON(casa, divide);
-    $('.json-build').append(`<textarea id="json-output" cols="120" rows="30">${json}</textarea>`);
+    $(`.page-build`).empty();
+    $('.page-build').append(`<textarea id="page-output" cols="130" rows="38">${json}</textarea>`);
     window.scrollTo(0, 0);
 }
 
@@ -51,6 +52,9 @@ const buildJSON = (casa, divide) => {
 const buildMessages = (fields, divide) => {
     let json = [];
     fields.forEach(field => {
+        if (divide) {
+            json += `\n============ ${[field["field-name"]]} ============`;
+        }
         switch (field['field-name']) {
             case 'address':
                 json += address_JSON(field);
@@ -79,6 +83,9 @@ const buildMessages = (fields, divide) => {
             case 'text-input':
                 json += textInput_JSON(field);
                 break;
+            case 'bank-details':
+                json += bankDetails_JSON(field);
+                break;
             case 'header':
                 json += header_JSON(field);
                 break;
@@ -91,9 +98,6 @@ const buildMessages = (fields, divide) => {
             case 'checkbox-array':
                 json += checkboxArray_JSON(field);
                 break;
-        }
-        if (divide) {
-            json += `\n[]=======================================================================================[]\n\n`;
         }
     })
     return json;

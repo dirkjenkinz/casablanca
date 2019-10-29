@@ -1,6 +1,6 @@
 `use strict`
 
-const { delete_file, load_casa, build_display } = require("./input_output/file_handler");
+const { deleteFile, loadCasa, buildDisplay } = require("./input_output/file_handler");
 const buildData = require("./output/build_data");
 
 let topPart = [
@@ -22,11 +22,9 @@ const buildTopPartDisplay = () => {
 }
 
 const initView = () => {
+    $(`.help-build`).hide();
     $(`.page-build`).hide();
     $(`.page-neutral`).hide();
-    $(`.json-build`).hide();
-    $(`.validator-build`).hide();
-    $(`.javascript-build`).hide();
     $(`#file-display`).hide();
 }
 
@@ -36,12 +34,13 @@ const flipView = () => {
     $(`.page-details`).show();
     $(`#main-display`).show();
     $(`#summary`).show();
+    $(`#fields`).show();
+    $(`.help-build`).hide();
     $(`.page-build`).hide();
     $(`.page-neutral`).hide();
-    $(`.json-build`).hide();
-    $(`.validator-build`).hide();
-    $(`.javascript-build`).hide();
     $(`#file-display`).hide();
+    $(`#return-btn-row`).empty();
+    $(`#field-input-area`).show();
 }
 
 const deleteButton = (id) => {
@@ -74,7 +73,7 @@ const changeSelection = (id) => {
 const showAll = () => {
     let casa = buildData();
     $("#elements").empty();
-    build_display(casa);
+    buildDisplay(casa);
     children = $(".field-build").children();
     for (let i = 0; i < children.length; i++) {
         let thisID = children[i].id;
@@ -117,7 +116,7 @@ const moveUp = id => {
         casa.fields[index - 1] = casa.fields[index];
         casa.fields[index] = hold;
         $("#elements").empty();
-        build_display(casa);
+        buildDisplay(casa);
         children = ($(`.field-build`).children());
         let newID = (children[index - 1].id);
         $(`#${newID}-element-btn`).click();
@@ -140,7 +139,7 @@ const moveDown = id => {
         casa.fields[index + 1] = casa.fields[index];
         casa.fields[index] = hold;
         $("#elements").empty();
-        build_display(casa);
+        buildDisplay(casa);
         children = ($(`.field-build`).children());
         let newID = (children[index + 1].id);
         $(`#${newID}-element-btn`).click();
@@ -159,15 +158,16 @@ const bodyClick = e => {
         } else if (id.includes("-down")) {
             moveDown(id)
         } else if (id === "return-to-build") {
+            console.log('!!!!!')
             flipView();
         } else if (id.includes("element-btn")) {
             changeSelection(id);
         } else if ($(`#${id}`).hasClass(`delete-btn`)) {
             deleteButton(id);
         } else if ($(`#${id}`).hasClass(`load-btn`)) {
-            load_casa(id);
+            loadCasa(id);
         } else if ($(`#${id}`).hasClass(`del-file-btn`)) {
-            delete_file(id);
+            deleteFile(id);
         } else if ($(`#${id}`).hasClass(`replacements-btn`)) {
             if ($(`#${id}`).text() === "Show Replacements") {
                 $(`#${id}`).text("Hide Replacements")

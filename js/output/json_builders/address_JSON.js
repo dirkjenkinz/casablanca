@@ -7,8 +7,8 @@ const address_JSON = (field) => {
         "validation": {
             "mandatory": "Enter your address. You must complete the first two lines.",
             "errorMsgAddress1and2": {
-                "inline": "${field.header} You must complete the first two lines.",
-                "summary": "${field.header} You must complete the first two lines."
+                "inline": "${field.header} - You must complete the first two lines.",
+                "summary": "${field.header} - You must complete the first two lines."
             },
             "errorMsgPostcode": {
                 "inline": "A post code must be in the format PR2 8AE",
@@ -23,8 +23,8 @@ const address_JSON = (field) => {
                 "summary": "Enter a valid address using only letters and numbers"
             },
             "mandatoryAndRegexErrors": {
-              "inline": "${field.header} You must complete the first two lines and you must only use letters and numbers",
-              "summary": "${field.header} You must complete the first two lines and you must only use letters and numbers"
+              "inline": "${field.header} - You must complete the first two lines and you must only use letters and numbers",
+              "summary": "${field.header} - You must complete the first two lines and you must only use letters and numbers"
             },
             "errorMsgAddressTooLong": {
                 "inline": "Too many characters in address line",

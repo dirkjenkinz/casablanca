@@ -1,7 +1,7 @@
 'use strict'
 
 const { replacementAdd } = require("../fields/build_field");
-const buildElement = require("../fields/build_element");
+const { buildElement } = require("../fields/build_element");
 const { checkbox_array_addCheckbox } = require("../fields/checkbox_array");
 const { radio_group_addRadioButton } = require("../fields/radio_group");
 
@@ -29,10 +29,6 @@ const populateCheckboxArray = field => {
     for (let i = 0; i < field.boxes.length; i++) {
         let newBox = checkbox_array_addCheckbox(`${prefix}-cb-add-1`, checkbox_array_boxCount);
         prefix = newBox.substring(40, 57);
-        console.log(field.boxes[i][2])
-            // <input type="text" id="AA-checkbox-array-cb-trigger-0" size="40">
-            //                        AA-checkbox-array-cb-trigger-0-value
-        console.log(`${prefix}-cb-trigger-${checkbox_array_boxCount}-value`)
         $(`#${prefix}-cb-text-${checkbox_array_boxCount}-value`).val(field.boxes[i][0]);
         $(`#${prefix}-cb-value-${checkbox_array_boxCount}-value`).val(field.boxes[i][1]);
         $(`#${prefix}-cb-trigger-${checkbox_array_boxCount}`).val(field.boxes[i][2]);
@@ -66,8 +62,9 @@ const populateAddress = field => {
 }
 
 const populateBeginHidden = field => {
-    let prefix = buildElement(`begin-hidden`).substring(9, 23);
+    let prefix = buildElement(`begin-hidden`).substring(9, 24);
     rebuild(prefix, field);
+    $(`#${prefix}-blanked-by-value`).val(field[`blanked-by`]);
 }
 
 const populateIf = field => {
@@ -100,6 +97,12 @@ const populateNino = field => {
     rebuild(prefix, field);
 }
 
+const populateParagraph = field => {
+    let prefix = buildElement(`paragraph`).substring(9, 21);
+    rebuild(prefix, field);
+    $(`#${prefix}-textarea`).val(field.paragraph);
+}
+
 const populateFragment = field => {
     let prefix = buildElement(`fragment`).substring(9, 20);
     let f_area = `${prefix}-textarea`;
@@ -115,8 +118,20 @@ const populateTopPart = field => {
 const populateTextInput = field => {
     let prefix = buildElement(`text-input`).substring(9, 22);
     rebuild(prefix, field);
-    $(`#${prefix}-length-value`).val(field.length);
+    $(`#${prefix}-length-value`).val(field[`text-length`]);
+}
 
+const populateTextArea = field => {
+    let prefix = buildElement(`text-area`).substring(9, 21);
+    rebuild(prefix, field);
+    $(`#${prefix}-length-value`).val(field[`text-length`]);
+    $(`#${prefix}-height-value`).val(field[`text-height`]);
+}
+
+const populateBankDetails = field => {
+    let prefix = buildElement(`bank-details`).substring(9, 24);
+    rebuild(prefix, field);
+    $(`#${prefix}-length-value`).val(field.length);
 }
 
 const populateHeader = field => {
@@ -131,33 +146,6 @@ const populateErrorSummary = field => {
     $(`#${prefix}-tag-value`).val(field["tag"]);
     $(`#${prefix}-header-value`).val(field.header)
     $(`#${prefix}-textarea`).val(field["error-summary"]);
-}
-
-const populateParagraph = field => {
-    let prefix = buildElement(`paragraph`).substring(9, 21);
-    $(`#${prefix}-tag-value`).val(field["tag"]);
-    $(`#${prefix}-header-value`).val(field.header);
-    $(`#${prefix}-textarea`).val(field.paragraph);
-    switch (field["header-size"]) {
-        case 1:
-            $(`#${prefix}-h1`).prop("checked", true);
-            break;
-        case 2:
-            $(`#${prefix}-h2`).prop("checked", true);
-            break;
-        case 3:
-            $(`#${prefix}-h3`).prop("checked", true);
-            break;
-        case 4:
-            $(`#${prefix}-h4`).prop("checked", true);
-            break;
-        case 5:
-            $(`#${prefix}-h5`).prop("checked", true);
-            break;
-        case 6:
-            $(`#${prefix}-h6`).prop("checked", true);
-            break;
-    }
 }
 
 const rebuild = (prefix, field) => {
@@ -209,5 +197,7 @@ module.exports = {
     populatePhone,
     populateRadioGroup,
     populateTextInput,
+    populateTextArea,
+    populateBankDetails,
     populateTopPart
 }

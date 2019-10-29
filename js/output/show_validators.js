@@ -7,12 +7,13 @@ const name_validators = require("./validation_builders/name_validators");
 const nino_validators = require("./validation_builders/nino_validators");
 const phone_validators = require("./validation_builders/phone_validators");
 const textInput_validators = require("./validation_builders/textInput_validators");
+const bankDetails_validators = require("./validation_builders/bankDetails_validators");
 const radioGroup_validators = require("./validation_builders/radioGroup_validators");
 const checkboxArray_validators = require("./validation_builders/checkboxArray_validators");
 
-
 const showValidators = (casa, divide) => {
     $(".field-build").hide();
+    $(`#field-input-area`).hide();
     $(`#show-all`).hide();
     $(".page-build").show();
     $(".page-details").hide();
@@ -20,7 +21,8 @@ const showValidators = (casa, divide) => {
     $("#page-output").remove();
     $(`#summary`).hide();
     let validators = buildValidators(casa, divide);
-    $(".page-build").append(`<textarea id="page-output" cols="120" rows="30">${validators}</textarea>`);
+    $(`.page-build`).empty();
+    $(".page-build").append(`<textarea id="page-output" cols="130" rows="38">${validators}</textarea>`);
     window.scrollTo(0, 0);
 }
 
@@ -32,6 +34,9 @@ const buildValidators = (casa, divide) => {
 
     casa.fields.forEach(field => {
         let tag = field.tag;
+        if (divide) {
+            validators += `\n\n============ ${[field["field-name"]]} ============`;
+        }
         switch (field["field-name"]) {
             case 'address':
                 validators += address_validators(pageName, tag);
@@ -57,12 +62,12 @@ const buildValidators = (casa, divide) => {
             case 'text-input':
                 validators += textInput_validators(pageName, field);
                 break;
+            case 'bank-details':
+                validators += bankDetails_validators(pageName, tag);
+                break;
             case 'checkbox-array':
                 validators += checkboxArray_validators(pageName, field);
                 break;
-        }
-        if (divide) {
-            validators += `\n[]=======================================================================================[]\n\n`;
         }
     })
 
@@ -83,7 +88,10 @@ const sf = Validation.SimpleField;\n`
             case 'address':
                 top += `const addressValidation = require('ui-citizen-casa-extensions/app/custom-validators/cadsAddress');\n`
                 break;
+            case 'bank-details':
+                top += `const bankDetailsValidation = require('ui-citizen-casa-extensions/app/custom-validators/cadsSortCode');\n`
             case 'phone':
+            case 'text-area':
             case 'text-input':
                 top += `const regexDefinitions = require('ui-citizen-casa-extensions/app/helpers/regexDefinitions');\n`
                 break;
@@ -91,6 +99,10 @@ const sf = Validation.SimpleField;\n`
                 top += `const emailFormatValidator = require('ui-citizen-casa-extensions/app/custom-validators/emailFormatValidator');\n`
                 top += `const emailValidator = require('../../../custom-validators/emailMatchValidator');\n`
                 break;
+            case 'nino':
+                top += `const ninoValidation = require('../../../custom-validators/cadsNino');\n`
+                top += `const cadsNinoValidation = require('ui-citizen-casa-extensions/app/custom-validators/cadsNinoValidator');\n`
+                break
         }
     })
     return top + '\n';

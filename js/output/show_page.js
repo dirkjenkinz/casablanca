@@ -11,7 +11,9 @@ const buildDateObject = require("./page_builders/date_page.js");
 const buildCheckboxArrayObject = require("./page_builders/checkbox_array_page.js");
 const buildParagraphObject = require("./page_builders/paragraph_page.js");
 const buildErrorSummaryObject = require("./page_builders/error_summary_page.js");
-const buildTextInputObject = require("./page_builders/text_input_page.js")
+const buildTextInputObject = require("./page_builders/text_input_page.js");
+const buildTextAreaObject = require("./page_builders/text_area_page.js");
+const buildBankDetailsObject = require("./page_builders/bank_details_page.js");
 const buildHeaderObject = require("./page_builders/header_page.js");
 const buildRadioGroupObject = require("./page_builders/radio_group_page.js");
 const buildBeginHiddenObject = require("./page_builders/begin_hidden_page.js");
@@ -19,6 +21,7 @@ const parseFragment = require("./page_builders/fragment_page.js");
 
 const showPage = (casa, topPart, divide) => {
     $(`.field-build`).hide();
+    $(`#field-input-area`).hide();
     $(`#show-all`).hide();
     $(`.page-build`).show();
     $(`.page-details`).hide();
@@ -26,19 +29,17 @@ const showPage = (casa, topPart, divide) => {
     $(`#page-output`).remove();
     $(`#summary`).hide();
     let page = buildPage(casa, topPart, divide);
-    $(`.page-build`).append(`<textarea id="page-output" cols="120" rows="30">${page}</textarea>`);
+    $(`.page-build`).empty();
+    $(`.page-build`).append(`<textarea id="page-output" cols="130" rows="38">${page}</textarea>`);
     window.scrollTo(0, 0);
-}
+};
 
 const buildPage = (casa, topPart, divide) => {
-
         let pageName = `${casa.folder}-${casa[`page-name`]}`;
   let page = ``;
-
   let firstField = casa.fields[0];
 
   if (firstField) {
-
     if (firstField["field-name"] === `top-part`) {
       page += `${firstField.top}\n`;
     } else {
@@ -47,21 +48,47 @@ const buildPage = (casa, topPart, divide) => {
       })
     }
 
+    page += otherTopParts(casa.fields);
     page += `{% set pageName = "${pageName}" %}\n\n`
     page += `{% block journey_form %}\n`
     page += `{{ super() }}\n\n`
+
     if (casa.fields) {
       page += buildFields(casa.fields, pageName, divide)
     }
-    page = indentPage(page.split('\n')).trim();
 
+    page = indentPage(page.split('\n')).trim();
   }
   return page;
 }
 
+const otherTopParts = (fields) => {
+  let other = "";
+  let address = false;
+  let bankDetails = false;
+  fields.forEach(field => {
+    if (field[`field-name`] === 'address') {
+      address = true;
+    };
+    if (field[`field-name`] === 'bank-details') {
+      bankDetails = true;
+    };
+  })
+  if (address) {
+    other += `{% import "cads/macros/cads-address.html" as address %}\n`
+  };
+  if (bankDetails) {
+    other += `{% import "cads/macros/cads-sortCode.html" as sortCode %}\n`
+  }
+  return other;
+};
+
 const buildFields = (fields, pageName, divide) => {
   let fieldData = ``;
   fields.forEach(field => {
+    if (divide) {
+      fieldData += `============ ${[field["field-name"]]} ============\n`;
+    }
     switch (field[`field-name`]) {
       case `address`:
         fieldData += buildAddressObject(pageName, field);
@@ -89,6 +116,12 @@ const buildFields = (fields, pageName, divide) => {
         break;
       case `text-input`:
         fieldData += buildTextInputObject(pageName, field);
+        break;
+      case `text-area`:
+        fieldData += buildTextAreaObject(pageName, field);
+        break;
+      case `bank-details`:
+        fieldData += buildBankDetailsObject(pageName, field);
         break;
       case `header`:
         fieldData += buildHeaderObject(pageName, field);
@@ -120,9 +153,6 @@ const buildFields = (fields, pageName, divide) => {
       case `fragment`:
         fieldData += parseFragment(pageName, field);
         break;
-    }
-    if (divide) {
-      fieldData += `\n[]=======================================================================================[]\n\n`;
     }
   });
 

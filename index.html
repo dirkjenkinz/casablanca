@@ -10,17 +10,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="./css/style.css">
     <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
-    <script src="http://cdn.jsdelivr.net/g/filesaver.js"></script>
 </head>
 
 <body>
     <div class="container-fluid">
-        <div class="row top-row">
-            <div class="col">CASABLANCA</div>
+        <header class="row top-row">
+            <div class="col-md-2">CASABLANCA &nbsp;&nbsp;&nbsp;v1.0</div>
             <div class="col">A High-Level Compiler for the CASA Framework</div>
-            <div class="col"></div>
-            <div class="col" id="folder-and-page">Current Entity:</div>
-        </div>
+            <div class="col" id="folder-and-page">Current Screen:</div>
+        </header>
         <div class="row">
             <div class="page-neutral col-md-3">
                 <div class="row">
@@ -36,11 +34,17 @@
             <div class="page-details col-md-3">
                 <div id="file-display"></div>
                 <div id="main-display">
+                    <div class="row part-label">Control Panel</div>
                     <div class="row">
-                        <div class=col>
+                        <div class="col">
+                            <button class="button btn-sm btn-danger field-button btn-block" id="show-help">Help</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
                             <button class="button btn-sm btn-danger field-button btn-block" id="save">Save</button>
                         </div>
-                        <div class=col>
+                        <div class="col">
                             <button class="button btn-sm btn-danger field-button btn-block" id="file-list">Saved Pages</button>
                         </div>
                     </div>
@@ -50,8 +54,8 @@
                     <div class="tab">
                         <button class="tablinks" id="defaultOpen" onclick="selectTab(event, 'page-tab-content')">Page</button>
                         <button class="tablinks" onclick="selectTab(event, 'fields-tab-content')">Fields<br></button>
-                        <button class="tablinks" onclick="selectTab(event, 'top-tab-content')">Top</button>
-                        <button class="tablinks" onclick="selectTab(event, 'help-tab-content')">Help</button>
+                        <button class="tablinks" onclick="selectTab(event, 'output-content')">Output</button>
+                        <button class="tablinks" onclick="selectTab(event, 'top-tab-content')">Top Part</button>
                     </div>
 
                     <!-- Tab content -->
@@ -60,11 +64,40 @@
                         </div>
                     </div>
 
-                    <!-- Tab content -->
-                    <div id="help-tab-content" class="tabcontent">
-                        Coming soon...
-                        <img src="images/casablanca.jpeg" alt="casablanca" width="320px" />
+                    <!-- Output content-->
+                    <div id="output-content" class="tabcontent page-data">
+                        <div class="row dividers">
+                            <div class="col">Dividers</div>
+                        </div>
+                        <div class="row dividers">
+                            <div class="col">
+                                <input type="checkbox" id="divide-page">&nbsp;Page</input>
+                            </div>
+                            <div class="col">
+                                <input type="checkbox" id="divide-JSON">&nbsp;JSON</input>
+                            </div>
+                            <div class="col">
+                                <input type="checkbox" id="divide-validators">&nbsp;Validators</input>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row dividers">
+                            <div class="col">
+                                <button class="button btn-sm btn-danger btn-block field-button" id="show-page">Page</button>
+                                <button class="button btn-sm btn-danger btn-block field-button" id="show-validators">Validators</button>
+                            </div>
+                            <div class="col">
+                                <button class="button btn-sm btn-danger btn-block field-button" id="show-json">JSON</button>
+                                <button class="button btn-sm btn-danger btn-block field-button" id="show-javascript">JavaScript</button>
+                            </div>
+                        </div>
+                        <!-- end of row-->
+
+                        <div class="row dividers">
+                            <button class="button btn-sm btn-danger btn-block field-button" id="export">EXPORT</button>
+                        </div>
                     </div>
+
 
                     <!-- Tab content -->
                     <div id="page-tab-content" class="tabcontent page-data">
@@ -74,7 +107,13 @@
                         <div class="row"><input type="text" id="page-name" size="30"></div>
                         <div class="row page-label">Page Header</div>
                         <div class="row"><input type="text" id="page-header" size="30"></div>
-
+                        <div class="row" id="hooks">
+                            <div class="col">
+                            </div>
+                            <div class="col">
+                                <input type="checkbox" id="postrender">&nbsp;Postrender</input>
+                            </div>
+                        </div>
                         <div class="row" id="hooks">
                             <div class="col">
                                 <input type="checkbox" id="prevalidate">&nbsp;Prevalidate</input>
@@ -83,159 +122,48 @@
                                 <input type="checkbox" id="postvalidate">&nbsp;Postvalidate</input>
                             </div>
                         </div>
+                        <div class="row" id="hooks">
+                            <div class="col">
+                                <input type="checkbox" id="preredirect">&nbsp;Preredirect</input>
+                            </div>
+                            <div class="col">
+                                <input type="checkbox" id="pregather">&nbsp;Pregather</input>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Tab content -->
-                    <div id="fields-tab-content" class="tabcontent">
+                    <div id="fields-tab-content" class="tabcontent"></div>
 
-                        <div class="row btn-row">
-                            <div class="col">
-                                <button class="button btn-sm btn-danger btn-block field-button" id="if">if</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-danger btn-block field-button" id="else">else</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-danger btn-block field-button" id="elseif">elseif</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-danger btn-block field-button" id="endif">endif</button>
-                            </div>
-                        </div>
-
-                        <div class="row btn-row">
-                            <div class="col">
-                                <button class="button btn-sm btn-secondary btn-block field-button" id="begin-hidden">Begin Hidden
-                  Field</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-secondary btn-block field-button" id="end-hidden">End Hidden
-                  Field</button>
-                            </div>
-                        </div>
-
-
-                        <div class="row btn-row">
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="address">Address</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="checkbox-array">Check
-                  Boxes</button>
-                            </div>
-                        </div>
-
-                        <div class="row btn-row">
-                            <div class="col">
-                                <button class="button btn-sm btn-fragment btn-block field-button" id="fragment">Code Fragment</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="date">Date</button>
-                            </div>
-                        </div>
-
-                        <div class="row btn-row">
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="email">Email</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="error-summary">Error
-                  Summary</button>
-                            </div>
-                        </div>
-
-
-                        <div class="row btn-row">
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="header">Header</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="name">Name</button>
-                            </div>
-                        </div>
-
-                        <div class="row btn-row">
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="nino">NINO</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="paragraph">Paragraph</button>
-                            </div>
-                        </div>
-                        <!-- end of btn-row -->
-
-                        <div class="row btn-row">
-                            <div class=" col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="phone">Phone</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="radio-group">Radio Group</button>
-                            </div>
-                        </div>
-
-                        <div class="row btn-row">
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="text-input">Text Input</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-casa btn-block field-button" id="top-part">Top Part</button>
-                            </div>
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="row dividers">
-                        <div class="col">Dividers:</div>
-                        <div class="col">
-                            <input type="checkbox" id="divide-page">&nbsp;Page</input>
-                        </div>
-                        <div class="col">
-                            <input type="checkbox" id="divide-JSON">&nbsp;JSON</input>
-                        </div>
-                        <div class="col">
-                            <input type="checkbox" id="divide-validators">&nbsp;Validators</input>
-                        </div>
-                    </div>
-                    <hr />
-                    <div class="row">
-                        <div class="col">
-                            <button class="button btn-sm btn-danger btn-block field-button" id="show-page">Page</button>
-                            <button class="button btn-sm btn-danger btn-block field-button" id="show-validators">Validators</button>
-                        </div>
-                        <div class="col">
-                            <button class="button btn-sm btn-danger btn-block field-button" id="show-json">JSON</button>
-                            <button class="button btn-sm btn-danger btn-block field-button" id="show-javascript">JavaScript</button>
-                        </div>
-                    </div>
-                    <!-- end of row-->
-
-                    <div class="row">
-                        <button class="button btn-sm btn-danger btn-block field-button" id="export">EXPORT</button>
-                    </div>
                 </div>
                 <!-- end of main display -->
             </div>
             <div class="col-md-2" id="summary">
-                <br>
+                <div class="row part-label">Fields List</div>
                 <div id="elements"></div>
             </div>
 
             <div class="col" id="fields">
+                <div class="row part-label" id="field-input-area">Field Input Area</div>
                 <div class="row">
-                    <div class="col-md-1"></div>
-                    <div class="col-md-2">
-                        <button class="button btn-sm btn-dark btn-block field-button" id="show-all">Show All</button>
+                    <div class="col-md-2"></div>
+                    <div class="col">
+                        <button class="button btn-sm btn-danger btn-block field-button" id="show-all">Show All</button>
                     </div>
-                    <div class="col-md-1"></div>
+                    <div class="col-md-2"></div>
                 </div>
                 <div class="field-build">
                 </div>
                 <div class="page-build"></div>
-                <div class="json-build"></div>
-                <div class="validators-build"></div>
-                <div class="javascript-build"></div>
+                <div class="help-build"></div>
             </div>
         </div>
         <!--end of row-->
+        <footer class="row bottom-row">
+            <div class="col-md-2">CASABLANCA &nbsp;&nbsp;&nbsp;v1.0</div>
+            <div class="col"></div>
+            <div class="col-md-8" id="message-box"></div>
+        </footer>
     </div>
     <!--end of container-->
 

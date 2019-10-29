@@ -1,8 +1,7 @@
 'use strict'
 
 const name_JSON = field => {
-  let tag = field.tag;
-  console.log(tag)
+    let tag = field.tag;
     let json = `
     "${tag}.Title": {
         "label": "Title",

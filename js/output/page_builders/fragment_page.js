@@ -1,6 +1,7 @@
 'use strict'
 
 const parseFragment = (pageName, field) => {
+    let tag = field.tag;
     let frag = field.fragment;
     let start;
     let end;
@@ -13,7 +14,7 @@ const parseFragment = (pageName, field) => {
         if (start > -1 && end > -1) {
             let subFrag = frag.substring(start + 2, end).trim();
             let varName = subFrag.substring(0, subFrag.indexOf(`=`)).trim();
-            let newText = `"${pageName}:${varName}"`
+            let newText = `{{ t("${pageName}:${tag}.${varName}) }}`
             let oldText = frag.substring(start, end + 2);
             frag = frag.replace(oldText, newText)
         }

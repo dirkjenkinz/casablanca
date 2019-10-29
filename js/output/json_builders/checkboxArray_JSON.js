@@ -1,6 +1,6 @@
 'use strict'
 
-const checkbox_array_JSON = (field) => {
+const checkboxArray_JSON = (field) => {
     let tag = field.tag;
     let header = field.header;
     let boxes = field.boxes;
@@ -34,8 +34,8 @@ const checkbox_array_JSON = (field) => {
         "summary": "${header} - Invalid value"
       }
     }
-  }\n,`
+  },`
     return json;
 }
 
-module.exports = checkbox_array_JSON;
+module.exports = checkboxArray_JSON;

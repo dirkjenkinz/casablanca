@@ -4,13 +4,13 @@ const { buildField } = require(`./build_field`);
 const { addElement, showSelectedElement } = require(`./elements.js`);
 
 let elements = [
-    [`top-part`, `Top Part`],
-    [`else`, `else`],
-    [`if`, `if`],
-    [`elseif`, `elseif`],
-    [`endif`, `endif`],
-    [`begin-hidden`, `Begin Hidden`, `tag`, `blanked`],
-    [`end-hidden`, `End Hidden`],
+    [`top-part`, `Top Part`, `textarea-small`],
+    [`else`, `else`, `flow`],
+    [`if`, `if`, 'flow'],
+    [`elseif`, `elseif`, 'flow'],
+    [`endif`, `endif`, 'flow'],
+    [`begin-hidden`, `Begin Hidden`, `tag`, `blanked`, `hidden`],
+    [`end-hidden`, `End Hidden`, `hidden`],
     [`radio-group`, `Radio Group`, `tag`, `header`, `hint`, `replacements`, `radio`],
     [`date`, `Date`, `tag`, `header`, `hint`, `replacements`],
     [`email`, `Email`, `tag`, `header`, `hint`, `replacements`],
@@ -18,12 +18,14 @@ let elements = [
     [`phone`, `Phone`, `tag`, `header`, `hint`, `replacements`],
     [`name`, `Name`, `tag`, `header`, `hint`, `replacements`],
     [`address`, `Address`, `tag`, `header`, `hint`, `replacements`],
-    [`nino`, `NINO`, `tag`, `header`, `replacements`],
-    [`fragment`, `Code`, `tag`, `textarea-large`],
-    [`paragraph`, `Paragraph`, `tag`, `textarea-large`],
+    [`nino`, `NINO`, `tag`, `header`, `replacements`, `hint`],
+    [`fragment`, `Code`, `tag`, `textarea-large`, 'shrink'],
+    [`paragraph`, `Paragraph`, `tag`, `textarea-medium`, `shrink`],
     [`error-summary`, `Error Summary`, `tag`, `textarea-medium`],
+    [`text-area`, `Text Area`, "tag", "header", "hint", "replacements", "length", "height"],
     [`text-input`, `Text Input`, "tag", "header", "hint", "replacements", "length"],
-    [`header`, `Header`, `tag`, `header-size`]
+    [`header`, `Header`, `tag`, `header-size`],
+    [`bank-details`, `Bank Details`, `tag`]
 ]
 
 const buildElement = (id) => {
@@ -53,10 +55,10 @@ const buildElement = (id) => {
             $(`.field-build`).append(element);
             $(`#elements`).append(addElement(element_details[1], prefix));
         }
-
         showSelectedElement();
+
         return element;
     }
 }
 
-module.exports = buildElement;
+module.exports = { buildElement, elements };

@@ -14,6 +14,9 @@ const buildCasaObject = () => {
     casa["page-header"] = $(`#page-header`).val();
     casa.prevalidate = $("#prevalidate").prop("checked");
     casa.postvalidate = $("#postvalidate").prop("checked");
+    casa.postrender = $("#postrender").prop("checked");
+    casa.pregather = $("#pregather").prop("checked");
+    casa.preredirect = $("#preredirect").prop("checked");
 
     let nodes = $(".field-build").children();
 
@@ -39,17 +42,17 @@ const buildCasaObject = () => {
                     field.target = $(`#${id}`).val();
                 } else if (id.includes("blanked-by-value")) {
                     field["blanked-by"] = $(`#${id}`).val();
-                } else if (id.includes(`textInput-length-value`)) {
+                } else if (id.includes(`length-value`)) {
                     field['text-length'] = $(`#${id}`).val();
+                } else if (id.includes(`height-value`)) {
+                    field['text-height'] = $(`#${id}`).val();
                 } else if (id.includes("-left-")) {
                     let left = $(`#${id}`).val();
                     id = id.replace(`-left-`, `-right-`);
                     let right = $(`#${id}`).val();
                     let name = id.replace(`right`, `field`);
                     let fieldName = $(`input[name=${name}]:checked`).val();
-                    if (fieldName) {
-                        reps.push([fieldName, left, right]);
-                    }
+                    reps.push([fieldName, left, right]);
                 } else {
                     headerBreakdown(id, field);
                 }
@@ -128,7 +131,6 @@ let checkboxArrayExtras = (field, inputs) => {
             boxes.push([text, value, trigger])
         }
     }
-    console.log(boxes)
     if (boxes) {
         field.boxes = boxes;
     }
