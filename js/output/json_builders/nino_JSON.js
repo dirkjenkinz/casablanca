@@ -1,8 +1,8 @@
 'use strict'
 
 const nino_JSON = (field) => {
-let tag = field.tag;
-let hint = field["text-hint"];
+    let tag = field.tag;
+    let hint = field.hint;
     let json = `
     "${tag}NationalInsuranceNumber": {
         "label": "National Insurance number",
@@ -16,7 +16,7 @@ let hint = field["text-hint"];
             }
         }
     },`
-    return json+`\n`;
+    return json + `\n`;
 }
 
 module.exports = nino_JSON;

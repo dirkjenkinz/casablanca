@@ -155,8 +155,8 @@ const rebuild = (prefix, field) => {
     let header_field = `${prefix}-header-value`;
     $(`#${header_field}`).val(field.header);
 
-    let hint_field = `${prefix}-text-hint-value`;
-    $(`#${hint_field}`).val(field["text-hint"]);
+    let hint_field = `${prefix}-hint-value`;
+    $(`#${hint_field}`).val(field.hint);
 
     let target_field = `${prefix}-target-value`;
     $(`#${target_field}`).val(field.target);

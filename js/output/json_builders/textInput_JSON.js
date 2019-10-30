@@ -2,7 +2,7 @@
 
 const textInput_JSON = (field) => {
     let header = field.header;
-    let hint = field["text-hint"];
+    let hint = field.hint;
 
     let json = `"${header}": {\n`;;
     json += `"label": "${header}",\n`;

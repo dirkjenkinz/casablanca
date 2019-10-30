@@ -36,8 +36,8 @@ const buildCasaObject = () => {
                     field.tag = $(`#${id}`).val();
                 } else if (id.includes("header-value")) {
                     field.header = $(`#${id}`).val();
-                } else if (id.includes("text-hint-value")) {
-                    field["text-hint"] = $(`#${id}`).val();
+                } else if (id.includes("hint-value")) {
+                    field.hint = $(`#${id}`).val();
                 } else if (id.includes("target-value")) {
                     field.target = $(`#${id}`).val();
                 } else if (id.includes("blanked-by-value")) {

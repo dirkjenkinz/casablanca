@@ -1,10 +1,10 @@
 'use strict'
 
 const phone_JSON = field => {
-let header = field.header;
-let tag = field.tag;
-let hint = field["text-hint"];
-  
+    let header = field.header;
+    let tag = field.tag;
+    let hint = field.hint;
+
     let json = `"${tag}": {\n`;
     json += `"label": "${tag} number",\n`;
     json += ` "validation": {\n`

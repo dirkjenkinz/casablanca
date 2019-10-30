@@ -112,7 +112,7 @@ const addHint = prefix => {
     output += `</div>`;
     output += `<div class="col-md-1 field-label">Hint:</div>`;
     output += `<div class="col" id="${prefix}-form-hint">`;
-    output += `<input type="text" id="${prefix}-text-hint-value" size="60" />`;
+    output += `<input type="text" id="${prefix}-hint-value" size="60" />`;
     output += `</div>`;
     output += `<div class="col-md-1"></div>`;
     output += `</div>`;

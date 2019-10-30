@@ -1,7 +1,7 @@
 'use  strict'
 
 const buildHeader = (pageName, tag, field) => {
-    let header = `t("${pageName}:${tag}.label")`;
+    let header = `t("${pageName}:${tag}.header")`;
 
     field.replacements.forEach(replacement => {
         if (replacement[0] === `header`) {
@@ -16,10 +16,10 @@ const buildHeader = (pageName, tag, field) => {
 const buildOptions = (pageName, tag, field, maxlength = 0, inline = false, trim = false) => {
     let options = "";
 
-    if (field["text-hint"] || maxlength || field.target || trim) {
+    if (field.hint || maxlength || field.target || trim) {
         options = `options = {\n`;
 
-        if (field["text-hint"]) {
+        if (field.hint) {
             options += `hint: t("${pageName}:${tag}.hint")`;
 
             field.replacements.forEach(replacement => {

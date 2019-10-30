@@ -89,48 +89,51 @@ const buildFields = (fields, pageName, divide) => {
     if (divide) {
       fieldData += `============ ${[field["field-name"]]} ============\n`;
     }
+    console.log(field)
+    let fieldCopy = parseHeader(field, pageName);
+    fieldCopy = parseHint(field, pageName);
     switch (field[`field-name`]) {
       case `address`:
-        fieldData += buildAddressObject(pageName, field);
+        fieldData += buildAddressObject(pageName, fieldCopy);
         break;
       case `phone`:
-        fieldData += buildPhoneObject(pageName, field);
+        fieldData += buildPhoneObject(pageName, fieldCopy);
         break;
       case `email`:
-        fieldData += buildEmailObject(pageName, field);
+        fieldData += buildEmailObject(pageName, fieldCopy);
         break;
       case `name`:
-        fieldData += buildNameObject(pageName, field);
+        fieldData += buildNameObject(pageName, fieldCopy);
         break;
       case `nino`:
-        fieldData += buildNinoObject(pageName, field);
+        fieldData += buildNinoObject(pageName, fieldCopy);
         break;
       case `date`:
-        fieldData += buildDateObject(pageName, field);
+        fieldData += buildDateObject(pageName, fieldCopy);
         break;
       case `paragraph`:
-        fieldData += buildParagraphObject(pageName, field);
+        fieldData += buildParagraphObject(pageName, fieldCopy);
         break;
       case `error-summary`:
-        fieldData += buildErrorSummaryObject(pageName, field);
+        fieldData += buildErrorSummaryObject(pageName, fieldCopy);
         break;
       case `text-input`:
-        fieldData += buildTextInputObject(pageName, field);
+        fieldData += buildTextInputObject(pageName, fieldCopy);
         break;
       case `text-area`:
-        fieldData += buildTextAreaObject(pageName, field);
+        fieldData += buildTextAreaObject(pageName, fieldCopy);
         break;
       case `bank-details`:
-        fieldData += buildBankDetailsObject(pageName, field);
+        fieldData += buildBankDetailsObject(pageName, fieldCopy);
         break;
       case `header`:
-        fieldData += buildHeaderObject(pageName, field);
+        fieldData += buildHeaderObject(pageName, fieldCopy);
         break;
       case `if`:
-        fieldData += buildIfObject(pageName, field);
+        fieldData += buildIfObject(pageName, fieldCopy);
         break;
       case `elseif`:
-        fieldData += buildElseifObject(pageName, field);
+        fieldData += buildElseifObject(pageName, fieldCopy);
         break;
       case `end-hidden`:
         fieldData += `</div>\n\n`
@@ -142,16 +145,16 @@ const buildFields = (fields, pageName, divide) => {
         fieldData += ` {% else %}\n\n`
         break;
       case `begin-hidden`:
-        fieldData += buildBeginHiddenObject(pageName, field);
+        fieldData += buildBeginHiddenObject(pageName, fieldCopy);
         break;
       case `radio-group`:
-        fieldData += buildRadioGroupObject(pageName, field);
+        fieldData += buildRadioGroupObject(pageName, fieldCopy);
         break;
       case `checkbox-array`:
-        fieldData += buildCheckboxArrayObject(pageName, field);
+        fieldData += buildCheckboxArrayObject(pageName, fieldCopy);
         break;
       case `fragment`:
-        fieldData += parseFragment(pageName, field);
+        fieldData += parseFragment(pageName, fieldCopy);
         break;
     }
   });
@@ -159,6 +162,52 @@ const buildFields = (fields, pageName, divide) => {
   fieldData += `{% endblock %}`
   return fieldData;
 }
+
+const parseHeader = (field, pageName) => {
+  let start;
+  let end;
+  let cnt = 0;
+  let header = field.header;
+  let tag = field.tag;
+
+  do {
+    cnt++
+    start = header.indexOf(`<=`);
+    end = header.indexOf(`=>`);
+    if (start > -1 && end > -1) {
+      let subHeader = header.substring(start + 2, end).trim();
+      let varName = subHeader.substring(0, subHeader.indexOf(`=`)).trim();
+      let newText = `{{ t("${pageName}:${tag}.${varName}) }}`
+      let oldText = header.substring(start, end + 2);
+      header = header.replace(oldText, newText)
+    }
+  } while (start > -1 && end > -1 && cnt < 500);
+  field.header = header;
+  return field;
+};
+
+const parseHint = (field, pageName) => {
+  let start;
+  let end;
+  let cnt = 0;
+  let hint = field.hint;
+  let tag = field.tag;
+
+  do {
+    cnt++
+    start = hint.indexOf(`<=`);
+    end = hint.indexOf(`=>`);
+    if (start > -1 && end > -1) {
+      let subHint = hint.substring(start + 2, end).trim();
+      let varName = subHint.substring(0, subHint.indexOf(`=`)).trim();
+      let newText = `{{ t("${pageName}:${tag}.${varName}) }}`
+      let oldText = hint.substring(start, end + 2);
+      hint = hint.replace(oldText, newText)
+    }
+  } while (start > -1 && end > -1 && cnt < 500);
+  field.hint = hint;
+  return field;
+};
 
 const indentPage = data => {
   let b = `        `;
