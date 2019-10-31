@@ -3,7 +3,7 @@
 const address_JSON = require("./json_builders/address_JSON");
 const date_JSON = require("./json_builders/date_JSON");
 const email_JSON = require("./json_builders/email_JSON");
-const fragment_JSON = require("./json_builders/fragment_JSON");
+const code_JSON = require("./json_builders/code_JSON");
 const header_JSON = require("./json_builders/header_JSON");
 const name_JSON = require("./json_builders/name_JSON");
 const nino_JSON = require("./json_builders/nino_JSON");
@@ -33,7 +33,7 @@ const showJSON = (casa, divide) => {
 const buildJSON = (casa, divide) => {
     let header = casa['page-header'];
     let json = `{\n`;
-    json += `"pageHeader": "${header}",\n`
+    json += `"pageHeader": "${header}",`
     json += buildMessages(casa.fields, divide);
     json = indentJSON(json.split('\n')).trim();
 
@@ -53,7 +53,7 @@ const buildMessages = (fields, divide) => {
     let json = [];
     fields.forEach(field => {
         if (divide) {
-            json += `\n============ ${[field["field-name"]]} ============`;
+            json += `\n============ ${[field["field-name"]]} ============\n`;
         }
         switch (field['field-name']) {
             case 'address':
@@ -89,8 +89,8 @@ const buildMessages = (fields, divide) => {
             case 'header':
                 json += header_JSON(field);
                 break;
-            case 'fragment':
-                json += fragment_JSON(field);
+            case 'code':
+                json += code_JSON(field);
                 break;
             case 'radio-group':
                 json += radioGroup_JSON(field);

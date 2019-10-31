@@ -67,14 +67,17 @@ const buildCasaObject = () => {
                 case `checkbox-array`:
                     checkboxArrayExtras(field, inputs);
                     break;
-                case `fragment`:
-                    field.fragment = $(`#${id.substring(0, 11)}-textarea`).val();
+                case `code`:
+                    field.code = $(`#${id.substring(0, 11)}-textarea`).val();
                     break;
                 case `paragraph`:
                     field.paragraph = $(`#${id.substring(0, 12)}-textarea`).val();
                     break;
                 case `top-part`:
                     field.top = $(`#${id.substring(0, 11)}-textarea`).val();
+                    break;
+                case `footer`:
+                    field.footer = $(`#${id.substring(0, 9)}-textarea`).val();
                     break;
                 case `error-summary`:
                     field["error-summary"] = $(`#${id.substring(0, 16)}-textarea`).val();

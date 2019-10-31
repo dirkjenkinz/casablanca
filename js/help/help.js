@@ -10,7 +10,7 @@ const flowControlFields = require(`./fields/flow_control_fields`);
 const hiddenFields = require(`./fields/hidden_fields`);
 const addressField = require(`./fields/address_field`);
 const checkboxArrayField = require(`./fields/checkbox_array_field`);
-const codeFragmentField = require(`./fields/code_fragment_field`);
+const codeField = require(`./fields/code_field`);
 const dateField = require(`./fields/date_field`);
 const emailField = require(`./fields/email_field`);
 const errorSummaryField = require(`./fields/error_summary_field`);
@@ -78,8 +78,8 @@ const buildHelp = (section) => {
         case ('checkbox-array-field'):
             output = checkboxArrayField();
             break;
-        case ('code-fragment-field'):
-            output = codeFragmentField();
+        case ('code-field'):
+            output = codeField();
             break;
         case ('date-field'):
             output = dateField();
@@ -106,7 +106,6 @@ const buildHelp = (section) => {
             output = phoneField();
             break;
         case ('radio-group-field'):
-            console.log('fukiy')
             output = radioGroupField();
             break;
         case ('bank-details-field'):
@@ -137,7 +136,7 @@ const buildSideBar = () => {
     sideBar += helpButton(`field-input-area`, `Section 4: The Field Input Area`);
     sideBar += doubleButton('flow-control-fields', `Flow Control`, 'hidden-fields', `Hidden Fields`);
     sideBar += doubleButton(`address-field`, `Address`, 'checkbox-array-field', `Checkbox Array`);
-    sideBar += doubleButton('code-fragment-field', `Code Fragment`, 'date-field', `Date`);
+    sideBar += doubleButton('code-field', `Code`, 'date-field', `Date`);
     sideBar += doubleButton(`email-field`, `Email`, `error-summary-field`, `Error Summary`);
     sideBar += doubleButton(`name-field`, `Name`, `nino-field`, `Nino`);
     sideBar += doubleButton(`paragraph-field`, `Paragraph`, `phone-field`, `Phone`);
@@ -195,8 +194,8 @@ $(
                 buildHelp('address-field');
             } else if (e.target.id === 'checkbox-array-field') {
                 buildHelp('checkbox-array-field');
-            } else if (e.target.id === 'code-fragment-field') {
-                buildHelp('code-fragment-field');
+            } else if (e.target.id === 'code-field') {
+                buildHelp('code-field');
             } else if (e.target.id === 'date-field') {
                 buildHelp('date-field');
             } else if (e.target.id === 'email-field') {

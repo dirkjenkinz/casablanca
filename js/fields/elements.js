@@ -7,7 +7,7 @@ const addElement = (element, prefix) => {
     elementRow += `<button class="btn-sm btn-dark btn-block btn-select selected" id="${prefix}-element-btn">${element}</button>`
     elementRow += `</div>`
 
-    if (element !== `Top Part`) {
+    if (element !== `Top Part` && element !== `Footer`) {
         elementRow += `<div class="col-md-1">`
         elementRow += `<img id="${prefix}-up-arrow" src="../../images/arrow.png" class="arrow" height="25px">`
         elementRow += `</div>`

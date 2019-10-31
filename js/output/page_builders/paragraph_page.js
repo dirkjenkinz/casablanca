@@ -43,8 +43,6 @@ const parseVariables = (pageName, paragraph, tag) => {
         }
     } while (start > -1 && end > -1 && cnt < 500);
 
-    console.log(paragraph)
-
     return paragraph;
 }
 

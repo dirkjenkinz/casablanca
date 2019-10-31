@@ -14,7 +14,8 @@ const {
     populateEndHidden,
     populateEndif,
     populateErrorSummary,
-    populateFragment,
+    populateCode,
+    populateFooter,
     populateHeader,
     populateIf,
     populateName,
@@ -123,8 +124,11 @@ const buildDisplay = (casa) => {
             case "nino":
                 populateNino(field);
                 break;
-            case "fragment":
-                populateFragment(field)
+            case "code":
+                populateCode(field)
+                break;
+            case "footer":
+                populateFooter(field)
                 break;
             case "paragraph":
                 populateParagraph(field);

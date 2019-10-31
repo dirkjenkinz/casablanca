@@ -171,190 +171,192 @@ const { deleteFile, loadCasa, buildDisplay } = require("./input_output/file_hand
 const buildData = require("./output/build_data");
 
 let topPart = [
-    `{% extends "cads/layouts/journey-claim.html" %}`,
-    `{% import "casa/macros/form.html" as form %}`
+  `{% extends "cads/layouts/journey-claim.html" %}`,
+  `{% import "casa/macros/form.html" as form %}`
 ];
 
 const buildTopPartDisplay = () => {
-    let tp = `<div class="row"><div class="col"><h6>Default Top Part:</h6><div></div>`;
+  let tp = `<div class="row"><div class="col"><h6>Default Top Part:</h6><div></div>`;
 
-    topPart.forEach(item => {
-        tp += `<div class="row"><div class="col">${item}</div></div>`
-    });
+  topPart.forEach(item => {
+    tp += `<div class="row"><div class="col">${item}</div></div>`
+  });
 
-    tp += `<br><br><br>`;
-    tp += `<div class="row"><div class="col">Use the "Top Part" field to override these defaults.</div></div>`;
+  tp += `<br><br><br>`;
+  tp += `<div class="row"><div class="col">Use the "Top Part" field to override these defaults.</div></div>`;
 
-    $(`#top-parts`).append(tp);
+  $(`#top-parts`).append(tp);
 }
 
 const initView = () => {
-    $(`.help-build`).hide();
-    $(`.page-build`).hide();
-    $(`.page-neutral`).hide();
-    $(`#file-display`).hide();
+  $(`.help-build`).hide();
+  $(`.page-build`).hide();
+  $(`.page-neutral`).hide();
+  $(`#file-display`).hide();
 }
 
 const flipView = () => {
-    $(`.field-build`).show();
-    $(`#show-all`).show();
-    $(`.page-details`).show();
-    $(`#main-display`).show();
-    $(`#summary`).show();
-    $(`#fields`).show();
-    $(`.help-build`).hide();
-    $(`.page-build`).hide();
-    $(`.page-neutral`).hide();
-    $(`#file-display`).hide();
-    $(`#return-btn-row`).empty();
-    $(`#field-input-area`).show();
+  $(`.field-build`).show();
+  $(`#show-all`).show();
+  $(`.page-details`).show();
+  $(`#main-display`).show();
+  $(`#summary`).show();
+  $(`#fields`).show();
+  $(`.help-build`).hide();
+  $(`.page-build`).hide();
+  $(`.page-neutral`).hide();
+  $(`#file-display`).hide();
+  $(`#return-btn-row`).empty();
+  $(`#field-input-area`).show();
 }
 
 const deleteButton = (id) => {
-    let r = confirm("Are you sure you want to delete this element?");
-    if (r == true) {
-        let field = id.substring(0, id.length - 11);
-        $(`#${field}`).remove();
-        field = field + "-element";
-        $(`#${field}`).remove();
-    }
+  let r = confirm("Are you sure you want to delete this element?");
+  if (r == true) {
+    let field = id.substring(0, id.length - 11);
+    $(`#${field}`).remove();
+    field = field + "-element";
+    $(`#${field}`).remove();
+  }
 }
 
 const changeSelection = (id) => {
-    let children = $("#elements").children();
-    for (let i = 0; i < children.length; i++) {
-        let thisID = children[i].id;
-        $(`#${thisID}-btn`).removeClass("selected");
-    }
-    $(`#${id}`).addClass("selected");
+  let children = $("#elements").children();
+  for (let i = 0; i < children.length; i++) {
+    let thisID = children[i].id;
+    $(`#${thisID}-btn`).removeClass("selected");
+  }
+  $(`#${id}`).addClass("selected");
 
-    children = $(".field-build").children();
-    for (let i = 0; i < children.length; i++) {
-        let thisID = children[i].id;
-        $(`#${thisID}`).hide();
-    }
-    id = id.replace("-element-btn", "");
-    $(`#${id}`).show();
+  children = $(".field-build").children();
+  for (let i = 0; i < children.length; i++) {
+    let thisID = children[i].id;
+    $(`#${thisID}`).hide();
+  }
+  id = id.replace("-element-btn", "");
+  $(`#${id}`).show();
 }
 
 const showAll = () => {
-    let casa = buildData();
-    $("#elements").empty();
-    buildDisplay(casa);
-    children = $(".field-build").children();
-    for (let i = 0; i < children.length; i++) {
-        let thisID = children[i].id;
-        $(`#${thisID}`).show();
-    }
+  let casa = buildData();
+  $("#elements").empty();
+  buildDisplay(casa);
+  children = $(".field-build").children();
+  for (let i = 0; i < children.length; i++) {
+    let thisID = children[i].id;
+    $(`#${thisID}`).show();
+  }
 }
 
 const keyUp = e => {
-    let f = `Entity: ${$("#folder").val()}-${$("#page-name").val()}`;
-    $(`#folder-and-page`).text(f);
-    if (e.target.id.substring(3, 11) === `fragment` ||
-        e.target.id.substring(3, 12) === `paragraph` ||
-        e.target.id.substring(3, 11) === `top-part` ||
-        e.target.id.substring(3, 16) === `error-summary` |
-        e.target.id.substring(3, 8) === `input`
-    ) {
-        if (e.keyCode === 13) {
-            let $txt = $($(`#${e.target.id}`));
-            let caretPos = $txt[0].selectionStart;
-            let textAreaTxt = $txt.val();
-            let txtToAdd = "\n";
-            $txt.val(textAreaTxt.substring(0, caretPos) + txtToAdd + textAreaTxt.substring(caretPos));
-        }
+  let f = `Entity: ${$("#folder").val()}-${$("#page-name").val()}`;
+  $(`#folder-and-page`).text(f);
+  if (
+    e.target.id.includes(`code`) ||
+    e.target.id.includes(`paragraph`) ||
+    e.target.id.includes(`footer`) ||
+    e.target.id.includes(`top-part`) ||
+    e.target.id.includes(`error-summary`) ||
+    e.target.id.includes(`input`)
+  ) {
+    if (e.keyCode === 13) {
+      let $txt = $($(`#${e.target.id}`));
+      let caretPos = $txt[0].selectionStart;
+      let textAreaTxt = $txt.val();
+      let txtToAdd = "\n";
+      $txt.val(textAreaTxt.substring(0, caretPos) + txtToAdd + textAreaTxt.substring(caretPos));
     }
+  }
 }
 
 const moveUp = id => {
-    id = id.replace("-arrow", "");
-    id = id.substring(0, id.length - 3);
-    let casa = buildData();
-    let children = ($(`.field-build`).children());
-    let index;
-    for (let i = 0; i < children.length; i++) {
-        if (children[i].id === id) {
-            index = i;
-        }
+  id = id.replace("-arrow", "");
+  id = id.substring(0, id.length - 3);
+  let casa = buildData();
+  let children = ($(`.field-build`).children());
+  let index;
+  for (let i = 0; i < children.length; i++) {
+    if (children[i].id === id) {
+      index = i;
     }
-    if (index > 0) {
-        let hold = casa.fields[index - 1];
-        casa.fields[index - 1] = casa.fields[index];
-        casa.fields[index] = hold;
-        $("#elements").empty();
-        buildDisplay(casa);
-        children = ($(`.field-build`).children());
-        let newID = (children[index - 1].id);
-        $(`#${newID}-element-btn`).click();
-    }
+  }
+  if (index > 0) {
+    let hold = casa.fields[index - 1];
+    casa.fields[index - 1] = casa.fields[index];
+    casa.fields[index] = hold;
+    $("#elements").empty();
+    buildDisplay(casa);
+    children = ($(`.field-build`).children());
+    let newID = (children[index - 1].id);
+    $(`#${newID}-element-btn`).click();
+  }
 }
 
 const moveDown = id => {
-    id = id.replace("-arrow", "");
-    id = id.substring(0, id.length - 5);
-    let casa = buildData();
-    let children = ($(`.field-build`).children());
-    let index;
-    for (let i = 0; i < children.length; i++) {
-        if (children[i].id === id) {
-            index = i;
-        }
+  id = id.replace("-arrow", "");
+  id = id.substring(0, id.length - 5);
+  let casa = buildData();
+  let children = ($(`.field-build`).children());
+  let index;
+  for (let i = 0; i < children.length; i++) {
+    if (children[i].id === id) {
+      index = i;
     }
-    if (index < children.length - 1) {
-        let hold = casa.fields[index + 1];
-        casa.fields[index + 1] = casa.fields[index];
-        casa.fields[index] = hold;
-        $("#elements").empty();
-        buildDisplay(casa);
-        children = ($(`.field-build`).children());
-        let newID = (children[index + 1].id);
-        $(`#${newID}-element-btn`).click();
-    }
+  }
+  if (index < children.length - 1) {
+    let hold = casa.fields[index + 1];
+    casa.fields[index + 1] = casa.fields[index];
+    casa.fields[index] = hold;
+    $("#elements").empty();
+    buildDisplay(casa);
+    children = ($(`.field-build`).children());
+    let newID = (children[index + 1].id);
+    $(`#${newID}-element-btn`).click();
+  }
 }
 
 const bodyClick = e => {
-    let id = e.target.id;
+  let id = e.target.id;
 
-    if (id) {
-        if (id.includes(`-ftype`)) {
-            id = id.replace(`ftype`, `element-btn`);
-            $(`#${id}`).click();
-        } else if (id.includes("-up")) {
-            moveUp(id)
-        } else if (id.includes("-down")) {
-            moveDown(id)
-        } else if (id === "return-to-build") {
-            console.log('!!!!!')
-            flipView();
-        } else if (id.includes("element-btn")) {
-            changeSelection(id);
-        } else if ($(`#${id}`).hasClass(`delete-btn`)) {
-            deleteButton(id);
-        } else if ($(`#${id}`).hasClass(`load-btn`)) {
-            loadCasa(id);
-        } else if ($(`#${id}`).hasClass(`del-file-btn`)) {
-            deleteFile(id);
-        } else if ($(`#${id}`).hasClass(`replacements-btn`)) {
-            if ($(`#${id}`).text() === "Show Replacements") {
-                $(`#${id}`).text("Hide Replacements")
-            } else {
-                $(`#${id}`).text("Show Replacements")
-            }
+  if (id) {
+    if (id.includes(`-ftype`)) {
+      id = id.replace(`ftype`, `element-btn`);
+      $(`#${id}`).click();
+    } else if (id.includes("-up")) {
+      moveUp(id)
+    } else if (id.includes("-down")) {
+      moveDown(id)
+    } else if (id === "return-to-build") {
+      flipView();
+    } else if (id.includes("element-btn")) {
+      changeSelection(id);
+    } else if ($(`#${id}`).hasClass(`delete-btn`)) {
+      deleteButton(id);
+    } else if ($(`#${id}`).hasClass(`load-btn`)) {
+      loadCasa(id);
+    } else if ($(`#${id}`).hasClass(`del-file-btn`)) {
+      deleteFile(id);
+    } else if ($(`#${id}`).hasClass(`replacements-btn`)) {
+      if ($(`#${id}`).text() === "Show Replacements") {
+        $(`#${id}`).text("Hide Replacements")
+      } else {
+        $(`#${id}`).text("Show Replacements")
+      }
 
-            id = id.replace(`-btn`, ``);
-            $(`#${id}`).toggle();
-        }
+      id = id.replace(`-btn`, ``);
+      $(`#${id}`).toggle();
     }
+  }
 }
 
 module.exports = {
-    initView,
-    bodyClick,
-    buildTopPartDisplay,
-    keyUp,
-    topPart,
-    showAll
+  initView,
+  bodyClick,
+  buildTopPartDisplay,
+  keyUp,
+  topPart,
+  showAll,
+  moveUp
 };
 },{"./input_output/file_handler":33,"./output/build_data":35}],4:[function(require,module,exports){
 `use strict`
@@ -363,61 +365,79 @@ const { buildField } = require(`./build_field`);
 const { addElement, showSelectedElement } = require(`./elements.js`);
 
 let elements = [
-    [`top-part`, `Top Part`, `textarea-small`],
-    [`else`, `else`, `flow`],
-    [`if`, `if`, 'flow'],
-    [`elseif`, `elseif`, 'flow'],
-    [`endif`, `endif`, 'flow'],
-    [`begin-hidden`, `Begin Hidden`, `tag`, `blanked`, `hidden`],
-    [`end-hidden`, `End Hidden`, `hidden`],
-    [`radio-group`, `Radio Group`, `tag`, `header`, `hint`, `replacements`, `radio`],
-    [`date`, `Date`, `tag`, `header`, `hint`, `replacements`],
-    [`email`, `Email`, `tag`, `header`, `hint`, `replacements`],
-    [`checkbox-array`, `Checkbox Array`, `tag`, `header`, `hint`, `replacements`, `checkbox`],
-    [`phone`, `Phone`, `tag`, `header`, `hint`, `replacements`],
-    [`name`, `Name`, `tag`, `header`, `hint`, `replacements`],
-    [`address`, `Address`, `tag`, `header`, `hint`, `replacements`],
-    [`nino`, `NINO`, `tag`, `header`, `replacements`, `hint`],
-    [`fragment`, `Code`, `tag`, `textarea-large`, 'shrink'],
-    [`paragraph`, `Paragraph`, `tag`, `textarea-medium`, `shrink`],
-    [`error-summary`, `Error Summary`, `tag`, `textarea-medium`],
-    [`text-area`, `Text Area`, "tag", "header", "hint", "replacements", "length", "height"],
-    [`text-input`, `Text Input`, "tag", "header", "hint", "replacements", "length"],
-    [`header`, `Header`, `tag`, `header-size`],
-    [`bank-details`, `Bank Details`, `tag`]
+  [`top-part`, `Top Part`, `textarea-small`, `shrink`],
+  [`else`, `else`, `flow`],
+  [`if`, `if`, 'flow'],
+  [`elseif`, `elseif`, 'flow'],
+  [`endif`, `endif`, 'flow'],
+  [`begin-hidden`, `Begin Hidden`, `tag`, `blanked`, `hidden`],
+  [`end-hidden`, `End Hidden`, `hidden`],
+  [`radio-group`, `Radio Group`, `tag`, `header`, `hint`, `replacements`, `radio`],
+  [`date`, `Date`, `tag`, `header`, `hint`, `replacements`],
+  [`email`, `Email`, `tag`, `header`, `hint`, `replacements`],
+  [`checkbox-array`, `Checkbox Array`, `tag`, `header`, `hint`, `replacements`, `checkbox`],
+  [`phone`, `Phone`, `tag`, `header`, `hint`, `replacements`],
+  [`name`, `Name`, `tag`, `header`, `hint`, `replacements`],
+  [`address`, `Address`, `tag`, `header`, `hint`, `replacements`],
+  [`nino`, `NINO`, `tag`, `header`, `replacements`, `hint`],
+  [`code`, `Code`, `tag`, `textarea-large`, 'shrink'],
+  [`paragraph`, `Paragraph`, `tag`, `textarea-medium`, `shrink`],
+  [`error-summary`, `Error Summary`, `tag`, `textarea-medium`],
+  [`text-area`, `Text Area`, "tag", "header", "hint", "replacements", "length", "height"],
+  [`text-input`, `Text Input`, "tag", "header", "hint", "replacements", "length"],
+  [`header`, `Header`, `tag`, `header-size`],
+  [`bank-details`, `Bank Details`, `tag`],
+  [`footer`, `Footer`, `textarea-large`, `shrink`]
 ]
 
 const buildElement = (id) => {
-    let element_details = "";
+  let element_details = "";
 
-    elements.forEach(element => {
-        if (element[0] === id) {
-            element_details = element;
-        }
-    })
+  elements.forEach(element => {
+    if (element[0] === id) {
+      element_details = element;
+    }
+  })
 
+  if (element_details[0] === `top-part`) {
+    let children = $("#elements").children();
+    if (children.length > 0 && children[0].id.includes(`-top-part-`)) {
+      element_details = "";
+    }
+  }
+
+  if (element_details[0] === `footer`) {
+    let children = $("#elements").children();
+    if (children.length > 0 && children[children.length - 1].id.includes(`-footer-`)) {
+      element_details = "";
+    }
+  }
+
+  if (element_details !== "") {
+    let fieldID = getCode();
+    let prefix = `${fieldID}-${id}`;
+    let element = buildField(prefix, element_details)
     if (element_details[0] === `top-part`) {
-        let children = $("#elements").children();
-        if (children.length > 0 && children[0].id.includes(`-top-part-`)) {
-            element_details = "";
-        }
+      $(`.field-build`).prepend(element);
+      $(`#elements`).prepend(addElement(element_details[1], prefix));
+    } else {
+      $(`.field-build`).append(element);
+      $(`#elements`).append(addElement(element_details[1], prefix));
     }
 
-    if (element_details !== "") {
-        let fieldID = getCode();
-        let prefix = `${fieldID}-${id}`;
-        let element = buildField(prefix, element_details)
-        if (element_details[0] === `top-part`) {
-            $(`.field-build`).prepend(element);
-            $(`#elements`).prepend(addElement(element_details[1], prefix));
-        } else {
-            $(`.field-build`).append(element);
-            $(`#elements`).append(addElement(element_details[1], prefix));
-        }
-        showSelectedElement();
+    showSelectedElement();
 
-        return element;
+     if (element_details[0] !== `footer` && $("#elements").children().length > 1) {
+      let children = $("#elements").children();
+      if (children[children.length -2].id.includes(`footer`)){
+        let a = children[children.length - 2];
+        let b = children[children.length - 1];
+        $(a).insertAfter(b);
+      }
     }
+
+    return element;
+  }
 }
 
 module.exports = { buildElement, elements };
@@ -427,242 +447,253 @@ module.exports = { buildElement, elements };
 const BTN = "button btn-danger btn-sm btn-block";
 
 const buildField = (prefix, lines) => {
+  let fieldName = lines[1];
+  let type = lines[0];
+  let fieldObject = addLabel(prefix, fieldName, type);
 
-    let fieldName = lines[1];
-    let type = lines[0];
+  if (lines.includes(`tag`)) {
+    fieldObject += addTag(prefix, lines);
+  } else if (lines.includes(`shrink`)) {
+    fieldObject += addShrink(prefix);
+  }
 
-    let fieldObject = addLabel(prefix, fieldName, type);
-    if (lines.includes("tag")) {
-        fieldObject += addTag(prefix, lines);
-    }
-    fieldObject += `</div>`
+  fieldObject += `</div>`
 
-    if (lines.includes(`header`) && lines[0] !== `header`) {
-        fieldObject += addHeader(prefix)
-    }
+  if (lines.includes(`header`) && lines[0] !== `header`) {
+    fieldObject += addHeader(prefix)
+  }
 
-    if (lines.includes(`hint`)) {
-        fieldObject += addHint(prefix)
-    }
+  if (lines.includes(`hint`)) {
+    fieldObject += addHint(prefix)
+  }
 
-    if (lines.includes(`target`)) {
-        fieldObject += addTarget(prefix)
-    };
+  if (lines.includes(`target`)) {
+    fieldObject += addTarget(prefix)
+  };
 
-    if (lines.includes(`textarea-small`)) {
-        fieldObject += addTextArea(prefix, 8)
-    }
+  if (lines.includes(`textarea-small`)) {
+    fieldObject += addTextArea(prefix, 8)
+  }
 
-    if (lines.includes(`textarea-medium`)) {
-        fieldObject += addTextArea(prefix, 12)
-    }
+  if (lines.includes(`textarea-medium`)) {
+    fieldObject += addTextArea(prefix, 12)
+  }
 
-    if (lines.includes(`textarea-large`)) {
-        fieldObject += addTextArea(prefix, 20)
-    }
+  if (lines.includes(`textarea-large`)) {
+    fieldObject += addTextArea(prefix, 20)
+  }
 
-    if (lines.includes(`length`)) {
-        fieldObject += addLength(prefix)
-    }
+  if (lines.includes(`length`)) {
+    fieldObject += addLength(prefix)
+  }
 
-    if (lines.includes(`height`)) {
-        fieldObject += addHeight(prefix)
-    }
+  if (lines.includes(`height`)) {
+    fieldObject += addHeight(prefix)
+  }
 
-    if (lines.includes(`blanked`)) {
-        fieldObject += addBlanked(prefix);
-    }
+  if (lines.includes(`blanked`)) {
+    fieldObject += addBlanked(prefix);
+  }
 
-    if (lines.includes(`replacements`) && !lines.includes(`paragraph`)) {
-        fieldObject += addReplacements(prefix);
-    };
+  if (lines.includes(`replacements`) && !lines.includes(`paragraph`)) {
+    fieldObject += addReplacements(prefix);
+  };
 
-    if (lines.includes(`checkbox`)) {
-        fieldObject += addCheckbox(prefix);
-    };
+  if (lines.includes(`checkbox`)) {
+    fieldObject += addCheckbox(prefix);
+  };
 
-    if (lines.includes(`radio`)) {
-        fieldObject += addRadio(prefix);
-    };
+  if (lines.includes(`radio`)) {
+    fieldObject += addRadio(prefix);
+  };
 
-    if (lines.includes(`header-size`)) {
-        fieldObject += addHeaderSize(prefix);
-    };
+  if (lines.includes(`header-size`)) {
+    fieldObject += addHeaderSize(prefix);
+  };
 
-    fieldObject += `</div></div></div>`
+  fieldObject += `</div></div></div>`
 
-    return fieldObject;
+  return fieldObject;
 }
 
 const addLabel = (prefix, fieldName, type) => {
-    let output = `<div id="${prefix}" class="field ${type}">`;
-    output += `<div class="row">`;
-    output += `<div class="col-md-2 field-type" id="${prefix}-ftype" >${fieldName}</div>`;
-    return output;
+  let output = `<div id="${prefix}" class="field ${type}">`;
+  output += `<div class="row">`;
+  output += `<div class="col-md-2 field-type" id="${prefix}-ftype" >${fieldName}</div>`;
+  return output;
 }
 
 const addTag = (prefix, lines) => {
-    let output = `<div class="col-md-1 field-label">Tag:</div>`;
-    output += `<div class="col-md-5" id="${prefix}-tag">`;
-    output += `<input type="text" id="${prefix}-tag-value" size="40" />`;
-    output += `</div>`;
+  let output = `<div class="col-md-1 field-label">Tag:</div>`;
+  output += `<div class="col-md-5" id="${prefix}-tag">`;
+  output += `<input type="text" id="${prefix}-tag-value" size="40" />`;
+  output += `</div>`;
 
-    if (lines.includes(`shrink`)) {
-        output += `<div class="col-md-2">`
-        output += `<button class="${BTN} rep-btn-add" id="${prefix}-btn-shrink">Shrink Text</button>`;
-        output += `</div>`
-    }
+  if (lines.includes(`shrink`)) {
+    output += `<div class="col-md-2">`
+    output += `<button class="${BTN} rep-btn-add" id="${prefix}-btn-shrink">Shrink Text</button>`;
+    output += `</div>`
+  }
 
-    output += `<div class="col-md-1"></div>`;
-    return output;
-}
+  output += `<div class="col-md-1"></div>`;
+  return output;
+};
+
+const addShrink = (prefix) => {
+  let output = `<div class="col-md-6"></div>`
+  output += `<div class="col-md-2">`
+  output += `<button class="${BTN} rep-btn-add" id="${prefix}-btn-shrink">Shrink Text</button>`;
+  output += `</div>`
+  output += `<div class="col-md-1"></div>`;
+  return output;
+};
 
 const addHeader = prefix => {
-    let output = `<div id="${prefix}-details">`;
-    output += `<div class="row">`;
-    output += `<div class="col-md-2">`;
-    output += `</div>`;
-    output += `<div class="col-md-1 field-label">Header:</div>`;
-    output += `<div class="col" id="${prefix}-form-header">`;
-    output += `<input type="text" id="${prefix}-header-value" size="60" />`;
-    output += `</div>`;
-    output += `</div>`;
-    return output;
+  let output = `<div id="${prefix}-details">`;
+  output += `<div class="row">`;
+  output += `<div class="col-md-2">`;
+  output += `</div>`;
+  output += `<div class="col-md-1 field-label">Header:</div>`;
+  output += `<div class="col" id="${prefix}-form-header">`;
+  output += `<input type="text" id="${prefix}-header-value" size="60" />`;
+  output += `</div>`;
+  output += `</div>`;
+  return output;
 }
 
 const addHint = prefix => {
-    let output = `<div class="row">`;
-    output += `<div class="col-md-2">`;
-    output += `</div>`;
-    output += `<div class="col-md-1 field-label">Hint:</div>`;
-    output += `<div class="col" id="${prefix}-form-hint">`;
-    output += `<input type="text" id="${prefix}-text-hint-value" size="60" />`;
-    output += `</div>`;
-    output += `<div class="col-md-1"></div>`;
-    output += `</div>`;
-    return output;
+  let output = `<div class="row">`;
+  output += `<div class="col-md-2">`;
+  output += `</div>`;
+  output += `<div class="col-md-1 field-label">Hint:</div>`;
+  output += `<div class="col" id="${prefix}-form-hint">`;
+  output += `<input type="text" id="${prefix}-hint-value" size="60" />`;
+  output += `</div>`;
+  output += `<div class="col-md-1"></div>`;
+  output += `</div>`;
+  return output;
 }
 
 const addBlanked = prefix => {
-    let output = `<div class="row">`;
-    output += `<div class="col-md-1">`;
-    output += `</div>`;
-    output += `<div class="col-md-2 blanked field-label">Blanked by:</div>`;
-    output += `<div class="col" id="${prefix}-blanked-by">`
-    output += `<input type="text" id="${prefix}-blanked-by-value" size="60" />`
-    output += `</div>`;
-    output += `<div class="col-md-1"></div>`;
-    output += `</div>`;
-    return output;
+  let output = `<div class="row">`;
+  output += `<div class="col-md-1">`;
+  output += `</div>`;
+  output += `<div class="col-md-2 blanked field-label">Blanked by:</div>`;
+  output += `<div class="col" id="${prefix}-blanked-by">`
+  output += `<input type="text" id="${prefix}-blanked-by-value" size="60" />`
+  output += `</div>`;
+  output += `<div class="col-md-1"></div>`;
+  output += `</div>`;
+  return output;
 }
 
 const addTarget = prefix => {
-    let output = `<div class="row">`;
-    output += `<div class="col-md-2"></div>`;
-    output += `<div class="col-md-1 field-label">Target:</div>`;
-    output += `<div class="col" id="${prefix}-target">`;
-    output += `<input type="text" id="${prefix}-target-value" size="60" />`;
-    output += `</div>`;
-    output += `<div class="col-md-1"></div>`;
-    output += `</div>`;
-    return output;
+  let output = `<div class="row">`;
+  output += `<div class="col-md-2"></div>`;
+  output += `<div class="col-md-1 field-label">Target:</div>`;
+  output += `<div class="col" id="${prefix}-target">`;
+  output += `<input type="text" id="${prefix}-target-value" size="60" />`;
+  output += `</div>`;
+  output += `<div class="col-md-1"></div>`;
+  output += `</div>`;
+  return output;
 }
 
 const addLength = prefix => {
-    let output = `<div class="row">`;
-    output += `<div class="col-md-1"></div>`;
-    output += `<div class="col-md-2 field-label">Text Length:</div>`;
-    output += `<div class="col" id="${prefix}-length">`;
-    output += `<input type="text" id="${prefix}-length-value" size="3" />`;
-    output += `</div>`;
-    output += `<div class="col-md-1"></div>`;
-    output += `</div>`;
-    return output;
+  let output = `<div class="row">`;
+  output += `<div class="col-md-1"></div>`;
+  output += `<div class="col-md-2 field-label">Text Length:</div>`;
+  output += `<div class="col" id="${prefix}-length">`;
+  output += `<input type="text" id="${prefix}-length-value" size="3" />`;
+  output += `</div>`;
+  output += `<div class="col-md-1"></div>`;
+  output += `</div>`;
+  return output;
 }
 
 const addHeight = prefix => {
-    let output = `<div class="row">`;
-    output += `<div class="col-md-1"></div>`;
-    output += `<div class="col-md-2 field-label">Text Height:</div>`;
-    output += `<div class="col" id="${prefix}-height">`;
-    output += `<input type="text" id="${prefix}-height-value" size="3" />`;
-    output += `</div>`;
-    output += `<div class="col-md-1"></div>`;
-    output += `</div>`;
-    return output;
+  let output = `<div class="row">`;
+  output += `<div class="col-md-1"></div>`;
+  output += `<div class="col-md-2 field-label">Text Height:</div>`;
+  output += `<div class="col" id="${prefix}-height">`;
+  output += `<input type="text" id="${prefix}-height-value" size="3" />`;
+  output += `</div>`;
+  output += `<div class="col-md-1"></div>`;
+  output += `</div>`;
+  return output;
 }
 
 const addTextArea = (prefix, length) => {
-    let output = `<br/><div id="${prefix}-details">`
-    output += `<div class="row">`
-    output += `<div class="col-md-1"></div>`
-    output += `<div class="col">`
-    output += `<textarea class="form-control rounded-0" id="${prefix}-textarea" rows="${length}"></textarea>`
-    output += `</div>`
-    output += `<div class="col-md-2"></div>`
-    output += `</div><br>`
-    return output;
+  let output = `<br/><div id="${prefix}-details">`
+  output += `<div class="row">`
+  output += `<div class="col-md-1"></div>`
+  output += `<div class="col">`
+  output += `<textarea class="form-control rounded-0" id="${prefix}-textarea" rows="${length}"></textarea>`
+  output += `</div>`
+  output += `<div class="col-md-2"></div>`
+  output += `</div><br>`
+  return output;
 }
 
 const addReplacements = (prefix) => {
-    let output = `<br><div class="row" id="${prefix}-replacements-start">`;
-    output += `<div class="col-md-3">`;
-    output += `<button class="${BTN} rep-btn-add" id="${prefix}-rep-btn-add">Add a Replacement Field</button>`;
-    output += `</div>`;
-    output += `</div><br>`;
+  let output = `<br><div class="row" id="${prefix}-replacements-start">`;
+  output += `<div class="col-md-3">`;
+  output += `<button class="${BTN} rep-btn-add" id="${prefix}-rep-btn-add">Add a Replacement Field</button>`;
+  output += `</div>`;
+  output += `</div><br>`;
 
-    output += `<div class="replacements" id="${prefix}-replacements">`;
-    output += `<div class="row replace-row">`;
-    output += `<div class="col-md-2">Field</div>`;
-    output += `<div class="col-md-4">From</div>`;
-    output += `<div class="col-md-4">To</div>`;
-    output += `<div class="col"></div>`;
-    output += `</div>`;
+  output += `<div class="replacements" id="${prefix}-replacements">`;
+  output += `<div class="row replace-row">`;
+  output += `<div class="col-md-2">Field</div>`;
+  output += `<div class="col-md-4">From</div>`;
+  output += `<div class="col-md-4">To</div>`;
+  output += `<div class="col"></div>`;
+  output += `</div>`;
 
-    output += `<div class="replacements-field" id="${prefix}-replacements-field">`
+  output += `<div class="replacements-field" id="${prefix}-replacements-field">`
 
-    output += `</div>`
+  output += `</div>`
 
-    output += `<div class="row">`
-    output += `</div>`;
+  output += `<div class="row">`
+  output += `</div>`;
 
-    output += `</div>`;
+  output += `</div>`;
 
-    return output;
+  return output;
 }
 
 const addCheckbox = prefix => {
-    let checkbox_array = `<br><hr><div class="row checkbox-row">`;
-    checkbox_array += `<div class="col-md-3">`;
-    checkbox_array += `<button class="${BTN} cb-btn-add" id="${prefix}-cb-add-1">Add a checkbox</button>`;
-    checkbox_array += `</div></div><br>`;
-    checkbox_array += `<div id="${prefix}-checkbox-area"></div>`
-    return checkbox_array
+  let checkbox_array = `<br><hr><div class="row checkbox-row">`;
+  checkbox_array += `<div class="col-md-3">`;
+  checkbox_array += `<button class="${BTN} cb-btn-add" id="${prefix}-cb-add-1">Add a checkbox</button>`;
+  checkbox_array += `</div></div><br>`;
+  checkbox_array += `<div id="${prefix}-checkbox-area"></div>`
+  return checkbox_array
 }
 
 const addRadio = prefix => {
-    let radio_group = `<hr><div class="row inline" id="${prefix}-radio-group-inline">`
-    radio_group += `<div class="col"></div > `
-    radio_group += `<div class="col-md-1" > Inline:</div>`
-    radio_group += `<div class="col-md-3" id="${prefix}-radio-group-inline-buttons">`
-    radio_group += `<input type="radio" name="${prefix}-opt_inline" id="${prefix}-radio-group-inline-yes" >&nbsp; Yes`
-    radio_group += `&nbsp;&nbsp;&nbsp;&nbsp;`
-    radio_group += `<input type="radio" name="${prefix}-opt_inline" id="${prefix}-radio-group-inline-no" checked >&nbsp; No`
-    radio_group += `</div >`
-    radio_group += `<div class="col"></div>`
-    radio_group += `</div> <hr>`
-    radio_group += `<div class="row">`
-    radio_group += `<div class="col-md-3">`
-    radio_group += `<button class="${BTN} btn-rb-add" id="${prefix}-rb-add-1">Add a radio button</button>`
-    radio_group += `</div> `
-    radio_group += `<div class="col-md-1"></div>`
-    radio_group += `</div> `
-    radio_group += `<div id="${prefix}-button-area" ></div>`
-    return radio_group;
+  let radio_group = `<hr><div class="row inline" id="${prefix}-radio-group-inline">`
+  radio_group += `<div class="col"></div > `
+  radio_group += `<div class="col-md-1" > Inline:</div>`
+  radio_group += `<div class="col-md-3" id="${prefix}-radio-group-inline-buttons">`
+  radio_group += `<input type="radio" name="${prefix}-opt_inline" id="${prefix}-radio-group-inline-yes" >&nbsp; Yes`
+  radio_group += `&nbsp;&nbsp;&nbsp;&nbsp;`
+  radio_group += `<input type="radio" name="${prefix}-opt_inline" id="${prefix}-radio-group-inline-no" checked >&nbsp; No`
+  radio_group += `</div >`
+  radio_group += `<div class="col"></div>`
+  radio_group += `</div> <hr>`
+  radio_group += `<div class="row">`
+  radio_group += `<div class="col-md-3">`
+  radio_group += `<button class="${BTN} btn-rb-add" id="${prefix}-rb-add-1">Add a radio button</button>`
+  radio_group += `</div> `
+  radio_group += `<div class="col-md-1"></div>`
+  radio_group += `</div> `
+  radio_group += `<div id="${prefix}-button-area" ></div>`
+  return radio_group;
 }
 
 const addHeaderSize = prefix => {
-    let headerSize = `<div class="row header-size" id="${prefix}-headersize">
+  let headerSize = `<div class="row header-size" id="${prefix}-headersize">
     <div class="col-md-2 right-justify">Header Size&nbsp;&nbsp;</div>
     <div class="col"><label class="radio-inline"><input type="radio" id="${prefix}-h1" name="size">&nbsp;&nbsp;H1</label></div>
     <div class="col"><label class="radio-inline"><input type="radio" id="${prefix}-h2" name="size">&nbsp;&nbsp;H2</label></div>
@@ -671,68 +702,68 @@ const addHeaderSize = prefix => {
     <div class="col"><label class="radio-inline"><input type="radio" id="${prefix}-h5" name="size">&nbsp;&nbsp;H5</label></div>
     <div class="col"><label class="radio-inline"><input type="radio" id="${prefix}-h6" name="size">&nbsp;&nbsp;H6</label></div>
   </div>`
-    return headerSize;
+  return headerSize;
 }
 
 const replacementAdd = (id) => {
-    let prefix = id.substring(0, id.indexOf(`-rep`));
-    let children = $(`#${prefix}-replacements-field`).children();
-    let next = 0;
+  let prefix = id.substring(0, id.indexOf(`-rep`));
+  let children = $(`#${prefix}-replacements-field`).children();
+  let next = 0;
 
-    if (children.length > 0) {
-        let lastLine = children[children.length - 1].id;
-        next = parseInt(lastLine.substring(lastLine.indexOf('replace-') + 8)) + 1;
-    }
+  if (children.length > 0) {
+    let lastLine = children[children.length - 1].id;
+    next = parseInt(lastLine.substring(lastLine.indexOf('replace-') + 8)) + 1;
+  }
 
 
-    let newLine = `<div class="row replace-row" id="${prefix}-replace-${next}" > `;
-    newLine += `<div class="col-md-2">`;
-    if (id.includes(`-para`)) {
-        newLine += `&nbsp`
-    } else {
-        newLine += `<input type="radio" name="${prefix}-field-${next}" id="${prefix}-header-${next}" value="header" >&nbsp;&nbsp; Header<br>`;
-        newLine += `<input type="radio" name="${prefix}-field-${next}" id="${prefix}-hint-${next}" value="hint" >&nbsp;&nbsp; Hint`;
-    }
-    newLine += `</div > `;
+  let newLine = `<div class="row replace-row" id="${prefix}-replace-${next}" > `;
+  newLine += `<div class="col-md-2">`;
+  if (id.includes(`-para`)) {
+    newLine += `&nbsp`
+  } else {
+    newLine += `<input type="radio" name="${prefix}-field-${next}" id="${prefix}-header-${next}" value="header" >&nbsp;&nbsp; Header<br>`;
+    newLine += `<input type="radio" name="${prefix}-field-${next}" id="${prefix}-hint-${next}" value="hint" >&nbsp;&nbsp; Hint`;
+  }
+  newLine += `</div > `;
 
-    newLine += `<div class="col-md-4" > <input type="text" id="${prefix}-left-${next}" size="32"></div>`;
-    newLine += `<div class="col-md-4" > <input type="text" id="${prefix}-right-${next}" size="32"></div>`;
-    newLine += `<div class="col" > `
-    newLine += `<button class="button btn-danger btn-sm btn-block delete-btn" id="${prefix}-del-rep-btn-${next}" > Delete</button > `;
-    newLine += `</div ></div > `;
-    $(`#${prefix}-replacements-field`).append(newLine);
-    return newLine
+  newLine += `<div class="col-md-4" > <input type="text" id="${prefix}-left-${next}" size="32"></div>`;
+  newLine += `<div class="col-md-4" > <input type="text" id="${prefix}-right-${next}" size="32"></div>`;
+  newLine += `<div class="col" > `
+  newLine += `<button class="button btn-danger btn-sm btn-block delete-btn" id="${prefix}-del-rep-btn-${next}" > Delete</button > `;
+  newLine += `</div ></div > `;
+  $(`#${prefix}-replacements-field`).append(newLine);
+  return newLine
 }
 
 const replacementDelete = id => {
-    let cnt = id.substring(id.length - 1);
-    let prefix = id.substring(0, id.indexOf('-del'));
-    $(`#${prefix}-replace-${cnt} `).remove();
+  let cnt = id.substring(id.length - 1);
+  let prefix = id.substring(0, id.indexOf('-del'));
+  $(`#${prefix}-replace-${cnt} `).remove();
 }
 
 const shrinkOrUnshrinkText = (id) => {
-    let text = $(`#${id}`).text();
-    let id2 = id.replace(`-btn-shrink`, `-textarea`);
-    if (text === `Shrink Text`) {
-        $(`#${id}`).text(`Unshrink Text`);
-        $(`#${id2}`).addClass(`shrink`)
-    } else {
-        $(`#${id}`).text(`Shrink Text`);
-        $(`#${id2}`).removeClass(`shrink`)
-    }
+  let text = $(`#${id}`).text();
+  let id2 = id.replace(`-btn-shrink`, `-textarea`);
+  if (text === `Shrink Text`) {
+    $(`#${id}`).text(`Unshrink Text`);
+    $(`#${id2}`).addClass(`shrink`)
+  } else {
+    $(`#${id}`).text(`Shrink Text`);
+    $(`#${id2}`).removeClass(`shrink`)
+  }
 }
 
 $(
-    $("body").click((e) => {
-        let id = e.target.id;
-        if (id.includes("-del-rep-")) {
-            replacementDelete(id);
-        } else if (id.includes(`rep-btn-add`)) {
-            replacementAdd(id);
-        } else if (id.includes('shrink')) {
-            shrinkOrUnshrinkText(id)
-        }
-    })
+  $("body").click((e) => {
+    let id = e.target.id;
+    if (id.includes("-del-rep-")) {
+      replacementDelete(id);
+    } else if (id.includes(`rep-btn-add`)) {
+      replacementAdd(id);
+    } else if (id.includes('shrink')) {
+      shrinkOrUnshrinkText(id)
+    }
+  })
 )
 
 module.exports = { buildField, replacementAdd };
@@ -810,7 +841,7 @@ const addElement = (element, prefix) => {
     elementRow += `<button class="btn-sm btn-dark btn-block btn-select selected" id="${prefix}-element-btn">${element}</button>`
     elementRow += `</div>`
 
-    if (element !== `Top Part`) {
+    if (element !== `Top Part` && element !== `Footer`) {
         elementRow += `<div class="col-md-1">`
         elementRow += `<img id="${prefix}-up-arrow" src="../../images/arrow.png" class="arrow" height="25px">`
         elementRow += `</div>`
@@ -1032,17 +1063,17 @@ module.exports = checkboxArrayField;
 },{}],13:[function(require,module,exports){
 'use strict'
 
-const codeFragmentField = () => {
+const codeField = () => {
     let text = `<div class="row">`
 
     text += `<div class="col-md-1"></div>`;
     text += `<div class="col-md-6">`; // left side
-    text += `<img alt="code fragment" src="../images/code.png" width="500px">`;
+    text += `<img alt="code" src="../images/code.png" width="500px">`;
     text += `</div>`; //  left side end
 
     text += `<div class="col">`; // right side
     text += `<div class="col">`;
-    text += buildLine(`Code Fragment Field.`);
+    text += buildLine(`Code Field.`);
     text += `<br>`;
     text += `</div>`;
     text += `</div>`; // right side end
@@ -1060,7 +1091,7 @@ const buildLine = input => {
     return text;
 }
 
-module.exports = codeFragmentField;
+module.exports = codeField;
 },{}],14:[function(require,module,exports){
 'use strict'
 
@@ -1484,8 +1515,6 @@ const fieldsList = () => {
 
     text += `</div>`;
 
-    console.log(text)
-
     return text;
 }
 
@@ -1552,7 +1581,7 @@ const flowControlFields = require(`./fields/flow_control_fields`);
 const hiddenFields = require(`./fields/hidden_fields`);
 const addressField = require(`./fields/address_field`);
 const checkboxArrayField = require(`./fields/checkbox_array_field`);
-const codeFragmentField = require(`./fields/code_fragment_field`);
+const codeField = require(`./fields/code_field`);
 const dateField = require(`./fields/date_field`);
 const emailField = require(`./fields/email_field`);
 const errorSummaryField = require(`./fields/error_summary_field`);
@@ -1620,8 +1649,8 @@ const buildHelp = (section) => {
         case ('checkbox-array-field'):
             output = checkboxArrayField();
             break;
-        case ('code-fragment-field'):
-            output = codeFragmentField();
+        case ('code-field'):
+            output = codeField();
             break;
         case ('date-field'):
             output = dateField();
@@ -1648,7 +1677,6 @@ const buildHelp = (section) => {
             output = phoneField();
             break;
         case ('radio-group-field'):
-            console.log('fukiy')
             output = radioGroupField();
             break;
         case ('bank-details-field'):
@@ -1679,7 +1707,7 @@ const buildSideBar = () => {
     sideBar += helpButton(`field-input-area`, `Section 4: The Field Input Area`);
     sideBar += doubleButton('flow-control-fields', `Flow Control`, 'hidden-fields', `Hidden Fields`);
     sideBar += doubleButton(`address-field`, `Address`, 'checkbox-array-field', `Checkbox Array`);
-    sideBar += doubleButton('code-fragment-field', `Code Fragment`, 'date-field', `Date`);
+    sideBar += doubleButton('code-field', `Code`, 'date-field', `Date`);
     sideBar += doubleButton(`email-field`, `Email`, `error-summary-field`, `Error Summary`);
     sideBar += doubleButton(`name-field`, `Name`, `nino-field`, `Nino`);
     sideBar += doubleButton(`paragraph-field`, `Paragraph`, `phone-field`, `Phone`);
@@ -1737,8 +1765,8 @@ $(
                 buildHelp('address-field');
             } else if (e.target.id === 'checkbox-array-field') {
                 buildHelp('checkbox-array-field');
-            } else if (e.target.id === 'code-fragment-field') {
-                buildHelp('code-fragment-field');
+            } else if (e.target.id === 'code-field') {
+                buildHelp('code-field');
             } else if (e.target.id === 'date-field') {
                 buildHelp('date-field');
             } else if (e.target.id === 'email-field') {
@@ -1769,7 +1797,7 @@ $(
 )
 
 module.exports = showHelp;
-},{"./field_input_area":9,"./fields/address_field":10,"./fields/bank_details_field":11,"./fields/checkbox_array_field":12,"./fields/code_fragment_field":13,"./fields/date_field":14,"./fields/email_field":15,"./fields/error_summary_field":16,"./fields/flow_control_fields":17,"./fields/hidden_fields":18,"./fields/name_field":19,"./fields/nino_field":20,"./fields/paragraph_field":21,"./fields/phone_field":22,"./fields/radio_group_field":23,"./fields/text_input_field":24,"./fields/top_part_field":25,"./fields_list":26,"./fields_panel":27,"./output_panel":29,"./overview":30,"./page_panel":31}],29:[function(require,module,exports){
+},{"./field_input_area":9,"./fields/address_field":10,"./fields/bank_details_field":11,"./fields/checkbox_array_field":12,"./fields/code_field":13,"./fields/date_field":14,"./fields/email_field":15,"./fields/error_summary_field":16,"./fields/flow_control_fields":17,"./fields/hidden_fields":18,"./fields/name_field":19,"./fields/nino_field":20,"./fields/paragraph_field":21,"./fields/phone_field":22,"./fields/radio_group_field":23,"./fields/text_input_field":24,"./fields/top_part_field":25,"./fields_list":26,"./fields_panel":27,"./output_panel":29,"./overview":30,"./page_panel":31}],29:[function(require,module,exports){
 'use strict'
 
 const outputPanel = () => {
@@ -2027,7 +2055,8 @@ const {
     populateEndHidden,
     populateEndif,
     populateErrorSummary,
-    populateFragment,
+    populateCode,
+    populateFooter,
     populateHeader,
     populateIf,
     populateName,
@@ -2136,8 +2165,11 @@ const buildDisplay = (casa) => {
             case "nino":
                 populateNino(field);
                 break;
-            case "fragment":
-                populateFragment(field)
+            case "code":
+                populateCode(field)
+                break;
+            case "footer":
+                populateFooter(field)
                 break;
             case "paragraph":
                 populateParagraph(field);
@@ -2207,200 +2239,208 @@ const { checkbox_array_addCheckbox } = require("../fields/checkbox_array");
 const { radio_group_addRadioButton } = require("../fields/radio_group");
 
 const populateRadioGroup = field => {
-    let prefix = buildElement(`radio-group`).substring(9, 23);
-    rebuild(prefix, field)
-    if (field.inline) {
-        $(`#${prefix}-radio-group-inline-yes`).prop("checked", true)
-    }
-    let radio_group_buttonCount = 0;
-    for (let i = 0; i < field.buttons.length; i++) {
-        let newButton = radio_group_addRadioButton(`${prefix}-rb-add-1`, radio_group_buttonCount);
-        prefix = newButton.substring(38, 52);
-        $(`#${prefix}-rb-text-${radio_group_buttonCount}-value`).val(field.buttons[i][0])
-        $(`#${prefix}-rb-value-${radio_group_buttonCount}-value`).val(field.buttons[i][1]);
-        $(`#${prefix}-rb-trigger-${radio_group_buttonCount}`).val(field.buttons[i][2]);
-        radio_group_buttonCount++;
-    }
+  let prefix = buildElement(`radio-group`).substring(9, 23);
+  rebuild(prefix, field)
+  if (field.inline) {
+    $(`#${prefix}-radio-group-inline-yes`).prop("checked", true)
+  }
+  let radio_group_buttonCount = 0;
+  for (let i = 0; i < field.buttons.length; i++) {
+    let newButton = radio_group_addRadioButton(`${prefix}-rb-add-1`, radio_group_buttonCount);
+    prefix = newButton.substring(38, 52);
+    $(`#${prefix}-rb-text-${radio_group_buttonCount}-value`).val(field.buttons[i][0])
+    $(`#${prefix}-rb-value-${radio_group_buttonCount}-value`).val(field.buttons[i][1]);
+    $(`#${prefix}-rb-trigger-${radio_group_buttonCount}`).val(field.buttons[i][2]);
+    radio_group_buttonCount++;
+  }
 }
 
 const populateCheckboxArray = field => {
-    let prefix = buildElement(`checkbox-array`).substring(9, 26);
-    rebuild(prefix, field)
-    let checkbox_array_boxCount = 0;
-    for (let i = 0; i < field.boxes.length; i++) {
-        let newBox = checkbox_array_addCheckbox(`${prefix}-cb-add-1`, checkbox_array_boxCount);
-        prefix = newBox.substring(40, 57);
-        $(`#${prefix}-cb-text-${checkbox_array_boxCount}-value`).val(field.boxes[i][0]);
-        $(`#${prefix}-cb-value-${checkbox_array_boxCount}-value`).val(field.boxes[i][1]);
-        $(`#${prefix}-cb-trigger-${checkbox_array_boxCount}`).val(field.boxes[i][2]);
-        checkbox_array_boxCount++;
-    }
+  let prefix = buildElement(`checkbox-array`).substring(9, 26);
+  rebuild(prefix, field)
+  let checkbox_array_boxCount = 0;
+  for (let i = 0; i < field.boxes.length; i++) {
+    let newBox = checkbox_array_addCheckbox(`${prefix}-cb-add-1`, checkbox_array_boxCount);
+    prefix = newBox.substring(40, 57);
+    $(`#${prefix}-cb-text-${checkbox_array_boxCount}-value`).val(field.boxes[i][0]);
+    $(`#${prefix}-cb-value-${checkbox_array_boxCount}-value`).val(field.boxes[i][1]);
+    $(`#${prefix}-cb-trigger-${checkbox_array_boxCount}`).val(field.boxes[i][2]);
+    checkbox_array_boxCount++;
+  }
 }
 
 const populateDate = field => {
-    let prefix = buildElement(`date`).substring(9, 16);
-    rebuild(prefix, field);
+  let prefix = buildElement(`date`).substring(9, 16);
+  rebuild(prefix, field);
 }
 
 const populateEmail = field => {
-    let prefix = buildElement(`email`).substring(9, 17);
-    rebuild(prefix, field);
+  let prefix = buildElement(`email`).substring(9, 17);
+  rebuild(prefix, field);
 }
 
 const populatePhone = field => {
-    let prefix = buildElement('phone').substring(9, 17);
-    rebuild(prefix, field);
+  let prefix = buildElement('phone').substring(9, 17);
+  rebuild(prefix, field);
 }
 
 const populateName = field => {
-    let prefix = buildElement(`name`).substring(9, 16);
-    rebuild(prefix, field);
+  let prefix = buildElement(`name`).substring(9, 16);
+  rebuild(prefix, field);
 }
 
 const populateAddress = field => {
-    let prefix = buildElement(`address`).substring(9, 19);
-    rebuild(prefix, field);
+  let prefix = buildElement(`address`).substring(9, 19);
+  rebuild(prefix, field);
 }
 
 const populateBeginHidden = field => {
-    let prefix = buildElement(`begin-hidden`).substring(9, 24);
-    rebuild(prefix, field);
-    $(`#${prefix}-blanked-by-value`).val(field[`blanked-by`]);
+  let prefix = buildElement(`begin-hidden`).substring(9, 24);
+  rebuild(prefix, field);
+  $(`#${prefix}-blanked-by-value`).val(field[`blanked-by`]);
 }
 
 const populateIf = field => {
-    let prefix = buildElement(`if`).substring(9, 14);
-    let f_condition = `${prefix}-condition-value`;
-    $(`#${f_condition}`).val(field.condition);
+  let prefix = buildElement(`if`).substring(9, 14);
+  let f_condition = `${prefix}-condition-value`;
+  $(`#${f_condition}`).val(field.condition);
 }
 
 const populateEndif = field => {
-    let prefix = buildElement(`endif`).substring(9, 17);
+  let prefix = buildElement(`endif`).substring(9, 17);
 }
 
 const populateElse = field => {
-    let prefix = buildElement(`else`).substring(9, 16);
+  let prefix = buildElement(`else`).substring(9, 16);
 }
 
 const populateElseif = field => {
-    let prefix = buildElement(`elseif`).substring(9, 18);
-    let f_condition = `${prefix}-condition-value`;
-    $(`#${f_condition}`).val(field.condition);
+  let prefix = buildElement(`elseif`).substring(9, 18);
+  let f_condition = `${prefix}-condition-value`;
+  $(`#${f_condition}`).val(field.condition);
 }
 
 const populateEndHidden = field => {
-    let prefix = buildElement(`end-hidden`).substring(9, 21);
-    rebuild(prefix, field);
+  let prefix = buildElement(`end-hidden`).substring(9, 21);
+  rebuild(prefix, field);
 }
 
 const populateNino = field => {
-    let prefix = buildElement(`nino`).substring(9, 16);
-    rebuild(prefix, field);
+  let prefix = buildElement(`nino`).substring(9, 16);
+  rebuild(prefix, field);
 }
 
 const populateParagraph = field => {
-    let prefix = buildElement(`paragraph`).substring(9, 21);
-    rebuild(prefix, field);
-    $(`#${prefix}-textarea`).val(field.paragraph);
+  let prefix = buildElement(`paragraph`).substring(9, 21);
+  rebuild(prefix, field);
+  $(`#${prefix}-textarea`).val(field.paragraph);
 }
 
-const populateFragment = field => {
-    let prefix = buildElement(`fragment`).substring(9, 20);
-    let f_area = `${prefix}-textarea`;
-    $(`#${f_area}`).val(field.fragment);
+const populateFooter = field => {
+  let prefix = buildElement(`footer`).substring(9, 18);
+  rebuild(prefix, field);
+  $(`#${prefix}-textarea`).val(field.footer);
+}
+
+const populateCode = field => {
+  let prefix = buildElement(`code`).substring(9, 16);
+  let f_area = `${prefix}-textarea`;
+  $(`#${f_area}`).val(field.code);
+  $(`#${prefix}-tag-value`).val(field["tag"]);
 }
 
 const populateTopPart = field => {
-    let prefix = buildElement(`top-part`).substring(9, 20);
-    let f_top = `${prefix}-textarea`;
-    $(`#${f_top}`).val(field.top);
+  let prefix = buildElement(`top-part`).substring(9, 20);
+  let f_top = `${prefix}-textarea`;
+  $(`#${f_top}`).val(field.top);
 }
 
 const populateTextInput = field => {
-    let prefix = buildElement(`text-input`).substring(9, 22);
-    rebuild(prefix, field);
-    $(`#${prefix}-length-value`).val(field[`text-length`]);
+  let prefix = buildElement(`text-input`).substring(9, 22);
+  rebuild(prefix, field);
+  $(`#${prefix}-length-value`).val(field[`text-length`]);
 }
 
 const populateTextArea = field => {
-    let prefix = buildElement(`text-area`).substring(9, 21);
-    rebuild(prefix, field);
-    $(`#${prefix}-length-value`).val(field[`text-length`]);
-    $(`#${prefix}-height-value`).val(field[`text-height`]);
+  let prefix = buildElement(`text-area`).substring(9, 21);
+  rebuild(prefix, field);
+  $(`#${prefix}-length-value`).val(field[`text-length`]);
+  $(`#${prefix}-height-value`).val(field[`text-height`]);
 }
 
 const populateBankDetails = field => {
-    let prefix = buildElement(`bank-details`).substring(9, 24);
-    rebuild(prefix, field);
-    $(`#${prefix}-length-value`).val(field.length);
+  let prefix = buildElement(`bank-details`).substring(9, 24);
+  rebuild(prefix, field);
+  $(`#${prefix}-length-value`).val(field.length);
 }
 
 const populateHeader = field => {
-    let prefix = buildElement(`header`).substring(9, 18);
-    $(`#${prefix}-tag-value`).val(field["tag"]);
-    $(`#${prefix}-header-value`).val(field.header)
-    $(`#${prefix}-h${field["header-size"]}`).prop("checked", true);
+  let prefix = buildElement(`header`).substring(9, 18);
+  $(`#${prefix}-tag-value`).val(field["tag"]);
+  $(`#${prefix}-header-value`).val(field.header)
+  $(`#${prefix}-h${field["header-size"]}`).prop("checked", true);
 }
 
 const populateErrorSummary = field => {
-    let prefix = buildElement(`error-summary`).substring(9, 25);
-    $(`#${prefix}-tag-value`).val(field["tag"]);
-    $(`#${prefix}-header-value`).val(field.header)
-    $(`#${prefix}-textarea`).val(field["error-summary"]);
+  let prefix = buildElement(`error-summary`).substring(9, 25);
+  $(`#${prefix}-tag-value`).val(field["tag"]);
+  $(`#${prefix}-header-value`).val(field.header)
+  $(`#${prefix}-textarea`).val(field["error-summary"]);
 }
 
 const rebuild = (prefix, field) => {
-    let data_field = `${prefix}-tag-value`;
-    $(`#${data_field}`).val(field["tag"])
+  let data_field = `${prefix}-tag-value`;
+  $(`#${data_field}`).val(field["tag"])
 
-    let header_field = `${prefix}-header-value`;
-    $(`#${header_field}`).val(field.header);
+  let header_field = `${prefix}-header-value`;
+  $(`#${header_field}`).val(field.header);
 
-    let hint_field = `${prefix}-text-hint-value`;
-    $(`#${hint_field}`).val(field["text-hint"]);
+  let hint_field = `${prefix}-hint-value`;
+  $(`#${hint_field}`).val(field.hint);
 
-    let target_field = `${prefix}-target-value`;
-    $(`#${target_field}`).val(field.target);
+  let target_field = `${prefix}-target-value`;
+  $(`#${target_field}`).val(field.target);
 
-    if (field.replacements) {
-        for (let i = 0; i < field.replacements.length; i++) {
-            replacementAdd(`${prefix}-rep-btn-add`)
+  if (field.replacements) {
+    for (let i = 0; i < field.replacements.length; i++) {
+      replacementAdd(`${prefix}-rep-btn-add`)
 
-            if (field.replacements[i][0] === `hint`) {
-                $(`#${prefix}-hint-${i}`).prop("checked", true);
-            } else {
-                $(`#${prefix}-header-${i}`).prop("checked", true);
-            };
+      if (field.replacements[i][0] === `hint`) {
+        $(`#${prefix}-hint-${i}`).prop("checked", true);
+      } else {
+        $(`#${prefix}-header-${i}`).prop("checked", true);
+      };
 
-            $(`#${prefix}-left-${i}`).val(field.replacements[i][1]);
-            $(`#${prefix}-right-${i}`).val(field.replacements[i][2]);
-        }
+      $(`#${prefix}-left-${i}`).val(field.replacements[i][1]);
+      $(`#${prefix}-right-${i}`).val(field.replacements[i][2]);
     }
+  }
 }
 
 module.exports = {
-    populateAddress,
-    populateBeginHidden,
-    populateCheckboxArray,
-    populateDate,
-    populateElse,
-    populateElseif,
-    populateEmail,
-    populateEndHidden,
-    populateEndif,
-    populateErrorSummary,
-    populateFragment,
-    populateHeader,
-    populateIf,
-    populateName,
-    populateNino,
-    populateParagraph,
-    populatePhone,
-    populateRadioGroup,
-    populateTextInput,
-    populateTextArea,
-    populateBankDetails,
-    populateTopPart
+  populateAddress,
+  populateBeginHidden,
+  populateCheckboxArray,
+  populateDate,
+  populateElse,
+  populateElseif,
+  populateEmail,
+  populateEndHidden,
+  populateEndif,
+  populateErrorSummary,
+  populateCode,
+  populateFooter,
+  populateHeader,
+  populateIf,
+  populateName,
+  populateNino,
+  populateParagraph,
+  populatePhone,
+  populateRadioGroup,
+  populateTextInput,
+  populateTextArea,
+  populateBankDetails,
+  populateTopPart
 }
 },{"../fields/build_element":4,"../fields/build_field":5,"../fields/checkbox_array":6,"../fields/radio_group":8}],35:[function(require,module,exports){
 "use strict"
@@ -2441,8 +2481,8 @@ const buildCasaObject = () => {
                     field.tag = $(`#${id}`).val();
                 } else if (id.includes("header-value")) {
                     field.header = $(`#${id}`).val();
-                } else if (id.includes("text-hint-value")) {
-                    field["text-hint"] = $(`#${id}`).val();
+                } else if (id.includes("hint-value")) {
+                    field.hint = $(`#${id}`).val();
                 } else if (id.includes("target-value")) {
                     field.target = $(`#${id}`).val();
                 } else if (id.includes("blanked-by-value")) {
@@ -2472,14 +2512,17 @@ const buildCasaObject = () => {
                 case `checkbox-array`:
                     checkboxArrayExtras(field, inputs);
                     break;
-                case `fragment`:
-                    field.fragment = $(`#${id.substring(0, 11)}-textarea`).val();
+                case `code`:
+                    field.code = $(`#${id.substring(0, 11)}-textarea`).val();
                     break;
                 case `paragraph`:
                     field.paragraph = $(`#${id.substring(0, 12)}-textarea`).val();
                     break;
                 case `top-part`:
                     field.top = $(`#${id.substring(0, 11)}-textarea`).val();
+                    break;
+                case `footer`:
+                    field.footer = $(`#${id.substring(0, 9)}-textarea`).val();
                     break;
                 case `error-summary`:
                     field["error-summary"] = $(`#${id.substring(0, 16)}-textarea`).val();
@@ -2767,33 +2810,62 @@ module.exports = checkboxArray_JSON;
 },{}],39:[function(require,module,exports){
 'use strict'
 
+const code_JSON = (field) => {
+    let tag = field.tag
+    let messArray = [];
+    let json = "\n";
+
+    let subCodes = field.code.split("<=");
+
+    subCodes.forEach(subCode => {
+        let end = subCode.indexOf("=>");
+        if (end > -1) {
+            let pair = subCode.substring(0, end).split("=");
+            messArray.push(pair)
+        }
+    })
+
+    messArray.forEach(pair => {
+        json += `"${tag}.${pair[0].trim()}": "${pair[1].trim()}",\n`
+    })
+
+    if (json.length > 0) {
+        json + ",\n"
+    }
+    return json;
+}
+
+module.exports = code_JSON;
+},{}],40:[function(require,module,exports){
+'use strict'
+
 const date_JSON = (field) => {
-  let header = field.header;
-  let tag = field.tag;
-  let hint = field["text-hint"];
+    let header = field.header;
+    let tag = field.tag;
+    let hint = field.hint;
 
-  let json = `"${tag}": {\n`;
+    let json = `"${tag}": {\n`;
 
-  if (header !== "") {
-    json += `"label": "${header}",\n`
-  }
+    if (header !== "") {
+        json += `"label": "${header}",\n`
+    }
 
-  if (hint !== "") {
-    json += `"hint": "${hint}",\n`
-  }
+    if (hint !== "") {
+        json += `"hint": "${hint}",\n`
+    }
 
-  json += `"validation": {\n`
-  json += `"mandatoryInline": "You must complete this section",\n`
-  json += `"mandatorySummary": "${header} - You must complete this section",\n`
-  json += `"invalidDateInline":"Invalid value",\n`
-  json += `"invalidDateSummary":"${header} - Invalid value"\n`
-  json += `}\n`
-  json += `},\n`
-  return json;
+    json += `"validation": {\n`
+    json += `"mandatoryInline": "You must complete this section",\n`
+    json += `"mandatorySummary": "${header} - You must complete this section",\n`
+    json += `"invalidDateInline":"Invalid value",\n`
+    json += `"invalidDateSummary":"${header} - Invalid value"\n`
+    json += `}\n`
+    json += `},\n`
+    return json;
 }
 
 module.exports = date_JSON;
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict'
 
 const email_JSON = (field) => {
@@ -2829,7 +2901,7 @@ const email_JSON = (field) => {
 }
 
 module.exports = email_JSON;
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict'
 
 const errorSummary_JSON = (field) => {
@@ -2854,35 +2926,6 @@ const errorSummary_JSON = (field) => {
 }
 
 module.exports = errorSummary_JSON;
-},{}],42:[function(require,module,exports){
-'use strict'
-
-const fragment_JSON = (field) => {
-    let tag = field.tag
-    let messArray = [];
-    let json = "\n";
-
-    let subFragments = field.fragment.split("<=");
-
-    subFragments.forEach(subFragment => {
-        let end = subFragment.indexOf("=>");
-        if (end > -1) {
-            let pair = subFragment.substring(0, end).split("=");
-            messArray.push(pair)
-        }
-    })
-
-    messArray.forEach(pair => {
-        json += `"${tag}.${pair[0].trim()}": "${pair[1].trim()}",\n`
-    })
-
-    if (json.length > 0) {
-        json + ",\n"
-    }
-    return json;
-}
-
-module.exports = fragment_JSON;
 },{}],43:[function(require,module,exports){
 'use strict'
 
@@ -2970,8 +3013,8 @@ module.exports = name_JSON;
 'use strict'
 
 const nino_JSON = (field) => {
-let tag = field.tag;
-let hint = field["text-hint"];
+    let tag = field.tag;
+    let hint = field.hint;
     let json = `
     "${tag}NationalInsuranceNumber": {
         "label": "National Insurance number",
@@ -2985,7 +3028,7 @@ let hint = field["text-hint"];
             }
         }
     },`
-    return json+`\n`;
+    return json + `\n`;
 }
 
 module.exports = nino_JSON;
@@ -3021,10 +3064,10 @@ module.exports = paragraph_JSON;
 'use strict'
 
 const phone_JSON = field => {
-let header = field.header;
-let tag = field.tag;
-let hint = field["text-hint"];
-  
+    let header = field.header;
+    let tag = field.tag;
+    let hint = field.hint;
+
     let json = `"${tag}": {\n`;
     json += `"label": "${tag} number",\n`;
     json += ` "validation": {\n`
@@ -3046,50 +3089,50 @@ module.exports = phone_JSON;
 'use strict'
 
 const radioGroup_JSON = (field) => {
-  let tag = field.tag;
-  let answers = buildAnswers(field.buttons);
-  let validation = buildValidation(field.header);
-  let header = field.header;
-  let hint = field["text-hint"];
+    let tag = field.tag;
+    let answers = buildAnswers(field.buttons);
+    let validation = buildValidation(field.header);
+    let header = field.header;
+    let hint = field.hint;
 
-  let json = `"${tag}": {\n`;
-  json += `"header": "${header}",\n`;
+    let json = `"${tag}": {\n`;
+    json += `"header": "${header}",\n`;
 
-  if (hint !== "") {
-    json += `"hint": "${hint}",\n`;
-  };
+    if (hint !== "") {
+        json += `"hint": "${hint}",\n`;
+    };
 
-  json += `"answers": {\n`;
-  json += `${answers}},\n`;
-  json += `"validation": {\n`;
-  json += `${validation}\n`;
-  json += `}\n`
-  json += `},\n`
-  return json;
+    json += `"answers": {\n`;
+    json += `${answers}},\n`;
+    json += `"validation": {\n`;
+    json += `${validation}\n`;
+    json += `}\n`
+    json += `},\n`
+    return json;
 }
 
 const buildAnswers = buttons => {
-  let answers = "";
-  for (let i = 0; i < buttons.length; i++) {
-    if (i === buttons.length - 1) {
-      answers += `"${buttons[i][1]}":"${buttons[i][0]}"\n`;
-    } else {
-      answers += `"${buttons[i][1]}":"${buttons[i][0]}",\n`;
+    let answers = "";
+    for (let i = 0; i < buttons.length; i++) {
+        if (i === buttons.length - 1) {
+            answers += `"${buttons[i][1]}":"${buttons[i][0]}"\n`;
+        } else {
+            answers += `"${buttons[i][1]}":"${buttons[i][0]}",\n`;
+        }
     }
-  }
-  return answers;
+    return answers;
 }
 
 const buildValidation = header => {
-  let validation = `"mandatory": {\n`;
-  validation += `"inline": "You must complete this section",\n`
-  validation += `"summary": "${header} - You must complete this section"\n`;
-  validation += `},\n`;
-  validation += `"inArray": {\n`;
-  validation += `"inline": "Invalid value",\n`;
-  validation += `"summary": "${header} - Invalid value"\n`;
-  validation += `}`;
-  return validation;
+    let validation = `"mandatory": {\n`;
+    validation += `"inline": "You must complete this section",\n`
+    validation += `"summary": "${header} - You must complete this section"\n`;
+    validation += `},\n`;
+    validation += `"inArray": {\n`;
+    validation += `"inline": "Invalid value",\n`;
+    validation += `"summary": "${header} - Invalid value"\n`;
+    validation += `}`;
+    return validation;
 }
 
 module.exports = radioGroup_JSON;
@@ -3098,7 +3141,7 @@ module.exports = radioGroup_JSON;
 
 const textInput_JSON = (field) => {
     let header = field.header;
-    let hint = field["text-hint"];
+    let hint = field.hint;
 
     let json = `"${header}": {\n`;;
     json += `"label": "${header}",\n`;
@@ -3209,10 +3252,14 @@ module.exports = buildBankDetailsObject;
 'use strict'
 
 const buildBeginHiddenObject = (pageName, field) => {
-    let tag = field.tag;
-    let blanked = field["blanked-by"]
-    let beginHiddenObject = `<div class="panel panel-border-narrow js-hidden" id="${tag}" blanked-by="${blanked}">\n\n`;
-    return beginHiddenObject;
+  let tag = field.tag;
+  let blanked = field["blanked-by"]
+  let beginHiddenObject = `<div class="panel panel-border-narrow js-hidden" id="${tag}"`
+  if (blanked.length > 0) {
+    beginHiddenObject += `blanked-by="${blanked}"`
+  }
+  beginHiddenObject += `>\n\n`;
+  return beginHiddenObject;
 }
 
 module.exports = buildBeginHiddenObject;
@@ -3259,6 +3306,32 @@ module.exports = buildCheckboxArrayObject;
 },{"./page_utilities":63}],54:[function(require,module,exports){
 'use strict'
 
+const parseCode = (pageName, field) => {
+    let tag = field.tag;
+    let code = field.code;
+    let start;
+    let end;
+    let cnt = 0;
+
+    do {
+        cnt++
+        start = code.indexOf(`<=`);
+        end = code.indexOf(`=>`);
+        if (start > -1 && end > -1) {
+            let subCode = code.substring(start + 2, end).trim();
+            let varName = subCode.substring(0, subCode.indexOf(`=`)).trim();
+            let newText = `{{ t("${pageName}:${tag}.${varName}) }}`
+            let oldText = code.substring(start, end + 2);
+            code = code.replace(oldText, newText)
+        }
+    } while (start > -1 && end > -1 && cnt < 500);
+    return `${code},\n\n`;
+}
+
+module.exports = parseCode;
+},{}],55:[function(require,module,exports){
+'use strict'
+
 const { buildOptions, buildHeader } = require("./page_utilities");
 
 const buildDateObject = (pageName, field) => {
@@ -3278,7 +3351,7 @@ const buildDateObject = (pageName, field) => {
 
 
 module.exports = buildDateObject;
-},{"./page_utilities":63}],55:[function(require,module,exports){
+},{"./page_utilities":63}],56:[function(require,module,exports){
 'use strict'
 
 const buildElseifObject = (pageName, field) => {
@@ -3288,7 +3361,7 @@ const buildElseifObject = (pageName, field) => {
 }
 
 module.exports = buildElseifObject;
-},{}],56:[function(require,module,exports){
+},{}],57:[function(require,module,exports){
 'use strict'
 
 const { buildOptions, buildHeader } = require("./page_utilities");
@@ -3314,7 +3387,7 @@ const buildEmailObject = (pageName, field) => {
 }
 
 module.exports = buildEmailObject;
-},{"./page_utilities":63}],57:[function(require,module,exports){
+},{"./page_utilities":63}],58:[function(require,module,exports){
 'use strict'
 
 const buildErrorSummaryObject = (pageName, field) => {
@@ -3337,32 +3410,6 @@ const buildErrorSummaryObject = (pageName, field) => {
 }
 
 module.exports = buildErrorSummaryObject
-},{}],58:[function(require,module,exports){
-'use strict'
-
-const parseFragment = (pageName, field) => {
-    let tag = field.tag;
-    let frag = field.fragment;
-    let start;
-    let end;
-    let cnt = 0;
-
-    do {
-        cnt++
-        start = frag.indexOf(`<=`);
-        end = frag.indexOf(`=>`);
-        if (start > -1 && end > -1) {
-            let subFrag = frag.substring(start + 2, end).trim();
-            let varName = subFrag.substring(0, subFrag.indexOf(`=`)).trim();
-            let newText = `{{ t("${pageName}:${tag}.${varName}) }}`
-            let oldText = frag.substring(start, end + 2);
-            frag = frag.replace(oldText, newText)
-        }
-    } while (start > -1 && end > -1 && cnt < 500);
-    return `${frag},\n\n`;
-}
-
-module.exports = parseFragment;
 },{}],59:[function(require,module,exports){
 'use strict'
 
@@ -3463,7 +3510,7 @@ module.exports = buildNinoObject;
 'use  strict'
 
 const buildHeader = (pageName, tag, field) => {
-    let header = `t("${pageName}:${tag}.label")`;
+    let header = `t("${pageName}:${tag}.header")`;
 
     field.replacements.forEach(replacement => {
         if (replacement[0] === `header`) {
@@ -3478,10 +3525,10 @@ const buildHeader = (pageName, tag, field) => {
 const buildOptions = (pageName, tag, field, maxlength = 0, inline = false, trim = false) => {
     let options = "";
 
-    if (field["text-hint"] || maxlength || field.target || trim) {
+    if (field.hint || maxlength || field.target || trim) {
         options = `options = {\n`;
 
-        if (field["text-hint"]) {
+        if (field.hint) {
             options += `hint: t("${pageName}:${tag}.hint")`;
 
             field.replacements.forEach(replacement => {
@@ -3520,10 +3567,9 @@ module.exports = { buildOptions, buildHeader };
 
 const buildParagraphObject = (pageName, field) => {
     let tag = field.tag;
-    let paragraph = field.paragraph;
-    let paraSplit = paragraph.split("\n");
+    let parsed = parseVariables(pageName, field.paragraph, tag)
+    let paraSplit = parsed.split("\n");
     let paragraphObject = `<p>\n`;
-
     let lineCnt = 1;
 
     paraSplit.forEach(line => {
@@ -3538,10 +3584,31 @@ const buildParagraphObject = (pageName, field) => {
             lineCnt++;
         }
     })
-
     paragraphObject += `</p>,\n\n`
 
     return paragraphObject;
+}
+
+const parseVariables = (pageName, paragraph, tag) => {
+    let start;
+    let end;
+    let cnt = 0;
+
+    do {
+        cnt++
+        start = paragraph.indexOf(`<=`);
+        end = paragraph.indexOf(`=>`);
+
+        if (start > -1 && end > -1) {
+            let subFrag = paragraph.substring(start + 2, end).trim();
+            let varName = subFrag.substring(0, subFrag.indexOf(`=`)).trim();
+            let newText = `{{ t("${pageName}:${tag}.${varName}) }}`
+            let oldText = paragraph.substring(start, end + 2);
+            paragraph = paragraph.replace(oldText, newText)
+        }
+    } while (start > -1 && end > -1 && cnt < 500);
+
+    return paragraph;
 }
 
 module.exports = buildParagraphObject;
@@ -3650,7 +3717,7 @@ module.exports = buildTextInputObject;
 const address_JSON = require("./json_builders/address_JSON");
 const date_JSON = require("./json_builders/date_JSON");
 const email_JSON = require("./json_builders/email_JSON");
-const fragment_JSON = require("./json_builders/fragment_JSON");
+const code_JSON = require("./json_builders/code_JSON");
 const header_JSON = require("./json_builders/header_JSON");
 const name_JSON = require("./json_builders/name_JSON");
 const nino_JSON = require("./json_builders/nino_JSON");
@@ -3680,7 +3747,7 @@ const showJSON = (casa, divide) => {
 const buildJSON = (casa, divide) => {
     let header = casa['page-header'];
     let json = `{\n`;
-    json += `"pageHeader": "${header}",\n`
+    json += `"pageHeader": "${header}",`
     json += buildMessages(casa.fields, divide);
     json = indentJSON(json.split('\n')).trim();
 
@@ -3700,7 +3767,7 @@ const buildMessages = (fields, divide) => {
     let json = [];
     fields.forEach(field => {
         if (divide) {
-            json += `\n============ ${[field["field-name"]]} ============`;
+            json += `\n============ ${[field["field-name"]]} ============\n`;
         }
         switch (field['field-name']) {
             case 'address':
@@ -3736,8 +3803,8 @@ const buildMessages = (fields, divide) => {
             case 'header':
                 json += header_JSON(field);
                 break;
-            case 'fragment':
-                json += fragment_JSON(field);
+            case 'code':
+                json += code_JSON(field);
                 break;
             case 'radio-group':
                 json += radioGroup_JSON(field);
@@ -3782,7 +3849,7 @@ const indentJSON = data => {
 }
 
 module.exports = { showJSON, buildJSON };
-},{"./json_builders/address_JSON":36,"./json_builders/bankDetails_JSON":37,"./json_builders/checkboxArray_JSON":38,"./json_builders/date_JSON":39,"./json_builders/email_JSON":40,"./json_builders/errorSummary_JSON":41,"./json_builders/fragment_JSON":42,"./json_builders/header_JSON":43,"./json_builders/name_JSON":44,"./json_builders/nino_JSON":45,"./json_builders/paragraph_JSON":46,"./json_builders/phone_JSON":47,"./json_builders/radioGroup_JSON":48,"./json_builders/textInput_JSON":49}],70:[function(require,module,exports){
+},{"./json_builders/address_JSON":36,"./json_builders/bankDetails_JSON":37,"./json_builders/checkboxArray_JSON":38,"./json_builders/code_JSON":39,"./json_builders/date_JSON":40,"./json_builders/email_JSON":41,"./json_builders/errorSummary_JSON":42,"./json_builders/header_JSON":43,"./json_builders/name_JSON":44,"./json_builders/nino_JSON":45,"./json_builders/paragraph_JSON":46,"./json_builders/phone_JSON":47,"./json_builders/radioGroup_JSON":48,"./json_builders/textInput_JSON":49}],70:[function(require,module,exports){
 'use strict'
 
 const showJavaScript = (casa) => {
@@ -3873,27 +3940,28 @@ const buildBankDetailsObject = require("./page_builders/bank_details_page.js");
 const buildHeaderObject = require("./page_builders/header_page.js");
 const buildRadioGroupObject = require("./page_builders/radio_group_page.js");
 const buildBeginHiddenObject = require("./page_builders/begin_hidden_page.js");
-const parseFragment = require("./page_builders/fragment_page.js");
+const parseCode = require("./page_builders/code_page.js");
 
 const showPage = (casa, topPart, divide) => {
-    $(`.field-build`).hide();
-    $(`#field-input-area`).hide();
-    $(`#show-all`).hide();
-    $(`.page-build`).show();
-    $(`.page-details`).hide();
-    $(`.page-neutral`).show();
-    $(`#page-output`).remove();
-    $(`#summary`).hide();
-    let page = buildPage(casa, topPart, divide);
-    $(`.page-build`).empty();
-    $(`.page-build`).append(`<textarea id="page-output" cols="130" rows="38">${page}</textarea>`);
-    window.scrollTo(0, 0);
+  $(`.field-build`).hide();
+  $(`#field-input-area`).hide();
+  $(`#show-all`).hide();
+  $(`.page-build`).show();
+  $(`.page-details`).hide();
+  $(`.page-neutral`).show();
+  $(`#page-output`).remove();
+  $(`#summary`).hide();
+  let page = buildPage(casa, topPart, divide);
+  $(`.page-build`).empty();
+  $(`.page-build`).append(`<textarea id="page-output" cols="130" rows="38">${page}</textarea>`);
+  window.scrollTo(0, 0);
 };
 
 const buildPage = (casa, topPart, divide) => {
-        let pageName = `${casa.folder}-${casa[`page-name`]}`;
+  let pageName = `${casa.folder}-${casa[`page-name`]}`;
   let page = ``;
   let firstField = casa.fields[0];
+  let lastField = casa.fields[casa.fields.length - 1];
 
   if (firstField) {
     if (firstField["field-name"] === `top-part`) {
@@ -3911,6 +3979,10 @@ const buildPage = (casa, topPart, divide) => {
 
     if (casa.fields) {
       page += buildFields(casa.fields, pageName, divide)
+    }
+
+    if (lastField){
+      page += `\n\n${lastField.footer}`;
     }
 
     page = indentPage(page.split('\n')).trim();
@@ -4006,8 +4078,8 @@ const buildFields = (fields, pageName, divide) => {
       case `checkbox-array`:
         fieldData += buildCheckboxArrayObject(pageName, field);
         break;
-      case `fragment`:
-        fieldData += parseFragment(pageName, field);
+      case `code`:
+        fieldData += parseCode(pageName, field);
         break;
     }
   });
@@ -4090,7 +4162,7 @@ const indentPage = data => {
 }
 
 module.exports = { showPage, buildPage };
-},{"./page_builders/address_page.js":50,"./page_builders/bank_details_page.js":51,"./page_builders/begin_hidden_page.js":52,"./page_builders/checkbox_array_page.js":53,"./page_builders/date_page.js":54,"./page_builders/elseif_page.js":55,"./page_builders/email_page.js":56,"./page_builders/error_summary_page.js":57,"./page_builders/fragment_page.js":58,"./page_builders/header_page.js":59,"./page_builders/if_page.js":60,"./page_builders/name_page.js":61,"./page_builders/nino_page.js":62,"./page_builders/paragraph_page.js":64,"./page_builders/phone_page.js":65,"./page_builders/radio_group_page.js":66,"./page_builders/text_area_page.js":67,"./page_builders/text_input_page.js":68}],72:[function(require,module,exports){
+},{"./page_builders/address_page.js":50,"./page_builders/bank_details_page.js":51,"./page_builders/begin_hidden_page.js":52,"./page_builders/checkbox_array_page.js":53,"./page_builders/code_page.js":54,"./page_builders/date_page.js":55,"./page_builders/elseif_page.js":56,"./page_builders/email_page.js":57,"./page_builders/error_summary_page.js":58,"./page_builders/header_page.js":59,"./page_builders/if_page.js":60,"./page_builders/name_page.js":61,"./page_builders/nino_page.js":62,"./page_builders/paragraph_page.js":64,"./page_builders/phone_page.js":65,"./page_builders/radio_group_page.js":66,"./page_builders/text_area_page.js":67,"./page_builders/text_input_page.js":68}],72:[function(require,module,exports){
 'use strict'
 
 const address_validators = require("./validation_builders/address_validators");

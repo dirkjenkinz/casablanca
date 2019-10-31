@@ -1,21 +1,21 @@
 'use strict'
 
-const fieldsList = () => {
-    let text = `<div class="row">`;
+const codeField = () => {
+    let text = `<div class="row">`
 
     text += `<div class="col-md-1"></div>`;
-    text += `<div class="col-md-3">`; // left side
-    text += `<img alt="screenshot 12" src="../images/screenshot12.png" width="300px">`;
+    text += `<div class="col-md-6">`; // left side
+    text += `<img alt="code" src="../images/code.png" width="500px">`;
     text += `</div>`; //  left side end
 
     text += `<div class="col">`; // right side
     text += `<div class="col">`;
-    text += buildLine(`The Fields List...`);
+    text += buildLine(`Code Field.`);
     text += `<br>`;
+    text += `</div>`;
     text += `</div>`; // right side end
 
     text += `</div>`;
-
     return text;
 }
 
@@ -28,4 +28,4 @@ const buildLine = input => {
     return text;
 }
 
-module.exports = fieldsList;
+module.exports = codeField;
