@@ -4,7 +4,7 @@ const { buildField } = require(`./build_field`);
 const { addElement, showSelectedElement } = require(`./elements.js`);
 
 let elements = [
-  [`top-part`, `Top Part`, `textarea-small`, `shrink`],
+  [`top-part`, `Top Part`, `textarea-small`, `shrink`, `bookend`],
   [`else`, `else`, `flow`],
   [`if`, `if`, 'flow'],
   [`elseif`, `elseif`, 'flow'],
@@ -26,7 +26,7 @@ let elements = [
   [`text-input`, `Text Input`, "tag", "header", "hint", "replacements", "length"],
   [`header`, `Header`, `tag`, `header-size`],
   [`bank-details`, `Bank Details`, `tag`],
-  [`footer`, `Footer`, `textarea-large`, `shrink`]
+  [`footer`, `Footer`, `textarea-large`, `shrink`, `bookend`]
 ]
 
 const buildElement = (id) => {
@@ -39,17 +39,11 @@ const buildElement = (id) => {
   })
 
   if (element_details[0] === `top-part`) {
-    let children = $("#elements").children();
-    if (children.length > 0 && children[0].id.includes(`-top-part-`)) {
-      element_details = "";
-    }
+      $(`#top-part`).attr("disabled", true);
   }
 
   if (element_details[0] === `footer`) {
-    let children = $("#elements").children();
-    if (children.length > 0 && children[children.length - 1].id.includes(`-footer-`)) {
-      element_details = "";
-    }
+      $(`#footer`).attr("disabled", true);
   }
 
   if (element_details !== "") {

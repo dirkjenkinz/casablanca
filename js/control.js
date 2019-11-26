@@ -1,5 +1,4 @@
 `use strict`
-
 const { deleteFile, loadCasa, buildDisplay } = require("./input_output/file_handler");
 const buildData = require("./output/build_data");
 
@@ -50,6 +49,12 @@ const deleteButton = (id) => {
     $(`#${field}`).remove();
     field = field + "-element";
     $(`#${field}`).remove();
+    if (id.includes(`top-part`)) {
+      $(`#top-part`).attr("disabled", false);
+    }
+     if (id.includes(`footer`)) {
+      $(`#footer`).attr("disabled", false);
+    }
   }
 }
 
@@ -82,7 +87,18 @@ const showAll = () => {
 }
 
 const keyUp = e => {
-  let f = `Entity: ${$("#folder").val()}-${$("#page-name").val()}`;
+  let f = `Screen: ${$("#folder").val()}-${$("#page-name").val()}`;
+  if ($(`#folder`).val() === ``){
+    $(`#folder-name-warning`).show();
+  } else {
+    $(`#folder-name-warning`).hide();
+  }
+   if ($(`#page-name`).val() === ``){
+    $(`#page-name-warning`).show();
+  } else {
+    $(`#page-name-warning`).hide();
+  }
+
   $(`#folder-and-page`).text(f);
   if (
     e.target.id.includes(`code`) ||
@@ -188,6 +204,5 @@ module.exports = {
   buildTopPartDisplay,
   keyUp,
   topPart,
-  showAll,
-  moveUp
+  showAll
 };

@@ -1,7 +1,7 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 `use strict`
 
-const { buildElement, elements } = require("./js/fields/build_element");
+const { buildElement } = require("./js/fields/build_element");
 const { saveFile, listFiles } = require("./js/input_output/file_handler")
 const { buildCodes, getCode } = require("./js/codes");
 const buildData = require("./js/output/build_data");
@@ -12,136 +12,174 @@ const { showJavaScript } = require("./js/output/show_javascript");
 const exportFiles = require(`./js/input_output/export`);
 const { initView, bodyClick, buildTopPartDisplay, keyUp, topPart, showAll } = require("./js/control");
 const showHelp = require(`./js/help/help`);
-
-const buildFieldsContent = () => {
-    let sortedElements = elements.sort();
-    let fieldsContent = `<div class="row btn-row">`
-    fieldsContent += `<div class="col">`
-    fieldsContent += `<button class="button btn-sm btn-danger btn-block field-button" id="if">if</button>`
-    fieldsContent += `</div>`
-    fieldsContent += `<div class="col">`
-    fieldsContent += `<button class="button btn-sm btn-danger btn-block field-button" id="else">else</button>`
-    fieldsContent += `</div>`
-    fieldsContent += `<div class="col">`
-    fieldsContent += `<button class="button btn-sm btn-danger btn-block field-button" id="elseif">elseif</button>`
-    fieldsContent += `</div>`
-    fieldsContent += `<div class="col">`
-    fieldsContent += `<button class="button btn-sm btn-danger btn-block field-button" id="endif">endif</button>`
-    fieldsContent += `</div>`
-    fieldsContent += `</div>`
-    fieldsContent += `<div class="row btn-row">`
-    fieldsContent += `<div class="col">`
-    fieldsContent += `<button class="button btn-sm btn-secondary btn-block field-button" id="begin-hidden">Begin Hidden Field</button>`
-    fieldsContent += `</div>`
-    fieldsContent += `<div class="col">`
-    fieldsContent += `<button class="button btn-sm btn-secondary btn-block field-button" id="end-hidden">End Hidden Field</button>`
-    fieldsContent += `</div>`
-    fieldsContent += `</div>`
-
-    sortedElements = sortedElements.filter(e => {
-        return (!e.includes(`flow`) && !e.includes(`hidden`));
-    })
-
-    for (let i = 0; i < sortedElements.length; i = i + 2) {
-        let id1;
-        let id2;
-        let label1;
-        let label2;
-
-        id1 = sortedElements[i][0];
-        label1 = sortedElements[i][1];
-
-        if (i < sortedElements.length - 1) {
-            id2 = sortedElements[i + 1][0];
-            label2 = sortedElements[i + 1][1];
-        }
-
-        fieldsContent += `<div class="row btn-row">
-        <div class="col">
-        <button class="button btn-sm btn-casa btn-block field-button" id="${id1}">${label1}</button>
-        </div>
-        <div class="col">`;
-
-        if (i < sortedElements.length - 1) {
-            fieldsContent += `<button class="button btn-sm btn-casa btn-block field-button" id="${id2}">${label2}</button>`;
-        };
-
-        fieldsContent += `</div></div>`;
-    }
-
-    $(`#fields-tab-content`).append(fieldsContent)
-}
+const buildFieldsContent = require(`./js/buildFieldsContent`);
 
 $(
-    buildFieldsContent(),
-    $(window).keydown(function(event) {
-        if (event.keyCode == 13) {
-            event.preventDefault();
-            return false;
+  buildFieldsContent(),
+  $(window).keydown(function (event) {
+    if (event.keyCode == 13) {
+      event.preventDefault();
+      return false;
+    }
+  }),
+  getCode(),
+  buildCodes(),
+  initView(),
+  $(`.field-button`).click((e) => {
+    buildElement(e.target.id);
+  }),
+  $("#show-all").click(() => {
+    showAll();
+  }),
+  $(`#show-help`).click(() => {
+    showHelp();
+  }),
+  $(`#show-page`).click(() => {
+    let casa = buildData();
+    let divide = false;
+    if ($("#divide-page").prop("checked")) {
+      divide = true;
+    }
+    showPage(casa, topPart, divide);
+  }),
+  $(`#show-json`).click(() => {
+    let casa = buildData();
+    let divide = false;
+    if ($("#divide-JSON").prop("checked")) {
+      divide = true;
+    }
+    showJSON(casa, divide)
+  }),
+  $(`#show-javascript`).click(() => {
+    let casa = buildData();
+    showJavaScript(casa)
+  }),
+  $(`#show-validators`).click(() => {
+    let casa = buildData();
+    let divide = false;
+    if ($("#divide-validators").prop("checked")) {
+      divide = true;
+    }
+    showValidators(casa, divide)
+  }),
+  $(`#save`).click(() => {
+    saveFile();
+  }),
+  $(`#file-list`).click(() => {
+    listFiles();
+  }),
+  $(`#export`).click(() => {
+    let casa = buildData();
+    exportFiles(casa, topPart);
+  }),
+  $("body").keyup((e) => {
+    keyUp(e);
+  }),
+  $("body").click((e) => {
+    if (e.target.id != 'save') {
+      let hidden = 0;
+      let msg = ``;
+      let children = $("#elements").children();
+      for (let i = 0; i < children.length; i++) {
+        if (children[i].id.includes(`begin-hidden`)) {
+          hidden++;
+        } else if (children[i].id.includes(`end-hidden`)) {
+          hidden--;
+          if (hidden < 0) {
+            msg = `WARNING: Hidden field(s) terminated but not begun`;
+          }
         }
-    }),
-    getCode(),
-    buildCodes(),
-    initView(),
-    $(`.field-button`).click((e) => {
-        buildElement(e.target.id);
-    }),
-    $("#show-all").click(() => {
-        showAll();
-    }),
-    $(`#show-help`).click(() => {
-        showHelp();
-    }),
-    $(`#show-page`).click(() => {
-        let casa = buildData();
-        let divide = false;
-        if ($("#divide-page").prop("checked")) {
-            divide = true;
-        }
-        showPage(casa, topPart, divide);
-    }),
-    $(`#show-json`).click(() => {
-        let casa = buildData();
-        let divide = false;
-        if ($("#divide-JSON").prop("checked")) {
-            divide = true;
-        }
-        showJSON(casa, divide)
-    }),
-    $(`#show-javascript`).click(() => {
-        let casa = buildData();
-        showJavaScript(casa)
-    }),
-    $(`#show-validators`).click(() => {
-        let casa = buildData();
-        let divide = false;
-        if ($("#divide-validators").prop("checked")) {
-            divide = true;
-        }
-        showValidators(casa, divide)
-    }),
-    $(`#save`).click(() => {
-        saveFile();
-    }),
-    $(`#file-list`).click(() => {
-        listFiles();
-    }),
-    $(`#export`).click(() => {
-        let casa = buildData();
-        exportFiles(casa, topPart);
-    }),
-    $("body").keyup((e) => {
-        keyUp(e);
-    }),
-    $("body").click((e) => {
-        if (e.target.id != 'save') {
-            $(`#message-box`).text(``);
-        }
-        bodyClick(e);
-    }),
-    buildTopPartDisplay()
+      }
+      if (msg === `` && hidden > 0) {
+        msg = `WARNING: Hidden field(s) begun but not terminated`;
+      }
+      $(`#message-box`).text(msg);
+    }
+    bodyClick(e);
+  }),
+  buildTopPartDisplay()
 );
-},{"./js/codes":2,"./js/control":3,"./js/fields/build_element":4,"./js/help/help":28,"./js/input_output/export":32,"./js/input_output/file_handler":33,"./js/output/build_data":35,"./js/output/show_JSON":69,"./js/output/show_javascript":70,"./js/output/show_page":71,"./js/output/show_validators":72}],2:[function(require,module,exports){
+},{"./js/buildFieldsContent":2,"./js/codes":3,"./js/control":4,"./js/fields/build_element":5,"./js/help/help":29,"./js/input_output/export":33,"./js/input_output/file_handler":34,"./js/output/build_data":36,"./js/output/show_JSON":70,"./js/output/show_javascript":71,"./js/output/show_page":72,"./js/output/show_validators":73}],2:[function(require,module,exports){
+`use strict`
+const { elements } = require("./fields/build_element");
+
+const buttonRed = "button btn-sm btn-block if field-button";
+const buttonMauve = "button btn-sm btn-casa btn-block field-button";
+const buttonGrey = "button btn-sm  btn-block begin-hidden field-button";
+const buttonWhite = "button btn-sm btn-block top-part field-button";;
+
+const buildFieldsContent = () => {
+  let sortedElements = elements.sort();
+
+  let fieldsContent = `<div class="row btn-row">`
+  fieldsContent += `<div class="col">`
+  fieldsContent += `<button class="${buttonRed}" id="if">if</button>`
+  fieldsContent += `</div>`
+  fieldsContent += `<div class="col">`
+  fieldsContent += `<button class="${buttonRed}" id="else">else</button>`
+  fieldsContent += `</div>`
+  fieldsContent += `<div class="col">`
+  fieldsContent += `<button class="${buttonRed}" id="elseif">elseif</button>`
+  fieldsContent += `</div>`
+  fieldsContent += `<div class="col">`
+  fieldsContent += `<button class="${buttonRed}" id="endif">endif</button>`
+  fieldsContent += `</div>`
+  fieldsContent += `</div>`
+
+  fieldsContent += `<div class="row btn-row">`
+  fieldsContent += `<div class="col">`
+  fieldsContent += `<button class="${buttonWhite}" id="top-part">Top Part</button>`
+  fieldsContent += `</div>`
+  fieldsContent += `<div class="col">`
+  fieldsContent += `<button class="${buttonWhite}" id="footer">Footer</button>`
+  fieldsContent += `</div>`
+  fieldsContent += `</div>`
+
+  fieldsContent += `<div class="row btn-row">`
+  fieldsContent += `<div class="col">`
+  fieldsContent += `<button class="${buttonGrey}" id="begin-hidden">Begin Hidden Field</button>`
+  fieldsContent += `</div>`
+  fieldsContent += `<div class="col">`
+  fieldsContent += `<button class="${buttonGrey}" id="end-hidden">End Hidden Field</button>`
+  fieldsContent += `</div>`
+  fieldsContent += `</div>`
+
+  sortedElements = sortedElements.filter(e => {
+    return (!e.includes(`flow`) && !e.includes(`hidden`) && !e.includes(`bookend`));
+  })
+
+  for (let i = 0; i < sortedElements.length; i = i + 2) {
+    let id1;
+    let id2;
+    let label1;
+    let label2;
+
+    id1 = sortedElements[i][0];
+    label1 = sortedElements[i][1];
+
+    if (i < sortedElements.length - 1) {
+      id2 = sortedElements[i + 1][0];
+      label2 = sortedElements[i + 1][1];
+    }
+
+    fieldsContent += `<div class="row btn-row">`
+    fieldsContent += `<div class="col">`
+    fieldsContent += `<button class="${buttonMauve}" id="${id1}">${label1}</button>`
+    fieldsContent += `</div>`
+    fieldsContent += `<div class="col">`;
+
+    if (i < sortedElements.length - 1) {
+      fieldsContent += `<button class="${buttonMauve}" id="${id2}">${label2}</button>`;
+    };
+
+    fieldsContent += `</div></div>`;
+  }
+
+  $(`#fields-tab-content`).append(fieldsContent)
+};
+
+module.exports = buildFieldsContent;
+},{"./fields/build_element":5}],3:[function(require,module,exports){
 'use strict'
 
   let codes = [];
@@ -164,9 +202,8 @@ const getCode = () => {
 }
 
 module.exports = {buildCodes, getCode}
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 `use strict`
-
 const { deleteFile, loadCasa, buildDisplay } = require("./input_output/file_handler");
 const buildData = require("./output/build_data");
 
@@ -217,6 +254,12 @@ const deleteButton = (id) => {
     $(`#${field}`).remove();
     field = field + "-element";
     $(`#${field}`).remove();
+    if (id.includes(`top-part`)) {
+      $(`#top-part`).attr("disabled", false);
+    }
+     if (id.includes(`footer`)) {
+      $(`#footer`).attr("disabled", false);
+    }
   }
 }
 
@@ -249,7 +292,18 @@ const showAll = () => {
 }
 
 const keyUp = e => {
-  let f = `Entity: ${$("#folder").val()}-${$("#page-name").val()}`;
+  let f = `Screen: ${$("#folder").val()}-${$("#page-name").val()}`;
+  if ($(`#folder`).val() === ``){
+    $(`#folder-name-warning`).show();
+  } else {
+    $(`#folder-name-warning`).hide();
+  }
+   if ($(`#page-name`).val() === ``){
+    $(`#page-name-warning`).show();
+  } else {
+    $(`#page-name-warning`).hide();
+  }
+
   $(`#folder-and-page`).text(f);
   if (
     e.target.id.includes(`code`) ||
@@ -355,17 +409,16 @@ module.exports = {
   buildTopPartDisplay,
   keyUp,
   topPart,
-  showAll,
-  moveUp
+  showAll
 };
-},{"./input_output/file_handler":33,"./output/build_data":35}],4:[function(require,module,exports){
+},{"./input_output/file_handler":34,"./output/build_data":36}],5:[function(require,module,exports){
 `use strict`
 const { getCode } = require(`../codes`);
 const { buildField } = require(`./build_field`);
 const { addElement, showSelectedElement } = require(`./elements.js`);
 
 let elements = [
-  [`top-part`, `Top Part`, `textarea-small`, `shrink`],
+  [`top-part`, `Top Part`, `textarea-small`, `shrink`, `bookend`],
   [`else`, `else`, `flow`],
   [`if`, `if`, 'flow'],
   [`elseif`, `elseif`, 'flow'],
@@ -387,7 +440,7 @@ let elements = [
   [`text-input`, `Text Input`, "tag", "header", "hint", "replacements", "length"],
   [`header`, `Header`, `tag`, `header-size`],
   [`bank-details`, `Bank Details`, `tag`],
-  [`footer`, `Footer`, `textarea-large`, `shrink`]
+  [`footer`, `Footer`, `textarea-large`, `shrink`, `bookend`]
 ]
 
 const buildElement = (id) => {
@@ -400,17 +453,11 @@ const buildElement = (id) => {
   })
 
   if (element_details[0] === `top-part`) {
-    let children = $("#elements").children();
-    if (children.length > 0 && children[0].id.includes(`-top-part-`)) {
-      element_details = "";
-    }
+      $(`#top-part`).attr("disabled", true);
   }
 
   if (element_details[0] === `footer`) {
-    let children = $("#elements").children();
-    if (children.length > 0 && children[children.length - 1].id.includes(`-footer-`)) {
-      element_details = "";
-    }
+      $(`#footer`).attr("disabled", true);
   }
 
   if (element_details !== "") {
@@ -441,7 +488,7 @@ const buildElement = (id) => {
 }
 
 module.exports = { buildElement, elements };
-},{"../codes":2,"./build_field":5,"./elements.js":7}],5:[function(require,module,exports){
+},{"../codes":3,"./build_field":6,"./elements.js":8}],6:[function(require,module,exports){
 "use strict"
 
 const BTN = "button btn-danger btn-sm btn-block";
@@ -767,7 +814,7 @@ $(
 )
 
 module.exports = { buildField, replacementAdd };
-},{}],6:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 let checkbox_array_boxCount = 0;
 
 const checkbox_array_addCheckbox = (id, boxCount = checkbox_array_boxCount) => {
@@ -831,7 +878,7 @@ $(
 )
 
 module.exports = { checkbox_array_addCheckbox }
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 const addElement = (element, prefix) => {
     let elementRow = `<div class="row element-row"  id="${prefix}-element">`
     elementRow += `<div class="col-md-3">`
@@ -865,7 +912,7 @@ const showSelectedElement = () => {
 }
 
 module.exports = { addElement, showSelectedElement };
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict"
 let radio_group_buttonCount = 0;
 
@@ -926,7 +973,7 @@ $(
 )
 
 module.exports = { radio_group_addRadioButton }
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 'use strict'
 
 const fieldInputArea = () => {
@@ -958,7 +1005,7 @@ const buildLine = input => {
 }
 
 module.exports = fieldInputArea;
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict'
 
 const addressField = () => {
@@ -992,7 +1039,7 @@ const buildLine = input => {
 }
 
 module.exports = addressField;
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict'
 
 const bankDetailsField = () => {
@@ -1026,7 +1073,7 @@ const buildLine = input => {
 }
 
 module.exports = bankDetailsField;
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict'
 
 const checkboxArrayField = () => {
@@ -1060,7 +1107,7 @@ const buildLine = input => {
 }
 
 module.exports = checkboxArrayField;
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict'
 
 const codeField = () => {
@@ -1092,7 +1139,7 @@ const buildLine = input => {
 }
 
 module.exports = codeField;
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict'
 
 const dateField = () => {
@@ -1126,7 +1173,7 @@ const buildLine = input => {
 }
 
 module.exports = dateField;
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 'use strict'
 
 const emailField = () => {
@@ -1160,7 +1207,7 @@ const buildLine = input => {
 }
 
 module.exports = emailField;
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict'
 
 const errorSummaryField = () => {
@@ -1194,7 +1241,7 @@ const buildLine = input => {
 }
 
 module.exports = errorSummaryField;
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict'
 
 const flowControlField = () => {
@@ -1226,7 +1273,7 @@ const buildLine = input => {
 }
 
 module.exports = flowControlField;
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 'use strict'
 
 const hiddenField = () => {
@@ -1260,7 +1307,7 @@ const buildLine = input => {
 }
 
 module.exports = hiddenField;
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 'use strict'
 
 const nameField = () => {
@@ -1294,7 +1341,7 @@ const buildLine = input => {
 }
 
 module.exports = nameField;
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict'
 
 const ninoField = () => {
@@ -1328,7 +1375,7 @@ const buildLine = input => {
 }
 
 module.exports = ninoField;
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 'use strict'
 
 const paragraphField = () => {
@@ -1360,7 +1407,7 @@ const buildLine = input => {
 }
 
 module.exports = paragraphField;
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict'
 
 const phoneField = () => {
@@ -1394,7 +1441,7 @@ const buildLine = input => {
 }
 
 module.exports = phoneField;
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict'
 
 const radioGroupField = () => {
@@ -1430,7 +1477,7 @@ const buildLine = input => {
 }
 
 module.exports = radioGroupField;
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 'use strict'
 
 const textInputField = () => {
@@ -1464,7 +1511,7 @@ const buildLine = input => {
 }
 
 module.exports = textInputField;
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict'
 
 const topPartField = () => {
@@ -1496,7 +1543,7 @@ const buildLine = input => {
 }
 
 module.exports = topPartField;
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict'
 
 const fieldsList = () => {
@@ -1528,7 +1575,7 @@ const buildLine = input => {
 }
 
 module.exports = fieldsList;
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 'use strict'
 
 const fieldsPanel = () => {
@@ -1568,7 +1615,7 @@ const buildLine = input => {
 }
 
 module.exports = fieldsPanel;
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 'use strict'
 
 const overview = require(`./overview`);
@@ -1797,7 +1844,7 @@ $(
 )
 
 module.exports = showHelp;
-},{"./field_input_area":9,"./fields/address_field":10,"./fields/bank_details_field":11,"./fields/checkbox_array_field":12,"./fields/code_field":13,"./fields/date_field":14,"./fields/email_field":15,"./fields/error_summary_field":16,"./fields/flow_control_fields":17,"./fields/hidden_fields":18,"./fields/name_field":19,"./fields/nino_field":20,"./fields/paragraph_field":21,"./fields/phone_field":22,"./fields/radio_group_field":23,"./fields/text_input_field":24,"./fields/top_part_field":25,"./fields_list":26,"./fields_panel":27,"./output_panel":29,"./overview":30,"./page_panel":31}],29:[function(require,module,exports){
+},{"./field_input_area":10,"./fields/address_field":11,"./fields/bank_details_field":12,"./fields/checkbox_array_field":13,"./fields/code_field":14,"./fields/date_field":15,"./fields/email_field":16,"./fields/error_summary_field":17,"./fields/flow_control_fields":18,"./fields/hidden_fields":19,"./fields/name_field":20,"./fields/nino_field":21,"./fields/paragraph_field":22,"./fields/phone_field":23,"./fields/radio_group_field":24,"./fields/text_input_field":25,"./fields/top_part_field":26,"./fields_list":27,"./fields_panel":28,"./output_panel":30,"./overview":31,"./page_panel":32}],30:[function(require,module,exports){
 'use strict'
 
 const outputPanel = () => {
@@ -1829,7 +1876,7 @@ const buildLine = input => {
 }
 
 module.exports = outputPanel;
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 'use strict'
 
 const overview = () => {
@@ -1973,7 +2020,7 @@ const screenInProgress = () => {
 }
 
 module.exports = overview;
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 'use strict'
 
 const pagePanel = () => {
@@ -2008,7 +2055,7 @@ const buildLine = input => {
 }
 
 module.exports = pagePanel;
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 'use strict'
 
 const { saveAs } = require("file-saver");
@@ -2038,199 +2085,202 @@ const exportFiles = (casa, topPart) => {
 };
 
 module.exports = exportFiles;
-},{"../output/show_JSON.js":69,"../output/show_javascript.js":70,"../output/show_page.js":71,"../output/show_validators.js":72,"file-saver":83}],33:[function(require,module,exports){
+},{"../output/show_JSON.js":70,"../output/show_javascript.js":71,"../output/show_page.js":72,"../output/show_validators.js":73,"file-saver":84}],34:[function(require,module,exports){
 "use strict"
 
 const BTN = `button btn-primary btn-sm btn-block`;
 const buildData = require(`../output/build_data`);
 
 const {
-    populateAddress,
-    populateBeginHidden,
-    populateCheckboxArray,
-    populateDate,
-    populateElse,
-    populateElseif,
-    populateEmail,
-    populateEndHidden,
-    populateEndif,
-    populateErrorSummary,
-    populateCode,
-    populateFooter,
-    populateHeader,
-    populateIf,
-    populateName,
-    populateNino,
-    populateParagraph,
-    populatePhone,
-    populateRadioGroup,
-    populateTextInput,
-    populateTextArea,
-    populateBankDetails,
-    populateTopPart
+  populateAddress,
+  populateBeginHidden,
+  populateCheckboxArray,
+  populateDate,
+  populateElse,
+  populateElseif,
+  populateEmail,
+  populateEndHidden,
+  populateEndif,
+  populateErrorSummary,
+  populateCode,
+  populateFooter,
+  populateHeader,
+  populateIf,
+  populateName,
+  populateNino,
+  populateParagraph,
+  populatePhone,
+  populateRadioGroup,
+  populateTextInput,
+  populateTextArea,
+  populateBankDetails,
+  populateTopPart
 } = require("./populate");
 
 const saveFile = () => {
-    let casa = buildData();
-    console.log('SAVE:', casa);
-    let item = `casa-${casa.folder}/${casa["page-name"]}`;
-    localStorage.setItem(item, JSON.stringify(casa));
-    $(`#message-box`).text(`Screen saved: ${casa.folder}/${casa["page-name"]}.`);
+  let casa = buildData();
+  console.log('SAVE:', casa);
+  let item = `casa-${casa.folder}/${casa["page-name"]}`;
+  localStorage.setItem(item, JSON.stringify(casa));
+  $(`#message-box`).text(`Screen saved: ${casa.folder}/${casa["page-name"]}.`);
 }
 
 const listFiles = () => {
-    $("#file-display").show();
-    $("#main-display").hide();
-    $(`#list-of-files`).remove();
-    $(`#summary`).hide();
-    $(`#fields`).hide();
-    let items = `<div id="list-of-files"><br/><button class="button btn-sm btn-danger btn-block field-button" id="return-to-build">Return to Build</button>`
-    items += `<div class="row part-label">Saved Pages</div>`
-    items += `<div class="row part-label">Click on blue button to load.</div>`;
-    items += '<div class="files">'
+  $("#file-display").show();
+  $("#main-display").hide();
+  $(`#list-of-files`).remove();
+  $(`#summary`).hide();
+  $(`#fields`).hide();
+  let items = `<div id="list-of-files"><br/><button class="button btn-sm btn-danger btn-block field-button" id="return-to-build">Return to Build</button>`
+  items += `<div class="row part-label">Saved Pages</div>`
+  items += `<div class="row part-label">Click on blue button to load.</div>`;
+  items += '<div class="files">'
 
-    let fileList = [];
+  let fileList = [];
 
-    for (let i = 0; i < localStorage.length; i++) {
-        let key = window.localStorage.key(i);
-        if (key.substring(0, 5) === "casa-") {
-            fileList.push(key);
-        }
+  for (let i = 0; i < localStorage.length; i++) {
+    let key = window.localStorage.key(i);
+    if (key.substring(0, 5) === "casa-") {
+      fileList.push(key);
     }
+  }
 
-    fileList = fileList.sort();
+  fileList = fileList.sort();
 
-    for (let i = 0; i < fileList.length; i++) {
-        let key = fileList[i];
-        let key_transformed = key.replace("/", "_");
-        key = key.substring(5)
-        items += `
+  for (let i = 0; i < fileList.length; i++) {
+    let key = fileList[i];
+    let key_transformed = key.replace("/", "_");
+    key = key.substring(5)
+    items += `
         <div class="row load-btn-row">
           <div class="col-md-3"><button class="${BTN} del-file-btn" id="del-file-${key_transformed}">Delete</button></div>
           <div class="col"><button class="${BTN} load-btn" id="${key_transformed}">${key}</button></div>
         </div>`
-    }
-    items += `</div></div>`
-    $("#file-display").append(items);
+  }
+  items += `</div></div>`
+  $("#file-display").append(items);
 }
 
 const loadCasa = (id) => {
-    let key = id.replace("_", "/")
-    let casa = JSON.parse(localStorage.getItem(key));
-    console.log('LOAD:', casa)
-    $("#file-display").hide();
-    $("#main-display").show();
-    $("#elements").empty();
-    buildDisplay(casa);
-    let f = `Current Screen: ${$("#folder").val()}-${$("#page-name").val()}`;
-    $(`#folder-and-page`).text(f);
-    $(`#summary`).show();
-    $(`#fields`).show();
+  let key = id.replace("_", "/")
+  let casa = JSON.parse(localStorage.getItem(key));
+  console.log('LOAD:', casa)
+  $("#file-display").hide();
+  $("#main-display").show();
+  $("#elements").empty();
+  $(`#top-part`).attr("disabled", false);
+  $(`#footer`).attr("disabled", false);
+  $(`#message-box`).text(``);
+  buildDisplay(casa);
+  let f = `Current Screen: ${$("#folder").val()}-${$("#page-name").val()}`;
+  $(`#folder-and-page`).text(f);
+  $(`#summary`).show();
+  $(`#fields`).show();
 }
 
 const buildDisplay = (casa) => {
-    let divide = true;
-    $("#folder").val(casa.folder);
-    $("#page-name").val(casa["page-name"]);
-    $("#page-header").val(casa["page-header"]);
-    $("#prevalidate").prop("checked", casa.prevalidate);
-    $("#pregather").prop("checked", casa.pregather);
-    $("#postvalidate").prop("checked", casa.postvalidate);
-    $("#postrender").prop("checked", casa.postrender);
-    $("#preredirect").prop("checked", casa.preredirect);
-    $(".field-build").empty();
-    casa.fields.forEach(field => {
-        switch (field["field-name"]) {
-            case "radio-group":
-                populateRadioGroup(field);
-                break;
-            case "checkbox-array":
-                populateCheckboxArray(field);
-                break;
-            case "date":
-                populateDate(field);
-                break;
-            case "email":
-                populateEmail(field);
-                break;
-            case "phone":
-                populatePhone(field);
-                break;
-            case "name":
-                populateName(field);
-                break;
-            case "address":
-                populateAddress(field);
-                break;
-            case "nino":
-                populateNino(field);
-                break;
-            case "code":
-                populateCode(field)
-                break;
-            case "footer":
-                populateFooter(field)
-                break;
-            case "paragraph":
-                populateParagraph(field);
-                break;
-            case "top-part":
-                populateTopPart(field);
-                break;
-            case "error-summary":
-                populateErrorSummary(field);
-                break;
-            case "text-input":
-                populateTextInput(field);
-                break;
-            case "text-area":
-                populateTextArea(field);
-                break;
-            case "bank-details":
-                populateBankDetails(field);
-                break;
-            case "header":
-                populateHeader(field);
-                break;
-            case "end-hidden":
-                populateEndHidden(field);
-                break;
-            case "begin-hidden":
-                populateBeginHidden(field);
-                break;
-            case "if":
-                populateIf(field);
-                break;
-            case "endif":
-                populateEndif(field);
-                break;
-            case "elseif":
-                populateElseif(field);
-                break;
-            case "else":
-                populateElse(field);
-                break;
-        }
-    })
+  let divide = true;
+  $("#folder").val(casa.folder);
+  $("#page-name").val(casa["page-name"]);
+  $("#page-header").val(casa["page-header"]);
+  $("#prevalidate").prop("checked", casa.prevalidate);
+  $("#pregather").prop("checked", casa.pregather);
+  $("#postvalidate").prop("checked", casa.postvalidate);
+  $("#postrender").prop("checked", casa.postrender);
+  $("#preredirect").prop("checked", casa.preredirect);
+  $(".field-build").empty();
+  casa.fields.forEach(field => {
+    switch (field["field-name"]) {
+      case "radio-group":
+        populateRadioGroup(field);
+        break;
+      case "checkbox-array":
+        populateCheckboxArray(field);
+        break;
+      case "date":
+        populateDate(field);
+        break;
+      case "email":
+        populateEmail(field);
+        break;
+      case "phone":
+        populatePhone(field);
+        break;
+      case "name":
+        populateName(field);
+        break;
+      case "address":
+        populateAddress(field);
+        break;
+      case "nino":
+        populateNino(field);
+        break;
+      case "code":
+        populateCode(field)
+        break;
+      case "footer":
+        populateFooter(field)
+        break;
+      case "paragraph":
+        populateParagraph(field);
+        break;
+      case "top-part":
+        populateTopPart(field);
+        break;
+      case "error-summary":
+        populateErrorSummary(field);
+        break;
+      case "text-input":
+        populateTextInput(field);
+        break;
+      case "text-area":
+        populateTextArea(field);
+        break;
+      case "bank-details":
+        populateBankDetails(field);
+        break;
+      case "header":
+        populateHeader(field);
+        break;
+      case "end-hidden":
+        populateEndHidden(field);
+        break;
+      case "begin-hidden":
+        populateBeginHidden(field);
+        break;
+      case "if":
+        populateIf(field);
+        break;
+      case "endif":
+        populateEndif(field);
+        break;
+      case "elseif":
+        populateElseif(field);
+        break;
+      case "else":
+        populateElse(field);
+        break;
+    }
+  })
 }
 
 const deleteFile = (id) => {
-    let r = confirm("Are you sure you want to delete this file?");
-    if (r == true) {
-        id = id.substring(9);
-        localStorage.removeItem(id.replace("_", "/"));
-        listFiles();
-    }
+  let r = confirm("Are you sure you want to delete this file?");
+  if (r == true) {
+    id = id.substring(9);
+    localStorage.removeItem(id.replace("_", "/"));
+    listFiles();
+  }
 }
 
 module.exports = {
-    saveFile,
-    listFiles,
-    deleteFile,
-    loadCasa,
-    buildDisplay
+  saveFile,
+  listFiles,
+  deleteFile,
+  loadCasa,
+  buildDisplay
 }
-},{"../output/build_data":35,"./populate":34}],34:[function(require,module,exports){
+},{"../output/build_data":36,"./populate":35}],35:[function(require,module,exports){
 'use strict'
 
 const { replacementAdd } = require("../fields/build_field");
@@ -2442,7 +2492,7 @@ module.exports = {
   populateBankDetails,
   populateTopPart
 }
-},{"../fields/build_element":4,"../fields/build_field":5,"../fields/checkbox_array":6,"../fields/radio_group":8}],35:[function(require,module,exports){
+},{"../fields/build_element":5,"../fields/build_field":6,"../fields/checkbox_array":7,"../fields/radio_group":9}],36:[function(require,module,exports){
 "use strict"
 
 const buildtag = () => {
@@ -2614,7 +2664,7 @@ const headerBreakdown = (id, field) => {
 }
 
 module.exports = buildtag;
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 'use strict'
 
 const address_JSON = (field) => {
@@ -2657,7 +2707,7 @@ const address_JSON = (field) => {
 }
 
 module.exports = address_JSON;
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 'use strict'
 
 const bankDetails_JSON = (field) => {
@@ -2765,7 +2815,7 @@ const bankDetails_JSON = (field) => {
 }
 
 module.exports = bankDetails_JSON;
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 'use strict'
 
 const checkboxArray_JSON = (field) => {
@@ -2807,7 +2857,7 @@ const checkboxArray_JSON = (field) => {
 }
 
 module.exports = checkboxArray_JSON;
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 'use strict'
 
 const code_JSON = (field) => {
@@ -2836,7 +2886,7 @@ const code_JSON = (field) => {
 }
 
 module.exports = code_JSON;
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 'use strict'
 
 const date_JSON = (field) => {
@@ -2865,7 +2915,7 @@ const date_JSON = (field) => {
 }
 
 module.exports = date_JSON;
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict'
 
 const email_JSON = (field) => {
@@ -2901,7 +2951,7 @@ const email_JSON = (field) => {
 }
 
 module.exports = email_JSON;
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 'use strict'
 
 const errorSummary_JSON = (field) => {
@@ -2926,7 +2976,7 @@ const errorSummary_JSON = (field) => {
 }
 
 module.exports = errorSummary_JSON;
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 'use strict'
 
 const header_JSON = (field) => {
@@ -2937,7 +2987,7 @@ const header_JSON = (field) => {
 }
 
 module.exports = header_JSON;
-},{}],44:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 'use strict'
 
 const name_JSON = field => {
@@ -3009,7 +3059,7 @@ const name_JSON = field => {
 }
 
 module.exports = name_JSON;
-},{}],45:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 'use strict'
 
 const nino_JSON = (field) => {
@@ -3032,7 +3082,7 @@ const nino_JSON = (field) => {
 }
 
 module.exports = nino_JSON;
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict'
 
 const paragraph_JSON = (field) => {
@@ -3060,7 +3110,7 @@ const paragraph_JSON = (field) => {
 }
 
 module.exports = paragraph_JSON;
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict'
 
 const phone_JSON = field => {
@@ -3085,7 +3135,7 @@ const phone_JSON = field => {
 }
 
 module.exports = phone_JSON;
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 'use strict'
 
 const radioGroup_JSON = (field) => {
@@ -3136,7 +3186,7 @@ const buildValidation = header => {
 }
 
 module.exports = radioGroup_JSON;
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 'use strict'
 
 const textInput_JSON = (field) => {
@@ -3161,7 +3211,7 @@ const textInput_JSON = (field) => {
 }
 
 module.exports = textInput_JSON;
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 'use strict'
 const { buildOptions, buildHeader } = require("./page_utilities");
 
@@ -3178,7 +3228,7 @@ const buildAddressObject = (pageName, field) => {
 }
 
 module.exports = buildAddressObject;
-},{"./page_utilities":63}],51:[function(require,module,exports){
+},{"./page_utilities":64}],52:[function(require,module,exports){
 'use strict'
 const { buildOptions, buildHeader } = require("./page_utilities");
 
@@ -3248,7 +3298,7 @@ const buildBankDetailsObject = (pageName, field) => {
 }
 
 module.exports = buildBankDetailsObject;
-},{"./page_utilities":63}],52:[function(require,module,exports){
+},{"./page_utilities":64}],53:[function(require,module,exports){
 'use strict'
 
 const buildBeginHiddenObject = (pageName, field) => {
@@ -3263,7 +3313,7 @@ const buildBeginHiddenObject = (pageName, field) => {
 }
 
 module.exports = buildBeginHiddenObject;
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 'use strict'
 
 const { buildOptions, buildHeader } = require("./page_utilities");
@@ -3303,7 +3353,7 @@ const buildCheckboxArrayObject = (pageName, field) => {
 }
 
 module.exports = buildCheckboxArrayObject;
-},{"./page_utilities":63}],54:[function(require,module,exports){
+},{"./page_utilities":64}],55:[function(require,module,exports){
 'use strict'
 
 const parseCode = (pageName, field) => {
@@ -3329,7 +3379,7 @@ const parseCode = (pageName, field) => {
 }
 
 module.exports = parseCode;
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 'use strict'
 
 const { buildOptions, buildHeader } = require("./page_utilities");
@@ -3351,7 +3401,7 @@ const buildDateObject = (pageName, field) => {
 
 
 module.exports = buildDateObject;
-},{"./page_utilities":63}],56:[function(require,module,exports){
+},{"./page_utilities":64}],57:[function(require,module,exports){
 'use strict'
 
 const buildElseifObject = (pageName, field) => {
@@ -3361,7 +3411,7 @@ const buildElseifObject = (pageName, field) => {
 }
 
 module.exports = buildElseifObject;
-},{}],57:[function(require,module,exports){
+},{}],58:[function(require,module,exports){
 'use strict'
 
 const { buildOptions, buildHeader } = require("./page_utilities");
@@ -3387,7 +3437,7 @@ const buildEmailObject = (pageName, field) => {
 }
 
 module.exports = buildEmailObject;
-},{"./page_utilities":63}],58:[function(require,module,exports){
+},{"./page_utilities":64}],59:[function(require,module,exports){
 'use strict'
 
 const buildErrorSummaryObject = (pageName, field) => {
@@ -3410,7 +3460,7 @@ const buildErrorSummaryObject = (pageName, field) => {
 }
 
 module.exports = buildErrorSummaryObject
-},{}],59:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 'use strict'
 
 const buildHeaderObject = (pageName, field) => {
@@ -3422,7 +3472,7 @@ const buildHeaderObject = (pageName, field) => {
 }
 
 module.exports = buildHeaderObject;
-},{}],60:[function(require,module,exports){
+},{}],61:[function(require,module,exports){
 'use strict'
 
 const buildIfObject = (pageName, field) => {
@@ -3432,7 +3482,7 @@ const buildIfObject = (pageName, field) => {
 }
 
 module.exports = buildIfObject;
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict'
 
 const { buildOptions } = require("./page_utilities");
@@ -3477,7 +3527,7 @@ const buildNameObject = (pageName, field) => {
 }
 
 module.exports = buildNameObject;
-},{"./page_utilities":63}],62:[function(require,module,exports){
+},{"./page_utilities":64}],63:[function(require,module,exports){
 'use strict'
 const { buildHeader } = require("./page_utilities");
 
@@ -3506,7 +3556,7 @@ const buildOptions = (pageName, tag) => {
 }
 
 module.exports = buildNinoObject;
-},{"./page_utilities":63}],63:[function(require,module,exports){
+},{"./page_utilities":64}],64:[function(require,module,exports){
 'use  strict'
 
 const buildHeader = (pageName, tag, field) => {
@@ -3562,7 +3612,7 @@ const buildOptions = (pageName, tag, field, maxlength = 0, inline = false, trim 
 };
 
 module.exports = { buildOptions, buildHeader };
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict'
 
 const buildParagraphObject = (pageName, field) => {
@@ -3612,7 +3662,7 @@ const parseVariables = (pageName, paragraph, tag) => {
 }
 
 module.exports = buildParagraphObject;
-},{}],65:[function(require,module,exports){
+},{}],66:[function(require,module,exports){
 'use strict'
 const { buildOptions, buildHeader } = require("./page_utilities");
 
@@ -3628,7 +3678,7 @@ const buildPhoneObject = (pageName, field) => {
 }
 
 module.exports = buildPhoneObject;
-},{"./page_utilities":63}],66:[function(require,module,exports){
+},{"./page_utilities":64}],67:[function(require,module,exports){
 'use strict'
 
 const { buildOptions, buildHeader } = require("./page_utilities");
@@ -3669,7 +3719,7 @@ const buildRadioGroupObject = (pageName, field) => {
 }
 
 module.exports = buildRadioGroupObject;
-},{"./page_utilities":63}],67:[function(require,module,exports){
+},{"./page_utilities":64}],68:[function(require,module,exports){
 'use strict'
 
 const { buildOptions, buildHeader } = require("./page_utilities");
@@ -3693,7 +3743,7 @@ const buildTextAreaObject = (pageName, field) => {
 }
 
 module.exports = buildTextAreaObject;
-},{"./page_utilities":63}],68:[function(require,module,exports){
+},{"./page_utilities":64}],69:[function(require,module,exports){
 'use strict'
 
 const { buildOptions, buildHeader } = require("./page_utilities");
@@ -3711,7 +3761,7 @@ const buildTextInputObject = (pageName, field) => {
 }
 
 module.exports = buildTextInputObject;
-},{"./page_utilities":63}],69:[function(require,module,exports){
+},{"./page_utilities":64}],70:[function(require,module,exports){
 'use strict'
 
 const address_JSON = require("./json_builders/address_JSON");
@@ -3849,7 +3899,7 @@ const indentJSON = data => {
 }
 
 module.exports = { showJSON, buildJSON };
-},{"./json_builders/address_JSON":36,"./json_builders/bankDetails_JSON":37,"./json_builders/checkboxArray_JSON":38,"./json_builders/code_JSON":39,"./json_builders/date_JSON":40,"./json_builders/email_JSON":41,"./json_builders/errorSummary_JSON":42,"./json_builders/header_JSON":43,"./json_builders/name_JSON":44,"./json_builders/nino_JSON":45,"./json_builders/paragraph_JSON":46,"./json_builders/phone_JSON":47,"./json_builders/radioGroup_JSON":48,"./json_builders/textInput_JSON":49}],70:[function(require,module,exports){
+},{"./json_builders/address_JSON":37,"./json_builders/bankDetails_JSON":38,"./json_builders/checkboxArray_JSON":39,"./json_builders/code_JSON":40,"./json_builders/date_JSON":41,"./json_builders/email_JSON":42,"./json_builders/errorSummary_JSON":43,"./json_builders/header_JSON":44,"./json_builders/name_JSON":45,"./json_builders/nino_JSON":46,"./json_builders/paragraph_JSON":47,"./json_builders/phone_JSON":48,"./json_builders/radioGroup_JSON":49,"./json_builders/textInput_JSON":50}],71:[function(require,module,exports){
 'use strict'
 
 const showJavaScript = (casa) => {
@@ -3920,7 +3970,7 @@ const buildJavaScript = (casa) => {
 }
 
 module.exports = { showJavaScript, buildJavaScript };
-},{}],71:[function(require,module,exports){
+},{}],72:[function(require,module,exports){
 'use strict'
 
 const buildIfObject = require("./page_builders/if_page.js");
@@ -4162,7 +4212,7 @@ const indentPage = data => {
 }
 
 module.exports = { showPage, buildPage };
-},{"./page_builders/address_page.js":50,"./page_builders/bank_details_page.js":51,"./page_builders/begin_hidden_page.js":52,"./page_builders/checkbox_array_page.js":53,"./page_builders/code_page.js":54,"./page_builders/date_page.js":55,"./page_builders/elseif_page.js":56,"./page_builders/email_page.js":57,"./page_builders/error_summary_page.js":58,"./page_builders/header_page.js":59,"./page_builders/if_page.js":60,"./page_builders/name_page.js":61,"./page_builders/nino_page.js":62,"./page_builders/paragraph_page.js":64,"./page_builders/phone_page.js":65,"./page_builders/radio_group_page.js":66,"./page_builders/text_area_page.js":67,"./page_builders/text_input_page.js":68}],72:[function(require,module,exports){
+},{"./page_builders/address_page.js":51,"./page_builders/bank_details_page.js":52,"./page_builders/begin_hidden_page.js":53,"./page_builders/checkbox_array_page.js":54,"./page_builders/code_page.js":55,"./page_builders/date_page.js":56,"./page_builders/elseif_page.js":57,"./page_builders/email_page.js":58,"./page_builders/error_summary_page.js":59,"./page_builders/header_page.js":60,"./page_builders/if_page.js":61,"./page_builders/name_page.js":62,"./page_builders/nino_page.js":63,"./page_builders/paragraph_page.js":65,"./page_builders/phone_page.js":66,"./page_builders/radio_group_page.js":67,"./page_builders/text_area_page.js":68,"./page_builders/text_input_page.js":69}],73:[function(require,module,exports){
 'use strict'
 
 const address_validators = require("./validation_builders/address_validators");
@@ -4274,7 +4324,7 @@ const sf = Validation.SimpleField;\n`
 }
 
 module.exports = { showValidators, buildValidators };
-},{"./validation_builders/address_validators":73,"./validation_builders/bankDetails_validators":74,"./validation_builders/checkboxArray_validators":75,"./validation_builders/date_validators":76,"./validation_builders/email_validators":77,"./validation_builders/name_validators":78,"./validation_builders/nino_validators":79,"./validation_builders/phone_validators":80,"./validation_builders/radioGroup_validators":81,"./validation_builders/textInput_validators":82}],73:[function(require,module,exports){
+},{"./validation_builders/address_validators":74,"./validation_builders/bankDetails_validators":75,"./validation_builders/checkboxArray_validators":76,"./validation_builders/date_validators":77,"./validation_builders/email_validators":78,"./validation_builders/name_validators":79,"./validation_builders/nino_validators":80,"./validation_builders/phone_validators":81,"./validation_builders/radioGroup_validators":82,"./validation_builders/textInput_validators":83}],74:[function(require,module,exports){
 'use strict'
 
 const address_validators = (pageName, tag) => {
@@ -4317,7 +4367,7 @@ const address_validators = (pageName, tag) => {
 }
 
 module.exports = address_validators;
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 'use strict'
 
 const bankDetails_validators = (pageName, tag) => {
@@ -4451,7 +4501,7 @@ const bankDetails_validators = (pageName, tag) => {
 }
 
 module.exports = bankDetails_validators;
-},{}],75:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 'use strict'
 
 const checkboxArray_validators = (pageName, field) => {
@@ -4483,7 +4533,7 @@ const checkboxArray_validators = (pageName, field) => {
 }
 
 module.exports = checkboxArray_validators;
-},{}],76:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 'use strict'
 
 const date_validators = (pageName, tag) => {
@@ -4518,7 +4568,7 @@ const date_validators = (pageName, tag) => {
 }
 
 module.exports = date_validators;
-},{}],77:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 'use strict'
 
 const email_validators = (pageName, tag) => {
@@ -4569,7 +4619,7 @@ const email_validators = (pageName, tag) => {
 }
 
 module.exports = email_validators;
-},{}],78:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 'use strict'
 
 const name_validators = (pageName, tag) => {
@@ -4696,7 +4746,7 @@ const name_validators = (pageName, tag) => {
 }
 
 module.exports = name_validators;
-},{}],79:[function(require,module,exports){
+},{}],80:[function(require,module,exports){
 'use strict'
 
 const nino_validators = (pageName, tag) => {
@@ -4736,7 +4786,7 @@ const nino_validators = (pageName, tag) => {
 }
 
 module.exports = nino_validators;
-},{}],80:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 'use strict'
 
 const phone_validators = (pageName, tag) => {
@@ -4763,7 +4813,7 @@ const phone_validators = (pageName, tag) => {
 }
 
 module.exports = phone_validators;
-},{}],81:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 'use strict'
 
 const radioGroup_validators = (pageName, field) => {
@@ -4804,7 +4854,7 @@ const radioGroup_validators = (pageName, field) => {
 }
 
 module.exports = radioGroup_validators;
-},{}],82:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 'use strict'
 
 const textInput_validators = (pageName, field) => {
@@ -4839,7 +4889,7 @@ const textInput_validators = (pageName, field) => {
 }
 
 module.exports = textInput_validators;
-},{}],83:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 (function (global){
 (function(a,b){if("function"==typeof define&&define.amd)define([],b);else if("undefined"!=typeof exports)b();else{b(),a.FileSaver={exports:{}}.exports}})(this,function(){"use strict";function b(a,b){return"undefined"==typeof b?b={autoBom:!1}:"object"!=typeof b&&(console.warn("Deprecated: Expected third argument to be a object"),b={autoBom:!b}),b.autoBom&&/^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(a.type)?new Blob(["\uFEFF",a],{type:a.type}):a}function c(b,c,d){var e=new XMLHttpRequest;e.open("GET",b),e.responseType="blob",e.onload=function(){a(e.response,c,d)},e.onerror=function(){console.error("could not download file")},e.send()}function d(a){var b=new XMLHttpRequest;b.open("HEAD",a,!1);try{b.send()}catch(a){}return 200<=b.status&&299>=b.status}function e(a){try{a.dispatchEvent(new MouseEvent("click"))}catch(c){var b=document.createEvent("MouseEvents");b.initMouseEvent("click",!0,!0,window,0,0,0,80,20,!1,!1,!1,!1,0,null),a.dispatchEvent(b)}}var f="object"==typeof window&&window.window===window?window:"object"==typeof self&&self.self===self?self:"object"==typeof global&&global.global===global?global:void 0,a=f.saveAs||("object"!=typeof window||window!==f?function(){}:"download"in HTMLAnchorElement.prototype?function(b,g,h){var i=f.URL||f.webkitURL,j=document.createElement("a");g=g||b.name||"download",j.download=g,j.rel="noopener","string"==typeof b?(j.href=b,j.origin===location.origin?e(j):d(j.href)?c(b,g,h):e(j,j.target="_blank")):(j.href=i.createObjectURL(b),setTimeout(function(){i.revokeObjectURL(j.href)},4E4),setTimeout(function(){e(j)},0))}:"msSaveOrOpenBlob"in navigator?function(f,g,h){if(g=g||f.name||"download","string"!=typeof f)navigator.msSaveOrOpenBlob(b(f,h),g);else if(d(f))c(f,g,h);else{var i=document.createElement("a");i.href=f,i.target="_blank",setTimeout(function(){e(i)})}}:function(a,b,d,e){if(e=e||open("","_blank"),e&&(e.document.title=e.document.body.innerText="downloading..."),"string"==typeof a)return c(a,b,d);var g="application/octet-stream"===a.type,h=/constructor/i.test(f.HTMLElement)||f.safari,i=/CriOS\/[\d]+/.test(navigator.userAgent);if((i||g&&h)&&"object"==typeof FileReader){var j=new FileReader;j.onloadend=function(){var a=j.result;a=i?a:a.replace(/^data:[^;]*;/,"data:attachment/file;"),e?e.location.href=a:location=a,e=null},j.readAsDataURL(a)}else{var k=f.URL||f.webkitURL,l=k.createObjectURL(a);e?e.location=l:location.href=l,e=null,setTimeout(function(){k.revokeObjectURL(l)},4E4)}});f.saveAs=a.saveAs=a,"undefined"!=typeof module&&(module.exports=a)});
 

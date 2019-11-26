@@ -2,192 +2,200 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Casablanca</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="./css/style.css">
-    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Casablanca</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+    crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <div class="container-fluid">
-        <header class="row top-row">
-            <div class="col-md-2">CASABLANCA &nbsp;&nbsp;&nbsp;v1.0</div>
-            <div class="col">A High-Level Compiler for the CASA Framework</div>
-            <div class="col" id="folder-and-page">Current Screen:</div>
-        </header>
+  <div class="container-fluid">
+    <header class="row top-row">
+      <div class="col-md-2">CASABLANCA &nbsp;&nbsp;&nbsp;v1.0</div>
+      <div class="col">A High-Level Compiler for the CASA Framework</div>
+      <div class="col" id="folder-and-page">Current Screen:</div>
+    </header>
+    <div class="row">
+      <div class="page-neutral col-md-3">
         <div class="row">
-            <div class="page-neutral col-md-3">
-                <div class="row">
-                    <div class=col>
-                        <br><br>
-                        <button class="button btn-sm btn-danger btn-block field-button" id="return-to-build">Return to
+          <div class=col>
+            <br><br>
+            <button class="button btn-sm btn-danger btn-block field-button" id="return-to-build">Return to
               Build</button>
-                    </div>
-                </div>
-                <div id="return-btn-row"></div>
-            </div>
-            <!-- end of page neutral-->
-            <div class="page-details col-md-3">
-                <div id="file-display"></div>
-                <div id="main-display">
-                    <div class="row part-label">Control Panel</div>
-                    <div class="row">
-                        <div class="col">
-                            <button class="button btn-sm btn-danger field-button btn-block" id="show-help">Help</button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col">
-                            <button class="button btn-sm btn-danger field-button btn-block" id="save">Save</button>
-                        </div>
-                        <div class="col">
-                            <button class="button btn-sm btn-danger field-button btn-block" id="file-list">Saved Pages</button>
-                        </div>
-                    </div>
-                    <!--end of row -->
-                    <hr />
-                    <!-- Tab links -->
-                    <div class="tab">
-                        <button class="tablinks" id="defaultOpen" onclick="selectTab(event, 'page-tab-content')">Page</button>
-                        <button class="tablinks" onclick="selectTab(event, 'fields-tab-content')">Fields<br></button>
-                        <button class="tablinks" onclick="selectTab(event, 'output-content')">Output</button>
-                        <button class="tablinks" onclick="selectTab(event, 'top-tab-content')">Top Part</button>
-                    </div>
-
-                    <!-- Tab content -->
-                    <div id="top-tab-content" class="tabcontent page-data">
-                        <div class="row" id="top-parts">
-                        </div>
-                    </div>
-
-                    <!-- Output content-->
-                    <div id="output-content" class="tabcontent page-data">
-                        <div class="row dividers">
-                            <div class="col">Dividers</div>
-                        </div>
-                        <div class="row dividers">
-                            <div class="col">
-                                <input type="checkbox" id="divide-page">&nbsp;Page</input>
-                            </div>
-                            <div class="col">
-                                <input type="checkbox" id="divide-JSON">&nbsp;JSON</input>
-                            </div>
-                            <div class="col">
-                                <input type="checkbox" id="divide-validators">&nbsp;Validators</input>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row dividers">
-                            <div class="col">
-                                <button class="button btn-sm btn-danger btn-block field-button" id="show-page">Page</button>
-                                <button class="button btn-sm btn-danger btn-block field-button" id="show-validators">Validators</button>
-                            </div>
-                            <div class="col">
-                                <button class="button btn-sm btn-danger btn-block field-button" id="show-json">JSON</button>
-                                <button class="button btn-sm btn-danger btn-block field-button" id="show-javascript">JavaScript</button>
-                            </div>
-                        </div>
-                        <!-- end of row-->
-
-                        <div class="row dividers">
-                            <button class="button btn-sm btn-danger btn-block field-button" id="export">EXPORT</button>
-                        </div>
-                    </div>
-
-
-                    <!-- Tab content -->
-                    <div id="page-tab-content" class="tabcontent page-data">
-                        <div class="row page-label">Folder</div>
-                        <div class="row"><input type="text" id="folder" size="30"></div>
-                        <div class="row page-label">Page Name</div>
-                        <div class="row"><input type="text" id="page-name" size="30"></div>
-                        <div class="row page-label">Page Header</div>
-                        <div class="row"><input type="text" id="page-header" size="30"></div>
-                        <div class="row" id="hooks">
-                            <div class="col">
-                            </div>
-                            <div class="col">
-                                <input type="checkbox" id="postrender">&nbsp;Postrender</input>
-                            </div>
-                        </div>
-                        <div class="row" id="hooks">
-                            <div class="col">
-                                <input type="checkbox" id="prevalidate">&nbsp;Prevalidate</input>
-                            </div>
-                            <div class="col">
-                                <input type="checkbox" id="postvalidate">&nbsp;Postvalidate</input>
-                            </div>
-                        </div>
-                        <div class="row" id="hooks">
-                            <div class="col">
-                                <input type="checkbox" id="preredirect">&nbsp;Preredirect</input>
-                            </div>
-                            <div class="col">
-                                <input type="checkbox" id="pregather">&nbsp;Pregather</input>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab content -->
-                    <div id="fields-tab-content" class="tabcontent"></div>
-
-                </div>
-                <!-- end of main display -->
-            </div>
-            <div class="col-md-2" id="summary">
-                <div class="row part-label">Fields List</div>
-                <div id="elements"></div>
-            </div>
-
-            <div class="col" id="fields">
-                <div class="row part-label" id="field-input-area">Field Input Area</div>
-                <div class="row">
-                    <div class="col-md-2"></div>
-                    <div class="col">
-                        <button class="button btn-sm btn-danger btn-block field-button" id="show-all">Show All</button>
-                    </div>
-                    <div class="col-md-2"></div>
-                </div>
-                <div class="field-build">
-                </div>
-                <div class="page-build"></div>
-                <div class="help-build"></div>
-            </div>
+          </div>
         </div>
-        <!--end of row-->
-        <footer class="row bottom-row">
-            <div class="col-md-2">CASABLANCA &nbsp;&nbsp;&nbsp;v1.0</div>
-            <div class="col"></div>
-            <div class="col-md-8" id="message-box"></div>
-        </footer>
+        <div id="return-btn-row"></div>
+      </div>
+      <!-- end of page neutral-->
+      <div class="page-details col-md-3">
+        <div id="file-display"></div>
+        <div id="main-display">
+          <div class="row part-label">Control Panel</div>
+          <div class="row">
+            <div class="col">
+              <button class="button btn-sm btn-danger field-button btn-block" id="show-help">Help</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <button class="button btn-sm btn-danger field-button btn-block" id="save">Save</button>
+            </div>
+            <div class="col">
+              <button class="button btn-sm btn-danger field-button btn-block" id="file-list">Saved Pages</button>
+            </div>
+          </div>
+          <!--end of row -->
+          <hr />
+          <!-- Tab links -->
+          <div class="tab">
+            <button class="tablinks" id="defaultOpen" onclick="selectTab(event, 'page-tab-content')">Page</button>
+            <button class="tablinks" onclick="selectTab(event, 'fields-tab-content')">Fields<br></button>
+            <button class="tablinks" onclick="selectTab(event, 'output-content')">Output</button>
+            <button class="tablinks" onclick="selectTab(event, 'top-tab-content')">Top Part</button>
+          </div>
+
+          <!-- Tab content -->
+          <div id="top-tab-content" class="tabcontent page-data">
+            <div class="row" id="top-parts">
+            </div>
+          </div>
+
+          <!-- Output content-->
+          <div id="output-content" class="tabcontent page-data">
+            <div class="row dividers">
+              <div class="col">Dividers</div>
+            </div>
+            <div class="row dividers">
+              <div class="col">
+                <input type="checkbox" id="divide-page">&nbsp;Page</input>
+              </div>
+              <div class="col">
+                <input type="checkbox" id="divide-JSON">&nbsp;JSON</input>
+              </div>
+              <div class="col">
+                <input type="checkbox" id="divide-validators">&nbsp;Validators</input>
+              </div>
+            </div>
+            <hr />
+            <div class="row dividers">
+              <div class="col">
+                <button class="button btn-sm btn-danger btn-block field-button" id="show-page">Page</button>
+                <button class="button btn-sm btn-danger btn-block field-button" id="show-validators">Validators</button>
+              </div>
+              <div class="col">
+                <button class="button btn-sm btn-danger btn-block field-button" id="show-json">JSON</button>
+                <button class="button btn-sm btn-danger btn-block field-button" id="show-javascript">JavaScript</button>
+              </div>
+            </div>
+            <!-- end of row-->
+
+            <div class="row dividers">
+              <button class="button btn-sm btn-danger btn-block field-button" id="export">EXPORT</button>
+            </div>
+            <br>
+            <div class="row" id="folder-name-warning">
+              Warning: No Folder Name
+            </div>
+            <div class="row" id="page-name-warning">
+              Warning: No File Name
+            </div>
+          </div>
+
+
+          <!-- Tab content -->
+          <div id="page-tab-content" class="tabcontent page-data">
+            <div class="row page-label">Folder Name</div>
+            <div class="row"><input type="text" id="folder" size="30"></div>
+            <div class="row page-label">Page Name</div>
+            <div class="row"><input type="text" id="page-name" size="30"></div>
+            <div class="row page-label">Page Header</div>
+            <div class="row"><input type="text" id="page-header" size="30"></div>
+            <div class="row" id="hooks">
+              <div class="col">
+              </div>
+              <div class="col">
+                <input type="checkbox" id="postrender">&nbsp;Postrender</input>
+              </div>
+            </div>
+            <div class="row" id="hooks">
+              <div class="col">
+                <input type="checkbox" id="prevalidate">&nbsp;Prevalidate</input>
+              </div>
+              <div class="col">
+                <input type="checkbox" id="postvalidate">&nbsp;Postvalidate</input>
+              </div>
+            </div>
+            <div class="row" id="hooks">
+              <div class="col">
+                <input type="checkbox" id="preredirect">&nbsp;Preredirect</input>
+              </div>
+              <div class="col">
+                <input type="checkbox" id="pregather">&nbsp;Pregather</input>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab content -->
+          <div id="fields-tab-content" class="tabcontent"></div>
+
+        </div>
+        <!-- end of main display -->
+      </div>
+      <div class="col-md-2" id="summary">
+        <div class="row part-label">Fields List</div>
+        <div id="elements"></div>
+      </div>
+
+      <div class="col" id="fields">
+        <div class="row part-label" id="field-input-area">Field Input Area</div>
+        <div class="row">
+          <div class="col-md-2"></div>
+          <div class="col">
+            <button class="button btn-sm btn-danger btn-block field-button" id="show-all">Show All</button>
+          </div>
+          <div class="col-md-2"></div>
+        </div>
+        <div class="field-build">
+        </div>
+        <div class="page-build"></div>
+        <div class="help-build"></div>
+      </div>
     </div>
-    <!--end of container-->
+    <!--end of row-->
+    <footer class="row bottom-row">
+      <div class="col-md-2">CASABLANCA &nbsp;&nbsp;&nbsp;v1.0</div>
+      <div class="col"></div>
+      <div class="col-md-8" id="message-box"></div>
+    </footer>
+  </div>
+  <!--end of container-->
 
-    <script src="./bundle.js"></script>
-    <script>
-        const selectTab = (evt, cityName) => {
-            var i, tabcontent, tablinks;
+  <script src="./bundle.js"></script>
+  <script>
+    const selectTab = (evt, cityName) => {
+      var i, tabcontent, tablinks;
 
-            tabcontent = document.getElementsByClassName("tabcontent");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
 
-            tablinks = document.getElementsByClassName("tablinks");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
 
-            document.getElementById(cityName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
+      document.getElementById(cityName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
 
-        document.getElementById("defaultOpen").click();
-    </script>
+    document.getElementById("defaultOpen").click();
+  </script>
 </body>
 
 </html>
